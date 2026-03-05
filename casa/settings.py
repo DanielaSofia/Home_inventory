@@ -4,6 +4,8 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+#'HOST': 'IP_DO_SERVIDOR'
+
 SECRET_KEY = 'django-insecure-change-me'
 DEBUG = True
 ALLOWED_HOSTS = []
@@ -16,7 +18,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'inventario',
+    'casa.inventory',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -28,7 +31,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
 ]
 
-ROOT_URLCONF = 'casa_inventory.urls'
+ROOT_URLCONF = 'casa.urls'
 
 TEMPLATES = [
     {
@@ -51,7 +54,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'casa',
         'USER': 'admin',
-        'PASSWORD': 'wolfie',
+        'PASSWORD': 'super_casa',
         'HOST': 'localhost',
         'PORT': '3306',
     }
@@ -63,3 +66,9 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+    ]
+}

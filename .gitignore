@@ -1,5 +1,10 @@
-py_house/
+py_home/
 
+casa/__pycache__/
+__pycache__/
 
+casa/inventory/__pycache__/
+
+casa/inventory/migrations/
 
 mysql-apt-config_0.8.36-1_all.deb

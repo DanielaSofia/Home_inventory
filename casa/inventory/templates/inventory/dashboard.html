@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Inventário da Casa</title>
+
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body { background-color: #f8f9fa; }
+        .card-img-top { height: 200px; object-fit: cover; }
+    </style>
+</head>
+<body>
+
+<div class="container py-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-bold">🏠 Inventário da Casa</h1>
+        <div class="d-flex justify-content-between mb-4">
+    <div class="alert alert-success w-50 me-2">
+        <strong>Total Adquirido:</strong> €{{ total_adquirido }}
+    </div>
+    <div class="alert alert-warning w-50 ms-2">
+        <strong>Total Desejos:</strong> €{{ total_desejos }}
+    </div>
+</div>
+    </div>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDivisaoModal">➕ Nova Divisão</button>
+    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addItemModal">➕ Adicionar Item</button>
+    <p class="text-muted mt-2">Adicione, edite e gerencie os itens da sua casa.</p>
+    <!-- Filtros por Divisão -->
+<div class="mb-4">
+    <strong>Filtrar por Divisão:</strong>
+    <a href="{% url 'dashboard' %}" class="btn btn-sm btn-outline-secondary {% if not request.GET.divisao %}active{% endif %}">Todas</a>
+    {% for div in divisoes %}
+        <a href="?divisao={{ div.id }}" class="btn btn-sm btn-outline-secondary {% if request.GET.divisao|default:'' == div.id|stringformat:"s" %}active{% endif %}">
+            {{ div.nome }}
+        </a>
+    {% endfor %}
+</div>
+    <!-- Pesquisa + Filtro -->
+    <form method="get" class="row g-3 mb-4">
+
+        <div class="col-md-5">
+            <input type="text" name="q" class="form-control" placeholder="Pesquisar item...">
+        </div>
+
+        <div class="col-md-4">
+            <select name="divisao" class="form-select">
+                <option value="">Todas as divisões</option>
+                {% for d in divisoes %}
+                    <option value="{{ d.id }}">{{ d.nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <button class="btn btn-primary w-100">🔍 Filtrar</button>
+        </div>
+
+    </form>
+
+    <!-- Grid de Itens -->
+<h3>📦 Inventário</h3>
+<div class="row">
+    {% for item in itens %}
+        {% if not item.is_desejo %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    {% if item.imagem %}
+                        <img src="{{ item.imagem.url }}" class="card-img-top">
+                    {% else %}
+                        <img src="https://via.placeholder.com/400x200?text=Sem+Imagem" class="card-img-top">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ item.nome }}</h5>
+                        <p class="card-text">{{ item.descricao|default:"Sem descrição" }}</p>
+                        <p class="text-success">€{{ item.valor_estimado }}</p>
+                        {% if item.divisao %}
+                            <span class="badge bg-secondary">{{ item.divisao.nome }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
+</div>
+
+<h3 class="mt-5">🌟 Lista de Desejos</h3>
+<div class="row">
+    {% for item in itens %}
+        {% if item.is_desejo %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm border-warning">
+                    {% if item.imagem %}
+                        <img src="{{ item.imagem.url }}" class="card-img-top">
+                    {% else %}
+                        <img src="https://via.placeholder.com/400x200?text=Sem+Imagem" class="card-img-top">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ item.nome }}</h5>
+                        <p class="card-text">{{ item.descricao|default:"Sem descrição" }}</p>
+                        <p class="text-success">€{{ item.valor_estimado }}</p>
+                        {% if item.divisao %}
+                            <span class="badge bg-secondary">{{ item.divisao.nome }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="addItemModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="add_item" value="1">
+
+        <div class="modal-header">
+          <h5 class="modal-title">Novo Item</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
+
+          <div class="mb-3">
+            {{ form.divisao.label_tag }}
+            {{ form.divisao }}
+          </div>
+
+          <div class="mb-3">
+            {{ form.nome.label_tag }}
+            {{ form.nome }}
+          </div>
+
+          <div class="mb-3">
+            {{ form.descricao.label_tag }}
+            {{ form.descricao }}
+          </div>
+
+          <div class="mb-3">
+            {{ form.quantidade.label_tag }}
+            {{ form.quantidade }}
+          </div>
+
+          <div class="mb-3">
+            {{ form.valor_estimado.label_tag }}
+            {{ form.valor_estimado }}
+          </div>
+
+          <div class="mb-3">
+            {{ form.imagem.label_tag }}
+            {{ form.imagem }}
+          </div>
+
+          <div class="form-check mb-3">
+            {{ form.is_desejo }}
+            {{ form.is_desejo.label_tag }}
+        </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Guardar</button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="addDivisaoModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="add_divisao" value="1">
+
+        <div class="modal-header">
+          <h5 class="modal-title">Nova Divisão</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="mb-3">
+            {{ divisao_form.nome.label_tag }}
+            {{ divisao_form.nome }}
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Guardar</button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
