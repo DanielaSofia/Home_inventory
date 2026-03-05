@@ -1,10 +1,11 @@
 from rest_framework import viewsets, filters
 from django_filters.rest_framework import DjangoFilterBackend
-from .models import Divisao, Item
+from .models import Divisao, Item, Desejo
 from .serializers import DivisaoSerializer, ItemSerializer
 from django.db.models import Sum
-from django.shortcuts import render,redirect
-from .forms import ItemForm, DivisaoForm
+from django.shortcuts import render, redirect
+from .forms import ItemForm, DivisaoForm, DesejoForm
+
 
 class DivisaoViewSet(viewsets.ModelViewSet):
     queryset = Divisao.objects.all()
@@ -28,53 +29,47 @@ class ItemViewSet(viewsets.ModelViewSet):
 
 
 def dashboard(request):
-    query = request.GET.get("q")
-    divisao_id = request.GET.get("divisao")
 
-    itens = Item.objects.select_related("divisao")
+    item_form = ItemForm()
+    divisao_form = DivisaoForm()
+    desejo_form = DesejoForm()
 
-    itens_reais = Item.objects.filter(is_desejo=False)
-    itens_desejo = Item.objects.filter(is_desejo=True)
-
-    if query:
-        itens_reais = itens_reais.filter(Q(nome__icontains=query) | Q(descricao__icontains=query))
-        itens_desejo = itens_desejo.filter(Q(nome__icontains=query) | Q(descricao__icontains=query))
-
-    if divisao_id:
-        itens_reais = itens_reais.filter(divisao_id=divisao_id)
-        itens_desejo = itens_desejo.filter(divisao_id=divisao_id)
-
-    total_adquirido = itens_reais.aggregate(Sum('valor_estimado'))['valor_estimado__sum'] or 0
-    total_desejos = itens_desejo.aggregate(Sum('valor_estimado'))['valor_estimado__sum'] or 0
-
-    # 👇 FORM
     if request.method == "POST":
 
         if "add_item" in request.POST:
             item_form = ItemForm(request.POST, request.FILES)
-            divisao_form = DivisaoForm()
             if item_form.is_valid():
                 item_form.save()
-                return redirect("dashboard")
+                return redirect("/")
 
         elif "add_divisao" in request.POST:
             divisao_form = DivisaoForm(request.POST)
-            item_form = ItemForm()
             if divisao_form.is_valid():
                 divisao_form.save()
-                return redirect("dashboard")
+                return redirect("/")
 
-    else:
-        item_form = ItemForm()
-        divisao_form = DivisaoForm()
+        elif "add_desejo" in request.POST:
+            desejo_form = DesejoForm(request.POST, request.FILES)
+            if desejo_form.is_valid():
+                desejo_form.save()
+                return redirect("/")
+
+    itens = Item.objects.all()
+    desejos = Desejo.objects.all()
+    divisoes = Divisao.objects.all()
+
+    total_itens = Item.objects.aggregate(total=Sum("valor_estimado"))["total"] or 0
+    total_desejos = Desejo.objects.aggregate(total=Sum("valor_estimado"))["total"] or 0
 
     context = {
-        "itens_reais": itens_reais,
-        "itens_desejo": itens_desejo,
-        "total_adquirido": total_adquirido,
-        "total_desejos": total_desejos,
-        "form": item_form,
+        "itens": itens,
+        "desejos": desejos,
+        "divisoes": divisoes,
+        "item_form": item_form,
         "divisao_form": divisao_form,
-        }
+        "desejo_form": desejo_form,
+        "total_itens": total_itens,
+        "total_desejos": total_desejos,
+    }
 
     return render(request, "inventory/dashboard.html", context)
