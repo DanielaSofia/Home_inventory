@@ -22,10 +22,10 @@ class ItemViewSet(viewsets.ModelViewSet):
     def get_serializer_context(self):
         return {"request": self.request}
 
-    # @action(detail=False, methods=['get'])
     def total_valor(self, request):
-        total = Item.objects.aggregate(Sum("valor_estimado"))
-        return Response({"total_valor_casa": total["valor_estimado__sum"]})
+        if request.method == "GET":
+            total = Item.objects.aggregate(Sum("valor"))
+            return Response({"total_valor_casa": total["valor__sum"]})
 
 
 def dashboard(request):
@@ -58,8 +58,11 @@ def dashboard(request):
     desejos = Desejo.objects.all()
     divisoes = Divisao.objects.all()
 
-    total_itens = Item.objects.aggregate(total=Sum("valor_estimado"))["total"] or 0
-    total_desejos = Desejo.objects.aggregate(total=Sum("valor_estimado"))["total"] or 0
+    total_itens = Item.objects.aggregate(total=Sum("valor"))["total"] or 0
+    total_desejos = Desejo.objects.aggregate(total=Sum("valor"))["total"] or 0
+
+    total_itens_count = Item.objects.count()
+    total_desejos_count = Desejo.objects.count()
 
     context = {
         "itens": itens,
@@ -70,6 +73,8 @@ def dashboard(request):
         "desejo_form": desejo_form,
         "total_itens": total_itens,
         "total_desejos": total_desejos,
+        "total_itens_count": total_itens_count,
+        "total_desejos_count": total_desejos_count,
     }
 
     return render(request, "inventory/dashboard.html", context)

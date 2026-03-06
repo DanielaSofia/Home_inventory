@@ -26,13 +26,38 @@
 
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1 class="fw-bold">🏠 Inventário da Casa</h1>
-            <div class="d-flex justify-content-between mb-4">
-                <div class="alert alert-success w-50 me-2">
-                    <strong>Total Adquirido:</strong> €{{ total_adquirido }}
+            <div class="row mb-4">
+
+                <div class="col-md-4">
+                    <div class="card shadow-sm border-0 bg-success text-white">
+                        <div class="card-body text-center">
+                            <h6>💰 Valor da casa</h6>
+                            <h2>€ {{ total_itens }}</h2>
+                            <p>{{ total_itens_count }} itens</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="alert alert-warning w-50 ms-2">
-                    <strong>Total Desejos:</strong> €{{ total_desejos }}
+
+                <div class="col-md-4">
+                    <div class="card shadow-sm border-0 bg-warning">
+                        <div class="card-body text-center">
+                            <h6>🌟 Wishlist</h6>
+                            <h2>€ {{ total_desejos }}</h2>
+                            <p>{{ total_desejos_count }} desejos</p>
+                        </div>
+                    </div>
                 </div>
+
+                <div class="col-md-4">
+                    <div class="card shadow-sm border-0 bg-primary text-white">
+                        <div class="card-body text-center">
+                            <h6>🏠 Divisões</h6>
+                            <h2>{{ divisoes|length }}</h2>
+                            <p>Divisões registadas</p>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDivisaoModal">➕ Nova Divisão</button>
@@ -88,7 +113,13 @@
                         <h5>{{ item.nome }}</h5>
                         <p>{{ item.descricao }}</p>
                         <p>Quantidade: {{ item.quantidade }}</p>
-                        <p>Valor: €{{ item.valor_estimado }}</p>
+                        <p>Valor: €{{ item.valor }}</p>
+
+                        {% if item.data_aquisicao %}
+                        <p class="text-muted">
+                            📅 {{ item.data_aquisicao }}
+                        </p>
+                        {% endif %}
                         {% if item.divisao %}
                         <span class="badge bg-secondary">
                             {{ item.divisao.nome }}
@@ -121,8 +152,8 @@
                         <h5>{{ d.nome }}</h5>
                         <p>{{ d.descricao }}</p>
 
-                        {% if d.valor_estimado %}
-                        <p>€{{ d.valor_estimado }}</p>
+                        {% if d.valor %}
+                        <p>€{{ d.valor }}</p>
                         {% endif %}
 
                     </div>
