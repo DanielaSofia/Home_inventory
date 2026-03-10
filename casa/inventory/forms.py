@@ -5,8 +5,16 @@ from .models import Item, Divisao, Desejo
 class ItemForm(forms.ModelForm):
     class Meta:
         model = Item
-        fields = ["divisao", "nome", "descricao", "quantidade", "valor", "data_aquisicao", "imagem"]
-        widgets = {"data_aquisicao": forms.DateInput(attrs={"type": "date"})}
+        fields = "__all__"
+        widgets = {
+            "nome": forms.TextInput(attrs={"class": "form-control"}),
+            "descricao": forms.Textarea(attrs={"class": "form-control"}),
+            "quantidade": forms.NumberInput(attrs={"class": "form-control"}),
+            "valor_estimado": forms.NumberInput(attrs={"class": "form-control"}),
+            "divisao": forms.Select(attrs={"class": "form-control"}),
+            "data_aquisicao": forms.DateInput(attrs={"class": "form-control", "type": "date"}),
+            "imagem": forms.ClearableFileInput(attrs={"class": "form-control"}),
+        }
 
 
 class DivisaoForm(forms.ModelForm):
@@ -18,4 +26,11 @@ class DivisaoForm(forms.ModelForm):
 class DesejoForm(forms.ModelForm):
     class Meta:
         model = Desejo
-        fields = ["nome", "descricao", "valor", "divisao", "imagem"]
+        fields = "__all__"
+        widgets = {
+            "nome": forms.TextInput(attrs={"class": "form-control"}),
+            "descricao": forms.Textarea(attrs={"class": "form-control"}),
+            "valor": forms.NumberInput(attrs={"class": "form-control"}),
+            "divisao": forms.Select(attrs={"class": "form-control"}),
+            "imagem": forms.ClearableFileInput(attrs={"class": "form-control"}),
+        }

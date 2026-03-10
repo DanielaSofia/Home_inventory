@@ -3,7 +3,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from .models import Divisao, Item, Desejo
 from .serializers import DivisaoSerializer, ItemSerializer
 from django.db.models import Sum
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .forms import ItemForm, DivisaoForm, DesejoForm
 
 
@@ -54,8 +54,16 @@ def dashboard(request):
                 desejo_form.save()
                 return redirect("/")
 
+    divisao_id = request.GET.get("divisao")
+
     itens = Item.objects.all()
     desejos = Desejo.objects.all()
+
+
+    if divisao_id:
+        itens = itens.filter(divisao_id=divisao_id)
+        desejos = desejos.filter(divisao_id=divisao_id)
+
     divisoes = Divisao.objects.all()
 
     total_itens = Item.objects.aggregate(total=Sum("valor"))["total"] or 0
@@ -78,3 +86,68 @@ def dashboard(request):
     }
 
     return render(request, "inventory/dashboard.html", context)
+
+def editar_item(request, item_id):
+
+    item = get_object_or_404(Item, id=item_id)
+
+    if request.method == "POST":
+        form = ItemForm(request.POST, request.FILES, instance=item)
+
+        if form.is_valid():
+            form.save()
+            return redirect("dashboard")
+
+    else:
+        form = ItemForm(instance=item)
+
+    return render(request, "inventory/editar_item.html", {"form": form})
+
+def editar_desejo(request, desejo_id):
+
+    desejo = get_object_or_404(Desejo, id=desejo_id)
+
+    if request.method == "POST":
+
+        form = DesejoForm(request.POST, instance=desejo)
+
+        if form.is_valid():
+            form.save()
+            return redirect("dashboard")
+
+    return redirect("dashboard")
+
+def apagar_item(request, item_id):
+
+    item = get_object_or_404(Item, id=item_id)
+
+    if request.method == "POST":
+        item.delete()
+
+    return redirect("dashboard")
+
+def editar_desejo(request, desejo_id):
+
+    desejo = get_object_or_404(Desejo, id=desejo_id)
+
+    if request.method == "POST":
+        form = DesejoForm(request.POST, request.FILES, instance=desejo)
+
+        if form.is_valid():
+            form.save()
+            return redirect("dashboard")
+
+    else:
+        form = DesejoForm(instance=desejo)
+
+    return render(request, "inventory/editar_desejo.html", {"form": form})
+
+
+def apagar_desejo(request, desejo_id):
+
+    desejo = get_object_or_404(Desejo, id=desejo_id)
+
+    if request.method == "POST":
+        desejo.delete()
+
+    return redirect("dashboard")
