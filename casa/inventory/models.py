@@ -31,3 +31,18 @@ class Desejo(models.Model):
 
     def __str__(self):
         return self.nome
+
+class Compra(models.Model):
+
+    nome = models.CharField(max_length=200)
+    quantidade = models.IntegerField(default=1)
+    comprado = models.BooleanField(default=False)
+    divisao = models.ForeignKey(
+        "Divisao",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
+    def __str__(self):
+        return self.nome

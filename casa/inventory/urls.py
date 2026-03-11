@@ -8,6 +8,13 @@ from .views import (
     editar_item,
     apagar_item,
     apagar_desejo,
+    menu,
+    itens,
+    desejos,
+    compras,
+    gastos,
+    comprar_item,
+    apagar_compra,
 )
 from django.urls import include
 
@@ -16,8 +23,16 @@ router.register(r"divisoes", DivisaoViewSet)
 router.register(r"itens", ItemViewSet)
 
 urlpatterns = [
-    path("", dashboard, name="dashboard"),
     path("api/", include(router.urls)),
+    path("", menu, name="menu"),
+    path("itens/", itens, name="itens"),
+    path("desejos/", desejos, name="desejos"),
+    path("gastos/", gastos, name="gastos"),
+    path("compras/", compras, name="compras"),
+    path("compras/<int:id>/", comprar_item, name="comprar_item"),
+    path("apagar-compra/<int:id>/", apagar_compra, name="apagar_compra"),
+
+
     path("editar-item/<int:item_id>/", editar_item, name="editar_item"),
     path("apagar-item/<int:item_id>/", apagar_item, name="apagar_item"),
     path("editar-desejo/<int:desejo_id>/", editar_desejo, name="editar_desejo"),

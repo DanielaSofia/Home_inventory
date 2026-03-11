@@ -1,196 +1,194 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Editar Item</title>
+     <title>Editar Item</title>
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-<style>
+     <style>
+          body {
+               background: #f4f6fb;
+               transition: background 0.3s;
+          }
 
-body{
-background:#f4f6fb;
-transition:background 0.3s;
-}
+          .card {
+               border: none;
+               border-radius: 16px;
+               box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+               transition: transform .2s;
+          }
 
-.card{
-border:none;
-border-radius:16px;
-box-shadow:0 10px 30px rgba(0,0,0,0.08);
-transition:transform .2s;
-}
+          .card:hover {
+               transform: scale(1.01);
+          }
 
-.card:hover{
-transform:scale(1.01);
-}
+          .preview-img {
+               width: 100%;
+               max-height: 250px;
+               object-fit: cover;
+               border-radius: 10px;
+               margin-top: 10px;
+          }
 
-.preview-img{
-width:100%;
-max-height:250px;
-object-fit:cover;
-border-radius:10px;
-margin-top:10px;
-}
+          .btn-danger {
+               transition: 0.2s;
+          }
 
-.btn-danger{
-transition:0.2s;
-}
+          .btn-danger:hover {
+               transform: scale(1.05);
+          }
 
-.btn-danger:hover{
-transform:scale(1.05);
-}
+          @media (prefers-color-scheme: dark) {
 
-@media (prefers-color-scheme: dark){
+               body {
+                    background: #121212;
+                    color: white;
+               }
 
-body{
-background:#121212;
-color:white;
-}
+               .card {
+                    background: #1e1e1e;
+                    color: white;
+               }
 
-.card{
-background:#1e1e1e;
-color:white;
-}
-
-}
-
-</style>
+          }
+     </style>
 
 </head>
 
 <body>
 
-<div class="container py-5">
+     <div class="container py-5">
 
-<div class="row justify-content-center">
+          <div class="row justify-content-center">
 
-<div class="col-lg-7">
+               <div class="col-lg-7">
 
-<div class="card p-4">
+                    <div class="card p-4">
 
-<h3 class="mb-4">
-✏️ Editar Item
-</h3>
+                         <h3 class="mb-4">
+                              ✏️ Editar Item
+                         </h3>
 
-<form method="post" enctype="multipart/form-data">
+                         <form method="post" enctype="multipart/form-data">
 
-{% csrf_token %}
+                              {% csrf_token %}
 
-<div class="mb-3">
-<label class="form-label">Nome</label>
-{{ form.nome }}
-</div>
+                              <div class="mb-3">
+                                   <label class="form-label">Nome</label>
+                                   {{ form.nome }}
+                              </div>
 
-<div class="mb-3">
-<label class="form-label">Descrição</label>
-{{ form.descricao }}
-</div>
+                              <div class="mb-3">
+                                   <label class="form-label">Descrição</label>
+                                   {{ form.descricao }}
+                              </div>
 
-<div class="row">
+                              <div class="row">
 
-<div class="col-md-6 mb-3">
-<label class="form-label">Quantidade</label>
-{{ form.quantidade }}
-</div>
+                                   <div class="col-md-6 mb-3">
+                                        <label class="form-label">Quantidade</label>
+                                        {{ form.quantidade }}
+                                   </div>
 
-<div class="col-md-6 mb-3">
-<label class="form-label">Valor (€)</label>
-{{ form.valor_estimado }}
-</div>
+                                   <div class="col-md-6 mb-3">
+                                        <label class="form-label">Valor (€)</label>
+                                        {{ form.valor }}
+                                   </div>
 
-</div>
+                              </div>
 
-<div class="mb-3">
-<label class="form-label">Divisão</label>
-{{ form.divisao }}
-</div>
+                              <div class="mb-3">
+                                   <label class="form-label">Divisão</label>
+                                   {{ form.divisao }}
+                              </div>
 
-<div class="mb-3">
-<label class="form-label">Data de aquisição</label>
-{{ form.data_aquisicao }}
-</div>
+                              <div class="mb-3">
+                                   <label class="form-label">Data de aquisição</label>
+                                   {{ form.data_aquisicao }}
+                              </div>
 
-<div class="mb-3">
+                              <div class="mb-3">
 
-<label class="form-label">Imagem</label>
+                                   <label class="form-label">Imagem</label>
 
-{{ form.imagem }}
+                                   {{ form.imagem }}
 
-{% if form.instance.imagem %}
-<img id="preview"
-     src="{{ form.instance.imagem.url }}"
-     class="preview-img">
-{% else %}
-<img id="preview" class="preview-img" style="display:none">
-{% endif %}
+                                   {% if form.instance.imagem %}
+                                   <img id="preview" src="{{ form.instance.imagem.url }}" class="preview-img">
+                                   {% else %}
+                                   <img id="preview" class="preview-img" style="display:none">
+                                   {% endif %}
 
-</div>
+                              </div>
 
-<div class="d-flex justify-content-between mt-4">
+                              <div class="d-flex justify-content-between mt-4">
 
-<a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
-⬅ Voltar
-</a>
+                                   <a href="{% url 'itens' %}" class="btn btn-outline-secondary">
+                                        ⬅ Voltar
+                                   </a>
 
-<div>
+                                   <div>
 
-<button class="btn btn-primary">
-💾 Guardar
-</button>
+                                        <button class="btn btn-primary">
+                                             💾 Guardar
+                                        </button>
 
-</div>
+                                   </div>
 
-</div>
+                              </div>
 
-</form>
+                         </form>
 
-<hr class="my-4">
+                         <hr class="my-4">
 
-<form method="post" action="{% url 'apagar_item' form.instance.id %}">
+                         <form method="post" action="{% url 'apagar_item' form.instance.id %}">
 
-{% csrf_token %}
+                              {% csrf_token %}
 
-<button class="btn btn-danger w-100">
-🗑 Apagar Item
-</button>
+                              <button class="btn btn-danger w-100">
+                                   🗑 Apagar Item
+                              </button>
 
-</form>
+                         </form>
 
-</div>
+                    </div>
 
-</div>
+               </div>
 
-</div>
+          </div>
 
-</div>
+     </div>
 
-<script>
+     <script>
 
-const input = document.querySelector("input[type=file]");
-const preview = document.getElementById("preview");
+          const input = document.querySelector("input[type=file]");
+          const preview = document.getElementById("preview");
 
-if(input){
+          if (input) {
 
-input.addEventListener("change", function(){
+               input.addEventListener("change", function () {
 
-const file = this.files[0];
+                    const file = this.files[0];
 
-if(file){
+                    if (file) {
 
-preview.style.display="block";
-preview.src = URL.createObjectURL(file);
+                         preview.style.display = "block";
+                         preview.src = URL.createObjectURL(file);
 
-}
+                    }
 
-});
+               });
 
-}
+          }
 
-</script>
+     </script>
 
 </body>
+
 </html>

@@ -1,0 +1,19 @@
+<h2>💰 Gastos da Casa</h2>
+
+<a href="/" class="btn btn-secondary mb-3">Voltar</a>
+
+<h3>Total gasto: € {{ total }}</h3>
+
+<ul>
+
+{% for item in itens %}
+
+<li>
+
+{{ item.nome }} — € {{ item.valor }}
+
+</li>
+
+{% endfor %}
+
+</ul>
