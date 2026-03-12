@@ -24,11 +24,7 @@
     <div class="container py-5">
 
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="fw-bold">🏠 Inventário da Casa</h1>
-
-            <a href="{% url 'menu' %}" class="btn btn-outline-secondary">
-                ⬅ Voltar
-            </a>
+            <h1 class="fw-bold">🏠 Desejos</h1>
 
             <div class="card shadow-sm border-0 bg-warning">
                 <div class="card-body text-center">
@@ -37,10 +33,15 @@
                     <p>{{ total_desejos_count }} desejos</p>
                 </div>
             </div>
-
+            <a href="{% url 'menu' %}" class="btn btn-outline-secondary">
+                ⬅ Voltar
+            </a>
         </div>
+
         <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#desejoModal">
             🌟 Adicionar Desejo</button>
+
+        <hr class="my-4">
 
         <!-- Filtros por Divisão -->
         <div class="mb-4">

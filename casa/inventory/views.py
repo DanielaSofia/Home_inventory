@@ -305,3 +305,15 @@ def gastos(request):
         "total":total,
         "itens":itens
     })
+
+def criar_item(request):
+
+    if request.method == "POST":
+
+        Item.objects.create(
+            nome=request.POST.get("nome"),
+            descricao=request.POST.get("descricao"),
+            quantidade=request.POST.get("quantidade")
+        )
+
+    return redirect("itens")

@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt">
 
@@ -12,6 +13,7 @@
         }
 
         .card-img-top {
+            width: 100%;
             height: 200px;
             object-fit: cover;
         }
@@ -25,9 +27,7 @@
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1 class="fw-bold">🏠 Inventário da Casa</h1>
 
-            <a href="{% url 'menu' %}" class="btn btn-outline-secondary">
-                ⬅ Voltar
-            </a>
+
             <div class="card shadow-sm border-0 bg-success text-white">
                 <div class="card-body text-center">
                     <h6>💰 Valor da casa</h6>
@@ -36,10 +36,17 @@
                 </div>
             </div>
 
-
+            <a href="{% url 'menu' %}" class="btn btn-outline-secondary">
+                ⬅ Voltar
+            </a>
         </div>
         <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addItemModal">➕ Adicionar Item</button>
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#barcodeModal">
+            📷 Adicionar por código de barras
+        </button>
 
+        <div id="scanner" style="width:100%; height:300px;"></div>
+        <hr class="my-4">
         <!-- Filtros por Divisão -->
         <div class="mb-4">
             <strong>Filtrar por Divisão:</strong>
@@ -142,7 +149,55 @@
             </div>
         </div>
 
+        <div class="modal fade" id="barcodeModal" tabindex="-1">
 
+            <div class="modal-dialog modal-lg">
+
+                <div class="modal-content">
+
+                    <div class="modal-header">
+
+                        <h5 class="modal-title">Scan código de barras</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+                    </div>
+
+                    <div class="modal-body">
+
+                        <video id="scanner-video" style="width:100%; height:300px;"></video>
+                        <hr>
+                        <form method="post" action="{% url 'criar_item' %}">
+
+                            {% csrf_token %}
+
+                            <div class="mb-3">
+                                <label>Nome</label>
+                                <input id="id_nome" name="nome" class="form-control">
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Descrição</label>
+                                <textarea id="id_descricao" name="descricao" class="form-control"></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Quantidade</label>
+                                <input name="quantidade" type="number" value="1" class="form-control">
+                            </div>
+
+                            <button class="btn btn-primary">Guardar item</button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+        <script src="https://unpkg.com/@zxing/library@latest"></script>
+        <script src="{% static 'inventory/js/barcode_scanner.js' %}"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 

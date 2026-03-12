@@ -15,6 +15,7 @@ from .views import (
     gastos,
     comprar_item,
     apagar_compra,
+    criar_item
 )
 from django.urls import include
 
@@ -31,6 +32,7 @@ urlpatterns = [
     path("compras/", compras, name="compras"),
     path("compras/<int:id>/", comprar_item, name="comprar_item"),
     path("apagar-compra/<int:id>/", apagar_compra, name="apagar_compra"),
+    path("criar-item/", criar_item, name="criar_item"),
 
 
     path("editar-item/<int:item_id>/", editar_item, name="editar_item"),
