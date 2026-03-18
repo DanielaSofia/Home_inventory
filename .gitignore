@@ -7,4 +7,6 @@ casa/inventory/__pycache__/
 
 casa/inventory/migrations/
 
+staticfiles/
+
 mysql-apt-config_0.8.36-1_all.deb
