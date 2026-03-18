@@ -104,6 +104,12 @@
 
                         {% endif %}
                         <a href="{% url 'editar_desejo' d.id %}" class="btn btn-sm btn-warning">Editar</a>
+                    <form method="POST" action="{% url 'comprar_desejo' d.id %}">
+                        {% csrf_token %}
+                        <button class="btn btn-success">
+                            🛒 Comprar
+                        </button>
+                    </form>
                     </div>
                 </div>
             </div>
