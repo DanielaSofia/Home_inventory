@@ -1,5 +1,4 @@
 from django.urls import path
-from .views import dashboard
 from rest_framework.routers import DefaultRouter
 from .views import (
     DivisaoViewSet,
@@ -15,7 +14,7 @@ from .views import (
     gastos,
     comprar_item,
     apagar_compra,
-    criar_item
+    criar_item, comprar_desejo, despensa
 )
 from django.urls import include
 
@@ -28,12 +27,13 @@ urlpatterns = [
     path("", menu, name="menu"),
     path("itens/", itens, name="itens"),
     path("desejos/", desejos, name="desejos"),
+    path("comprar-desejo/<int:desejo_id>/", comprar_desejo, name="comprar_desejo"),
     path("gastos/", gastos, name="gastos"),
     path("compras/", compras, name="compras"),
     path("compras/<int:id>/", comprar_item, name="comprar_item"),
     path("apagar-compra/<int:id>/", apagar_compra, name="apagar_compra"),
     path("criar-item/", criar_item, name="criar_item"),
-
+    path("despensa/", despensa, name="despensa"),
 
     path("editar-item/<int:item_id>/", editar_item, name="editar_item"),
     path("apagar-item/<int:item_id>/", apagar_item, name="apagar_item"),
