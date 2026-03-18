@@ -1,58 +1,89 @@
-document.addEventListener("DOMContentLoaded", function () {
-
-    const modal = document.getElementById("barcodeModal")
-
-    modal.addEventListener("shown.bs.modal", startScanner)
-
-})
-
 let codeReader
+let scanning = false
 
-function startScanner() {
+function toggleScanner(){
+
+    const container = document.getElementById("scanner-container")
+
+    if(!scanning){
+        container.style.display = "block"
+        startScanner()
+        scanning = true
+    } else {
+        stopScanner()
+        container.style.display = "none"
+        scanning = false
+    }
+}
+
+function startScanner(){
 
     codeReader = new ZXing.BrowserBarcodeReader()
+
     const video = document.getElementById("scanner-video")
+
     codeReader.decodeFromVideoDevice(null, video, (result, err) => {
 
-        if (result) {
-            let codigo = result.text
+        if(result){
+
+            const codigo = result.text
+
             console.log("Código:", codigo)
+
             buscarProduto(codigo)
-            codeReader.reset()
+
+            stopScanner()
         }
+
     })
 }
 
-function buscarProduto(codigo) {
+function stopScanner(){
+    if(codeReader){
+        codeReader.reset()
+    }
+}
+
+function buscarProduto(codigo){
 
     fetch("https://world.openfoodfacts.org/api/v0/product/" + codigo + ".json")
+    .then(res => res.json())
+    .then(data => {
 
-        .then(res => res.json())
+        if(data.status === 1){
 
-        .then(data => {
+            const produto = data.product
+            console.log("Produto encontrado")
+            preencherProduto(produto)
 
-            console.log(data)
-            alert("Produto lido")
+        } else {
 
-            if (data.status === 1) {
-                alert("Produto Encontrado")
+            console.log("Produto não encontrado")
 
-                let produto = data.product
+        }
 
-                document.getElementById("id_nome").value =
-                    produto.product_name || "Produto"
+    })
+}
+function preencherProduto(produto){
 
-                document.getElementById("id_descricao").value =
-                    produto.brands || ""
+    setTimeout(() => {
 
-            }
+        const nome = document.querySelector("#addItemModal input[name='nome']")
+        const descricao = document.querySelector("#addItemModal textarea[name='descricao']")
 
-            else {
+        if(nome){
+            nome.value =
+                produto.product_name ||
+                produto.product_name_pt ||
+                "Produto"
+        }
 
-                alert("Produto não encontrado")
+        if(descricao){
+            descricao.value =
+                produto.brands ||
+                produto.generic_name ||
+                ""
+        }
 
-            }
-
-        })
-
+    }, 200)
 }

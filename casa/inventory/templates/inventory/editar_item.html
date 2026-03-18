@@ -138,21 +138,21 @@
                                         <button class="btn btn-primary">
                                              💾 Guardar
                                         </button>
-                                        <form method="post" action="{% url 'apagar_item' form.instance.id %}">
 
-                                             {% csrf_token %}
-
-                                             <button class="btn btn-danger w-20">
-                                                  🗑 Apagar Item
-                                             </button>
-
-                                        </form>
                                    </div>
 
                               </div>
 
                          </form>
+                         <form method="post" action="{% url 'apagar_item' form.instance.id %}">
 
+                              {% csrf_token %}
+
+                              <button class="btn btn-danger w-20">
+                                   🗑 Apagar Item
+                              </button>
+
+                         </form>
                          <hr class="my-4">
 
 

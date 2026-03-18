@@ -41,11 +41,7 @@
             </a>
         </div>
         <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addItemModal">➕ Adicionar Item</button>
-        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#barcodeModal">
-            📷 Adicionar por código de barras
-        </button>
-
-        <div id="scanner" style="width:100%; height:300px;"></div>
+     
         <hr class="my-4">
         <!-- Filtros por Divisão -->
         <div class="mb-4">
@@ -120,26 +116,38 @@
 
         <!-- Modal -->
         <div class="modal fade" id="addItemModal" tabindex="-1">
-            <div class="modal-dialog">
+            <div class="modal-dialog modal-lg">
                 <div class="modal-content">
 
                     <div class="modal-header">
                         <h5 class="modal-title">Adicionar Item</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        <button class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
 
                     <form method="post" enctype="multipart/form-data">
+
                         <div class="modal-body">
 
                             {% csrf_token %}
                             <input type="hidden" name="add_item" value="1">
 
+                            <!-- SCANNER -->
+                            <div id="scanner-container" class="mb-3" style="display:none;">
+                                <video id="scanner-video" style="width:100%; height:250px;"></video>
+                            </div>
+
+                            <button type="button" onclick="toggleScanner()" class="btn btn-outline-primary w-100 mb-3">
+                                📷 Scan código de barras
+                            </button>
+
+                            <!-- FORM (o teu original) -->
                             {{ item_form.as_p }}
+
                         </div>
 
                         <div class="modal-footer">
-                            <button type="submit" class="btn btn-warning">
-                                Guardar Item
+                            <button type="submit" class="btn btn-warning w-100">
+                                💾 Guardar Item
                             </button>
                         </div>
 
@@ -147,54 +155,6 @@
 
                 </div>
             </div>
-        </div>
-
-        <div class="modal fade" id="barcodeModal" tabindex="-1">
-
-            <div class="modal-dialog modal-lg">
-
-                <div class="modal-content">
-
-                    <div class="modal-header">
-
-                        <h5 class="modal-title">Scan código de barras</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-
-                    </div>
-
-                    <div class="modal-body">
-
-                        <video id="scanner-video" style="width:100%; height:300px;"></video>
-                        <hr>
-                        <form method="post" action="{% url 'criar_item' %}">
-
-                            {% csrf_token %}
-
-                            <div class="mb-3">
-                                <label>Nome</label>
-                                <input id="id_nome" name="nome" class="form-control">
-                            </div>
-
-                            <div class="mb-3">
-                                <label>Descrição</label>
-                                <textarea id="id_descricao" name="descricao" class="form-control"></textarea>
-                            </div>
-
-                            <div class="mb-3">
-                                <label>Quantidade</label>
-                                <input name="quantidade" type="number" value="1" class="form-control">
-                            </div>
-
-                            <button class="btn btn-primary">Guardar item</button>
-
-                        </form>
-
-                    </div>
-
-                </div>
-
-            </div>
-
         </div>
         <script src="https://unpkg.com/@zxing/library@latest"></script>
         <script src="{% static 'inventory/js/barcode_scanner.js' %}"></script>
