@@ -19,6 +19,8 @@
 -- Dumping data for table `auth_group`
 --
 
+USE casa;
+
 LOCK TABLES `inventory_compra` WRITE;
 /*!40000 ALTER TABLE `inventory_compra` DISABLE KEYS */;
 INSERT INTO `inventory_compra` VALUES (8,'silicone para airfryer',1,0,3),(9,'Lampada',1,0,4),(10,'Saleiro',1,0,3),(11,'Jarro com filtro',1,0,3),(12,'Cesto da lenha',1,0,6),(13,'Taboa de engomar',1,0,7),(14,' Assadeira',1,0,3),(15,'Bacia para cozinhar',1,0,3);
