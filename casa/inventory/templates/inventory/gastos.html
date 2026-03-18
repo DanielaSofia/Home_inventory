@@ -1,19 +1,152 @@
-<h2>💰 Gastos da Casa</h2>
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt">
 
-<a href="/" class="btn btn-secondary mb-3">Voltar</a>
+<head>
+    <meta charset="UTF-8">
+    <title>Gastos</title>
 
-<h3>Total gasto: € {{ total }}</h3>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-<ul>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-{% for item in itens %}
+</head>
 
-<li>
+<body style="background:#f4f6fb;">
 
-{{ item.nome }} — € {{ item.valor }}
+<div class="container py-5">
 
-</li>
+    <h2 class="mb-4">💰 Dashboard de Gastos</h2>
 
-{% endfor %}
+    <a href="/" class="btn btn-outline-secondary mb-4">⬅ Voltar</a>
 
-</ul>
+    <!-- DASHBOARD -->
+    <div class="row text-center mb-4">
+
+        <div class="col-md-4 mb-3">
+            <div class="card p-3 shadow-sm">
+                <h6>Total gasto</h6>
+                <h3 class="text-success">€ {{ total }}</h3>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card p-3 shadow-sm">
+                <h6>Média</h6>
+                <h3>€ {{ media|floatformat:2 }}</h3>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card p-3 shadow-sm">
+                <h6>Nº de itens</h6>
+                <h3>{{ itens|length }}</h3>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- GRÁFICOS -->
+    <div class="row mb-4">
+
+        <div class="col-md-6">
+            <div class="card p-3 shadow-sm">
+                <h5>🏷️ Gastos por divisão</h5>
+                <canvas id="graficoDivisao"></canvas>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card p-3 shadow-sm">
+                <h5>📅 Gastos por mês</h5>
+                <canvas id="graficoMes"></canvas>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- LISTA -->
+    <div class="card p-3 shadow-sm">
+
+        <h5 class="mb-3">📦 Lista de Itens</h5>
+
+        <ul class="list-group list-group-flush">
+
+            {% for item in itens %}
+
+            <li class="list-group-item d-flex justify-content-between">
+
+                <div>
+                    <strong>{{ item.nome }}</strong><br>
+                    <small>{{ item.quantidade }} unidade(s)</small>
+                </div>
+
+                <span class="badge bg-primary">
+                    € {{ item.valor }}
+                </span>
+
+            </li>
+
+            {% endfor %}
+
+        </ul>
+
+    </div>
+
+</div>
+
+<!-- SCRIPT GRÁFICOS -->
+<script>
+
+    // 📊 Divisões
+    const divisaoLabels = [
+        {% for g in gastos_por_divisao %}
+            "{{ g.divisao__nome }}",
+
+        {% endfor %}
+    ];
+    const divisaoData = [
+        {% for g in gastos_por_divisao %}
+            {{ g.total }},
+        {% endfor %}
+    ];
+
+    new Chart(document.getElementById('graficoDivisao'), {
+        type: 'pie',
+        data: {
+            labels: divisaoLabels,
+            datasets: [{
+                data: divisaoData
+            }]
+        }
+    });
+
+    // 📅 Meses
+    const mesLabels = [
+        {% for g in gastos_mensais %}
+            "{{ g.mes|date:'M Y' }}",
+        {% endfor %}
+    ];
+
+    const mesData = [
+        {% for g in gastos_mensais %}
+            {{ g.total }},
+        {% endfor %}
+    ];
+
+    new Chart(document.getElementById('graficoMes'), {
+        type: 'bar',
+        data: {
+            labels: mesLabels,
+            datasets: [{
+                label: "Gastos (€)",
+                data: mesData
+            }]
+        }
+    });
+
+</script>
+
+</body>
+</html>
