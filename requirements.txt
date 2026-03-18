@@ -4,3 +4,4 @@ djangorestframework
 mysqlclient
 Pillow
 django-filter
+django_extensions

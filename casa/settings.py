@@ -62,6 +62,7 @@ DATABASES = {
 }
 
 STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -77,6 +78,8 @@ REST_FRAMEWORK = {
 CSRF_TRUSTED_ORIGINS = [
     "https://localhost:8000",
     "http://localhost:8000",
+    "https://192.168.1.78",
+    "http://192.168.1.78"
 ]
 
 CSRF_COOKIE_SECURE = True
