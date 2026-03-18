@@ -2,10 +2,11 @@ from rest_framework import viewsets, filters
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Divisao, Item, Desejo, Compra
 from .serializers import DivisaoSerializer, ItemSerializer
-from django.db.models import Sum
+from django.db.models import Sum, F, Avg
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import ItemForm, DivisaoForm, DesejoForm
 from django.db.models.functions import TruncMonth
+from django.contrib import messages
 
 class DivisaoViewSet(viewsets.ModelViewSet):
     queryset = Divisao.objects.all()
@@ -27,79 +28,6 @@ class ItemViewSet(viewsets.ModelViewSet):
             total = Item.objects.aggregate(Sum("valor"))
             return Response({"total_valor_casa": total["valor__sum"]})
 
-
-def dashboard(request):
-
-    item_form = ItemForm()
-    divisao_form = DivisaoForm()
-    desejo_form = DesejoForm()
-
-    if request.method == "POST":
-
-        if "add_item" in request.POST:
-            item_form = ItemForm(request.POST, request.FILES)
-            if item_form.is_valid():
-                item_form.save()
-                return redirect("/")
-
-        elif "add_divisao" in request.POST:
-            divisao_form = DivisaoForm(request.POST)
-            if divisao_form.is_valid():
-                divisao_form.save()
-                return redirect("/")
-
-        elif "add_desejo" in request.POST:
-            desejo_form = DesejoForm(request.POST, request.FILES)
-            if desejo_form.is_valid():
-                desejo_form.save()
-                return redirect("/")
-
-    divisao_id = request.GET.get("divisao")
-
-    itens = Item.objects.all()
-    desejos = Desejo.objects.all()
-
-
-    if divisao_id:
-        itens = itens.filter(divisao_id=divisao_id)
-        desejos = desejos.filter(divisao_id=divisao_id)
-
-    divisoes = Divisao.objects.all()
-
-    total_itens = Item.objects.aggregate(total=Sum("valor"))["total"] or 0
-    total_desejos = Desejo.objects.aggregate(total=Sum("valor"))["total"] or 0
-
-    total_itens_count = Item.objects.count()
-    total_desejos_count = Desejo.objects.count()
-
-
-    gastos_mes = (
-        Item.objects
-        .annotate(mes=TruncMonth("data_aquisicao"))
-        .values("mes")
-        .annotate(total=Sum("valor"))
-        .order_by("mes")
-    )
-
-    labels = [g["mes"].strftime("%Y-%m") for g in gastos_mes if g["mes"]]
-    valores = [float(g["total"]) for g in gastos_mes]
-
-    context = {
-        "itens": itens,
-        "desejos": desejos,
-        "divisoes": divisoes,
-        "item_form": item_form,
-        "divisao_form": divisao_form,
-        "desejo_form": desejo_form,
-        "total_itens": total_itens,
-        "total_desejos": total_desejos,
-        "total_itens_count": total_itens_count,
-        "total_desejos_count": total_desejos_count,
-        "labels": labels,
-        "valores": valores,
-    }
-
-    return render(request, "inventory/dashboard.html", context)
 
 def editar_item(request, item_id):
 
@@ -252,6 +180,29 @@ def desejos(request):
 
     return render(request,"inventory/desejos.html",context)
 
+def comprar_desejo(request, desejo_id):
+    desejo = get_object_or_404(Desejo, id=desejo_id)
+
+    if request.method == "POST":
+
+        # ✅ cria item
+        Item.objects.create(
+            nome=desejo.nome,
+            descricao=desejo.descricao,
+            valor=desejo.valor,
+            quantidade=desejo.quantidade,
+            divisao=desejo.divisao,
+            imagem=desejo.imagem
+        )
+
+        # ❌ remove desejo
+        desejo.delete()
+
+        messages.success(request, "Item comprado e adicionado ao inventário!")
+
+        return redirect('desejos')  # ou 'itens'
+
+    return redirect('desejos')
 
 def compras(request):
 
@@ -296,14 +247,36 @@ def apagar_compra(request,id):
 
 
 def gastos(request):
-
     itens = Item.objects.all()
 
-    total = sum(i.valor or 0 for i in itens)
+    # 💰 Total
+    total = itens.aggregate(
+        total=Sum(F('valor') * F('quantidade'))
+    )['total'] or 0
 
-    return render(request,"inventory/gastos.html",{
-        "total":total,
-        "itens":itens
+    # 📊 Média
+    media = itens.aggregate(
+        media=Avg('valor')
+    )['media'] or 0
+
+    # 🏷️ Gastos por divisão
+    gastos_por_divisao = itens.values('divisao__nome').annotate(
+        total=Sum(F('valor') * F('quantidade'))
+    ).order_by('-total')
+
+    # 📅 Gastos por mês
+    gastos_mensais = itens.annotate(
+        mes=TruncMonth('data_aquisicao')
+    ).values('mes').annotate(
+        total=Sum(F('valor') * F('quantidade'))
+    ).order_by('mes')
+
+    return render(request, "inventory/gastos.html", {
+        "itens": itens,
+        "total": total,
+        "media": media,
+        "gastos_por_divisao": gastos_por_divisao,
+        "gastos_mensais": gastos_mensais,
     })
 
 def criar_item(request):
@@ -317,3 +290,10 @@ def criar_item(request):
         )
 
     return redirect("itens")
+
+def despensa(request):
+    itens = Item.objects.filter(tipo="consumivel")
+
+    return render(request, "despensa.html", {
+        "itens": itens
+    })
