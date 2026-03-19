@@ -1,0 +1,142 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Compras</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: #f4f6fb;
+        }
+
+        .card {
+            border: none;
+            border-radius: 18px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        .item-row {
+            transition: 0.2s;
+        }
+
+        .item-row:hover {
+            background: #f9fafc;
+        }
+
+        .badge-priority {
+            font-size: 0.7rem;
+        }
+
+        .urgent {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .normal {
+            color: #198754;
+        }
+
+        .section-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+    </style>
+
+</head>
+
+<body>
+
+<div class="container py-5">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>🛒 Lista de Compras</h2>
+
+        <div class="d-flex gap-2">
+            <a href="{% url 'despensa' %}" class="btn btn-success">
+                🍎 Despensa
+            </a>
+            <a href="/" class="btn btn-outline-secondary">
+                ⬅ Voltar
+            </a>
+        </div>
+    </div>
+
+    <!-- LISTA ATIVA -->
+    <div class="card p-3 mb-4">
+
+        <div class="section-title">🛒 Precisa de comprar</div>
+
+        <ul class="list-group list-group-flush">
+
+            {% for item in ativos %}
+
+            <li class="list-group-item item-row d-flex justify-content-between align-items-center">
+
+                <div>
+
+                    <strong>{{ item.nome }}</strong><br>
+
+                    <small class="text-muted">
+                        {{ item.divisao.nome }}
+                    </small>
+
+                    <br>
+
+                    <!-- estado -->
+                    {% if item.consumivel.quantidade == 0 %}
+                        <span class="urgent">⚠️ Sem stock</span>
+                    {% elif item.consumivel.quantidade <= item.consumivel.quantidade_minima %}
+                        <span class="text-warning">⚠️ A acabar</span>
+                    {% else %}
+                        <span class="normal">✔ OK</span>
+                    {% endif %}
+
+                </div>
+
+                <div class="d-flex align-items-center gap-2">
+
+                    <!-- quantidade -->
+                    <span class="badge bg-warning text-dark">
+                        {{ item.quantidade }}
+                    </span>
+
+                    <!-- botão -->
+                    <form method="POST" action="{% url 'marcar_comprado' item.id %}">
+                        {% csrf_token %}
+                        <button class="btn btn-success btn-sm">
+                            ✔
+                        </button>
+                    </form>
+                    <form method="POST" action="{% url 'apagar_compra' item.id %}">
+    {% csrf_token %}
+    <button class="btn btn-danger btn-sm">
+        🗑
+    </button>
+</form>
+
+                </div>
+
+            </li>
+
+            {% empty %}
+
+            <li class="list-group-item text-center">
+                🎉 Tudo em stock!
+            </li>
+
+            {% endfor %}
+
+        </ul>
+
+    </div>
+
+
+</div>
+
+</body>
+</html>

@@ -59,24 +59,7 @@
                 </a>
 
             </div>
-
-            <div class="col-6">
-
-                <a href="{% url 'compras' %}" style="text-decoration:none">
-
-                    <div class="card menu-card p-4 text-center">
-
-                        <div class="icon">🛒</div>
-
-                        <h5 class="mt-2">Lista de Compras</h5>
-
-                    </div>
-
-                </a>
-
-            </div>
-
-            <div class="col-6">
+             <div class="col-6">
 
                 <a href="{% url 'desejos' %}" style="text-decoration:none">
 
@@ -94,19 +77,53 @@
 
             <div class="col-6">
 
-                <a href="{% url 'gastos' %}" style="text-decoration:none">
+                <a href="{% url 'lista_compras' %}" style="text-decoration:none">
 
                     <div class="card menu-card p-4 text-center">
 
-                        <div class="icon">💰</div>
+                        <div class="icon">🛒</div>
 
-                        <h5 class="mt-2">Gastos</h5>
+                        <h5 class="mt-2">Lista de Compras</h5>
 
                     </div>
 
                 </a>
 
             </div>
+
+           
+<div class="col-6">
+
+                <a href="{% url 'despensa' %}"  style="text-decoration:none">
+
+                    <div class="card menu-card p-4 text-center">
+
+                        <div class="icon">💰</div>
+
+                        <h5 class="mt-2">Despensa</h5>
+
+                    </div>
+
+                </a>
+
+            </div>
+
+            <div class="col-6">
+
+                <a href="{% url 'gastos' %}" style="text-decoration:none">
+
+                    <div class="card menu-card p-4 text-center">
+
+                        <div class="icon">💰</div>
+
+                        <h5 class="mt-2">Gastos Items</h5>
+
+                    </div>
+
+                </a>
+
+            </div>
+            
 
         </div>
 
