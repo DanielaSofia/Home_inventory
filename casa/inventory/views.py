@@ -1,6 +1,6 @@
 from rest_framework import viewsets, filters
 from django_filters.rest_framework import DjangoFilterBackend
-from .models import Divisao, Item, Desejo, Compra, Consumivel
+from .models import Divisao, HistoricoCompra, Item, Desejo, Compra, Consumivel
 from .serializers import DivisaoSerializer, ItemSerializer
 from django.db.models import Sum, F, Avg
 from django.shortcuts import render, redirect, get_object_or_404
@@ -164,30 +164,25 @@ def apagar_desejo(request, desejo_id):
 
     return redirect("desejo")
 
+
 def comprar_desejo(request, desejo_id):
     desejo = get_object_or_404(Desejo, id=desejo_id)
 
     if request.method == "POST":
+        data = request.POST.get("data")
+        preco = request.POST.get("preco")
 
-        # ✅ cria item
         Item.objects.create(
             nome=desejo.nome,
             descricao=desejo.descricao,
-            valor=desejo.valor,
-            quantidade=desejo.quantidade,
-            divisao=desejo.divisao,
-            imagem=desejo.imagem
+            data_aquisicao=data,
+            valor=preco if preco else None,
+            divisao=desejo.divisao  # 🔥 importante
         )
 
-        # ❌ remove desejo
         desejo.delete()
 
-        messages.success(request, "Item comprado e adicionado ao inventário!")
-
-        return redirect('desejos')  # ou 'itens'
-
-    return redirect('desejos')
-
+    return redirect('itens')
 
 def menu(request):
     return render(request, "inventory/menu.html")
@@ -239,7 +234,7 @@ def criar_item(request):
     return redirect("itens")
 
 def despensa(request):
-    itens = Consumivel.objects.all().order_by('quantidade')
+    itens = Consumivel.objects.all()
     divisoes = Divisao.objects.all()
 
     return render(request, "inventory/despensa.html", {
@@ -276,9 +271,6 @@ def adicionar_compra(request):
 
     return redirect('lista_compras')
 
-from django.shortcuts import get_object_or_404, redirect
-from .models import Consumivel
-
 def adicionar_a_lista(item):
     existente = Compra.objects.filter(
         consumivel=item,
@@ -309,33 +301,31 @@ def consumir_consumivel(request, id):
 
     return redirect('despensa')
 
+
 def marcar_comprado(request, compra_id):
     compra = get_object_or_404(Compra, id=compra_id)
 
-    # ✔ se tiver ligação ao consumível
-    if compra.consumivel:
-        compra.consumivel.quantidade += compra.quantidade
-        compra.consumivel.save()
+    if request.method == "POST":
 
-    else:
-        # ⚠️ fallback (caso não esteja ligado)
-        consumivel = Consumivel.objects.filter(nome=compra.nome).first()
+        quantidade = int(request.POST.get("quantidade") or compra.quantidade)
+        preco = request.POST.get("preco")
+        loja = request.POST.get("loja")
 
-        if consumivel:
-            consumivel.quantidade += compra.quantidade
-            consumivel.save()
-        else:
-            # 🔥 só cria se não existir mesmo
-            Consumivel.objects.create(
-                nome=compra.nome,
-                quantidade=compra.quantidade,
-                divisao=compra.divisao
+        if compra.consumivel:
+
+            # 🔥 histórico completo
+            HistoricoCompra.objects.create(
+                consumivel=compra.consumivel, quantidade=quantidade, preco=preco, loja=loja
             )
 
-    compra.comprado = True
-    compra.save()
+            # 🔄 atualizar stock
+            compra.consumivel.quantidade += quantidade
+            compra.consumivel.save()
 
-    return redirect('lista_compras')
+        compra.comprado = True
+        compra.save()
+
+    return redirect("lista_compras")
 
 
 def adicionar_consumivel(request):
@@ -343,11 +333,15 @@ def adicionar_consumivel(request):
         nome = request.POST.get("nome")
         quantidade = int(request.POST.get("quantidade") or 1)
         divisao_id = request.POST.get("divisao")
+        preco = request.POST.get("preco")
+        loja = request.POST.get("loja")
 
         Consumivel.objects.create(
             nome=nome,
             quantidade=quantidade,
-            divisao_id=divisao_id
+            divisao_id=divisao_id,
+            preco=preco if preco else None,
+            loja=loja
         )
 
     return redirect('despensa')

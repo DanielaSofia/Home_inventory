@@ -15,18 +15,16 @@
 
         .card {
             border: none;
-            border-radius: 18px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        }
+
+        .item-row {
             transition: 0.2s;
         }
 
-        .card:hover {
-            transform: translateY(-3px);
-        }
-
-        .stock-ok {
-            color: #198754;
-            font-weight: 500;
+        .item-row:hover {
+            background: #f9fafc;
         }
 
         .stock-low {
@@ -34,17 +32,8 @@
             font-weight: bold;
         }
 
-        .form-card {
-            background: white;
-            border-radius: 18px;
-        }
-
-        .btn-icon {
-            font-size: 0.9rem;
-        }
-
-        .progress {
-            height: 6px;
+        .stock-ok {
+            color: #198754;
         }
     </style>
 
@@ -68,16 +57,16 @@
         </div>
     </div>
 
-    <!-- FORM ADICIONAR -->
-    <div class="card form-card p-4 mb-4">
+    <!-- FORM -->
+    <div class="card p-3 mb-4">
 
         <form method="POST" action="{% url 'adicionar_consumivel' %}">
             {% csrf_token %}
 
-            <div class="row g-2 align-items-center">
+            <div class="row g-2">
 
-                <div class="col-md-5">
-                    <input type="text" name="nome" class="form-control" placeholder="Adicionar item..." required>
+                <div class="col-md-4">
+                    <input type="text" name="nome" class="form-control" placeholder="Item..." required>
                 </div>
 
                 <div class="col-md-2">
@@ -92,9 +81,9 @@
                     </select>
                 </div>
 
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <button class="btn btn-primary w-100">
-                        ➕
+                        ➕ Adicionar
                     </button>
                 </div>
 
@@ -104,90 +93,119 @@
 
     </div>
 
-    <!-- GRID -->
-    <div class="row">
+    <!-- LISTA -->
+    <div class="card p-3">
 
-        {% for item in itens %}
+        <ul class="list-group list-group-flush">
 
-        <div class="col-md-4 col-lg-3 mb-4">
+            {% for item in itens %}
 
-            <div class="card p-3 h-100">
+            <li class="list-group-item item-row d-flex justify-content-between align-items-center">
 
-                <!-- Nome -->
-                <h5 class="mb-1">{{ item.nome }}</h5>
+                <!-- INFO -->
+                <div>
+                    <strong>{{ item.nome }}</strong><br>
 
-                <!-- Divisão -->
-                <small class="text-muted mb-2">
-                    {{ item.divisao.nome }}
-                </small>
+                    <small class="text-muted">
+                        {{ item.divisao.nome }}
+                    </small><br>
 
-                <!-- Stock -->
-                <p class="mb-1">
-                    📦 <strong>{{ item.quantidade }}</strong>
-                </p>
-
-                <!-- Estado -->
-                {% if item.quantidade <= item.quantidade_minima %}
-                    <p class="stock-low">⚠️ A acabar</p>
-                {% else %}
-                    <p class="stock-ok">✔ Em stock</p>
-                {% endif %}
-
-                <!-- Barra -->
-                <div class="progress mb-3">
-                    <div class="progress-bar 
-                        {% if item.quantidade <= item.quantidade_minima %}
-                            bg-danger
-                        {% else %}
-                            bg-success
-                        {% endif %}"
-                        style="width: {{ item.quantidade|floatformat:0 }}0%">
-                    </div>
+                    {% if item.quantidade <= item.quantidade_minima %}
+                        <span class="stock-low">⚠️ A acabar</span>
+                    {% else %}
+                        <span class="stock-ok">✔ Em stock</span>
+                    {% endif %}
                 </div>
 
-                <!-- BOTÕES -->
-                <div class="d-flex gap-3 mt-auto">
+                <!-- AÇÕES -->
+                <div class="d-flex align-items-center gap-2">
 
-                    <!-- Usar -->
+                    <!-- quantidade -->
+                    <span class="badge bg-dark">
+                        {{ item.quantidade }}
+                    </span>
+                    <!-- usar -->
                     <form method="POST" action="{% url 'consumir_consumivel' item.id %}">
                         {% csrf_token %}
-                        <button class="btn btn-warning btn-sm w-100 btn-icon">
-                            ➖1
-                        </button>
+                        <button class="btn btn-danger btn-sm">➖</button>
                     </form>
 
-                    <!-- Repor -->
+                    <!-- repor -->
                     <form method="POST" action="{% url 'repor_consumivel' item.id %}">
                         {% csrf_token %}
-                        <button class="btn btn-success btn-sm w-100 btn-icon">
-                            ➕1
-                        </button>
+                        <button class="btn btn-success btn-sm">➕</button>
                     </form>
+
+                    <!-- apagar -->
                     <form method="POST" action="{% url 'apagar_consumivel' item.id %}">
                         {% csrf_token %}
-                        <button class="btn btn-danger btn-sm w-100 btn-icon">
+                        <button class="btn btn-outline-danger btn-sm"
+                                onclick="return confirm('Apagar item?')">
                             🗑
                         </button>
                     </form>
+                    <button class="btn btn-outline-dark btn-sm"
+        data-bs-toggle="modal"
+        data-bs-target="#modal{{ item.id }}">
+    📜
+</button>
+<div class="modal fade" id="modal{{ item.id }}" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
 
-                </div>
+      <div class="modal-header">
+        <h5 class="modal-title">
+            📜 Histórico — {{ item.nome }}
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+
+        {% for h in item.historico.all|slice:":10" %}
+
+            <div class="mb-2 border-bottom pb-2">
+
+                <strong>{{ h.loja }}</strong><br>
+
+                <small class="text-muted">
+                    {{ h.data|date:"d/m/Y" }}
+                </small><br>
+
+                <small>
+                    💰 €{{ h.preco }} • 🔢 {{ h.quantidade }}
+                </small>
 
             </div>
 
-        </div>
-
         {% empty %}
 
-        <div class="text-center">
-            <h5>🍃 Despensa vazia</h5>
-            <p class="text-muted">Adiciona itens para começar</p>
-        </div>
+            <p class="text-muted">Sem histórico</p>
 
         {% endfor %}
+
+      </div>
+
+    </div>
+  </div>
+</div>
+                </div>
+
+            </li>
+
+            {% empty %}
+
+            <li class="list-group-item text-center">
+                🍃 Despensa vazia
+            </li>
+
+            {% endfor %}
+
+        </ul>
 
     </div>
 
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
