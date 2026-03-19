@@ -8,6 +8,7 @@ from .forms import ItemForm, DivisaoForm, DesejoForm
 from django.db.models.functions import TruncMonth
 from django.contrib import messages
 
+
 class DivisaoViewSet(viewsets.ModelViewSet):
     queryset = Divisao.objects.all()
     serializer_class = DivisaoSerializer
@@ -28,7 +29,9 @@ class ItemViewSet(viewsets.ModelViewSet):
             total = Item.objects.aggregate(Sum("valor"))
             return Response({"total_valor_casa": total["valor__sum"]})
 
+
 ## Item
+
 
 def itens(request):
 
@@ -49,7 +52,6 @@ def itens(request):
     itens = Item.objects.all()
     desejos = Desejo.objects.all()
 
-
     if divisao_id:
         itens = itens.filter(divisao_id=divisao_id)
         desejos = desejos.filter(divisao_id=divisao_id)
@@ -69,9 +71,20 @@ def itens(request):
         "total_itens_count": total_itens_count,
     }
 
+    return render(request, "inventory/itens.html", context)
 
+def criar_item(request):
 
-    return render(request,"inventory/itens.html",context)
+    if request.method == "POST":
+
+        Item.objects.create(
+            nome=request.POST.get("nome"),
+            descricao=request.POST.get("descricao"),
+            quantidade=request.POST.get("quantidade"),
+        )
+
+    return redirect("itens")
+
 
 def editar_item(request, item_id):
 
@@ -89,6 +102,7 @@ def editar_item(request, item_id):
 
     return render(request, "inventory/editar_item.html", {"form": form})
 
+
 def apagar_item(request, item_id):
 
     item = get_object_or_404(Item, id=item_id)
@@ -98,7 +112,9 @@ def apagar_item(request, item_id):
 
     return redirect("itens")
 
+
 ## Desejo
+
 
 def desejos(request):
 
@@ -110,7 +126,7 @@ def desejos(request):
             desejo_form = DesejoForm(request.POST, request.FILES)
             if desejo_form.is_valid():
                 desejo_form.save()
-                return redirect("/")
+                return redirect("desejos")
 
     divisao_id = request.GET.get("divisao")
 
@@ -125,19 +141,16 @@ def desejos(request):
 
     total_desejos_count = Desejo.objects.count()
 
-
     context = {
         "desejos": desejos,
         "divisoes": divisoes,
         "desejo_form": desejo_form,
         "total_desejos": total_desejos,
         "total_desejos_count": total_desejos_count,
-
     }
 
+    return render(request, "inventory/desejos.html", context)
 
-
-    return render(request,"inventory/desejos.html",context)
 
 def editar_desejo(request, desejo_id):
 
@@ -148,12 +161,13 @@ def editar_desejo(request, desejo_id):
 
         if form.is_valid():
             form.save()
-            return redirect("desejo")
+            return redirect("desejos")
 
     else:
         form = DesejoForm(instance=desejo)
 
     return render(request, "inventory/editar_desejo.html", {"form": form})
+
 
 def apagar_desejo(request, desejo_id):
 
@@ -162,7 +176,7 @@ def apagar_desejo(request, desejo_id):
     if request.method == "POST":
         desejo.delete()
 
-    return redirect("desejo")
+    return redirect("desejos")
 
 
 def comprar_desejo(request, desejo_id):
@@ -177,79 +191,90 @@ def comprar_desejo(request, desejo_id):
             descricao=desejo.descricao,
             data_aquisicao=data,
             valor=preco if preco else None,
-            divisao=desejo.divisao  # 🔥 importante
+            divisao=desejo.divisao,  # 🔥 importante
         )
 
         desejo.delete()
 
-    return redirect('itens')
+    return redirect("itens")
+
+## MENU
+
 
 def menu(request):
     return render(request, "inventory/menu.html")
 
+## Gastos
 
 def gastos(request):
     itens = Item.objects.all()
 
     # 💰 Total
-    total = itens.aggregate(
-        total=Sum(F('valor') * F('quantidade'))
-    )['total'] or 0
+    total = itens.aggregate(total=Sum(F("valor") * F("quantidade")))["total"] or 0
 
     # 📊 Média
-    media = itens.aggregate(
-        media=Avg('valor')
-    )['media'] or 0
+    media = itens.aggregate(media=Avg("valor"))["media"] or 0
 
     # 🏷️ Gastos por divisão
-    gastos_por_divisao = itens.values('divisao__nome').annotate(
-        total=Sum(F('valor') * F('quantidade'))
-    ).order_by('-total')
+    gastos_por_divisao = (
+        itens.values("divisao__nome")
+        .annotate(total=Sum(F("valor") * F("quantidade")))
+        .order_by("-total")
+    )
 
     # 📅 Gastos por mês
-    gastos_mensais = itens.annotate(
-        mes=TruncMonth('data_aquisicao')
-    ).values('mes').annotate(
-        total=Sum(F('valor') * F('quantidade'))
-    ).order_by('mes')
+    gastos_mensais = (
+        itens.annotate(mes=TruncMonth("data_aquisicao"))
+        .values("mes")
+        .annotate(total=Sum(F("valor") * F("quantidade")))
+        .order_by("mes")
+    )
 
-    return render(request, "inventory/gastos.html", {
-        "itens": itens,
-        "total": total,
-        "media": media,
-        "gastos_por_divisao": gastos_por_divisao,
-        "gastos_mensais": gastos_mensais,
-    })
+    return render(
+        request,
+        "inventory/gastos.html",
+        {
+            "itens": itens,
+            "total": total,
+            "media": media,
+            "gastos_por_divisao": gastos_por_divisao,
+            "gastos_mensais": gastos_mensais,
+        },
+    )
 
-def criar_item(request):
 
-    if request.method == "POST":
-
-        Item.objects.create(
-            nome=request.POST.get("nome"),
-            descricao=request.POST.get("descricao"),
-            quantidade=request.POST.get("quantidade")
-        )
-
-    return redirect("itens")
+## Despensa
 
 def despensa(request):
     itens = Consumivel.objects.all()
     divisoes = Divisao.objects.all()
 
-    return render(request, "inventory/despensa.html", {
-        "itens": itens,
-        "divisoes": divisoes
-    })
+    return render(request, "inventory/despensa.html", {"itens": itens, "divisoes": divisoes})
 
+
+def consumir_consumivel(request, id):
+    item = get_object_or_404(Consumivel, id=id)
+
+    if item.quantidade > 0:
+        item.quantidade -= 1
+        item.save()
+
+    # 🔥 trigger automático
+    if item.quantidade <= item.quantidade_minima:
+        adicionar_a_lista(item)
+
+    return redirect("despensa")
+
+
+## Lista Compras
 def lista_compras(request):
-    ativos = Compra.objects.filter(comprado=False).order_by('consumivel__quantidade')
-    comprados = Compra.objects.filter(comprado=True).order_by('-id')
+    ativos = Compra.objects.filter(comprado=False).order_by("consumivel__quantidade")
+    comprados = Compra.objects.filter(comprado=True).order_by("-id")
 
-    return render(request, "inventory/lista_compras.html", {
-        "ativos": ativos,
-        "comprados": comprados
-    })
+    return render(
+        request, "inventory/lista_compras.html", {"ativos": ativos, "comprados": comprados}
+    )
+
 
 def adicionar_compra(request):
     if request.method == "POST":
@@ -264,42 +289,21 @@ def adicionar_compra(request):
             existente.save()
         else:
             Compra.objects.create(
-                nome=nome,
-                quantidade=quantidade,
-                divisao_id=divisao_id  # 🔥 importante
+                nome=nome, quantidade=quantidade, divisao_id=divisao_id  # 🔥 importante
             )
 
-    return redirect('lista_compras')
+    return redirect("lista_compras")
+
 
 def adicionar_a_lista(item):
-    existente = Compra.objects.filter(
-        consumivel=item,
-        comprado=False
-    ).first()
+    existente = Compra.objects.filter(consumivel=item, comprado=False).first()
 
     if existente:
         existente.quantidade += 1
         existente.save()
     else:
-        Compra.objects.create(
-            nome=item.nome,
-            quantidade=1,
-            divisao=item.divisao,
-            consumivel=item
-        )
+        Compra.objects.create(nome=item.nome, quantidade=1, divisao=item.divisao, consumivel=item)
 
-def consumir_consumivel(request, id):
-    item = get_object_or_404(Consumivel, id=id)
-
-    if item.quantidade > 0:
-        item.quantidade -= 1
-        item.save()
-
-    # 🔥 trigger automático
-    if item.quantidade <= item.quantidade_minima:
-        adicionar_a_lista(item)
-
-    return redirect('despensa')
 
 
 def marcar_comprado(request, compra_id):
@@ -341,10 +345,11 @@ def adicionar_consumivel(request):
             quantidade=quantidade,
             divisao_id=divisao_id,
             preco=preco if preco else None,
-            loja=loja
+            loja=loja,
         )
 
-    return redirect('despensa')
+    return redirect("despensa")
+
 
 def repor_consumivel(request, id):
     item = get_object_or_404(Consumivel, id=id)
@@ -354,12 +359,10 @@ def repor_consumivel(request, id):
 
     # 🔥 remover da lista se já não está no mínimo
     if item.quantidade > item.quantidade_minima:
-        Compra.objects.filter(
-            consumivel=item,
-            comprado=False
-        ).delete()
+        Compra.objects.filter(consumivel=item, comprado=False).delete()
 
-    return redirect('despensa')
+    return redirect("despensa")
+
 
 def apagar_consumivel(request, id):
     item = get_object_or_404(Consumivel, id=id)
@@ -367,7 +370,8 @@ def apagar_consumivel(request, id):
     if request.method == "POST":
         item.delete()
 
-    return redirect('despensa')
+    return redirect("despensa")
+
 
 def apagar_compra(request, id):
     compra = get_object_or_404(Compra, id=id)
@@ -375,4 +379,4 @@ def apagar_compra(request, id):
     if request.method == "POST":
         compra.delete()
 
-    return redirect('lista_compras')
+    return redirect("lista_compras")
