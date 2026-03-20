@@ -1,12 +1,13 @@
-from rest_framework import viewsets, filters
-from django_filters.rest_framework import DjangoFilterBackend
-from .models import Divisao, HistoricoCompra, Item, Desejo, Compra, Consumivel
-from .serializers import DivisaoSerializer, ItemSerializer
-from django.db.models import Sum, F, Avg
-from django.shortcuts import render, redirect, get_object_or_404
-from .forms import ItemForm, DivisaoForm, DesejoForm
-from django.db.models.functions import TruncMonth
 from django.contrib import messages
+from django.db.models import Avg, F, Sum
+from django.db.models.functions import TruncMonth
+from django.shortcuts import get_object_or_404, redirect, render
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, viewsets
+
+from .forms import DesejoForm, DivisaoForm, ItemForm
+from .models import Compra, Consumivel, Desejo, Divisao, HistoricoCompra, Item
+from .serializers import DivisaoSerializer, ItemSerializer
 
 
 class DivisaoViewSet(viewsets.ModelViewSet):
@@ -37,7 +38,6 @@ def itens(request):
 
     item_form = ItemForm()
     divisao_form = DivisaoForm()
-    desejo_form = DesejoForm()
 
     if request.method == "POST":
 
@@ -50,17 +50,12 @@ def itens(request):
     divisao_id = request.GET.get("divisao")
 
     itens = Item.objects.all()
-    desejos = Desejo.objects.all()
+    divisoes = Divisao.objects.all()
+    total_itens = Item.objects.aggregate(total=Sum("valor"))["total"] or 0
+    total_itens_count = Item.objects.count()
 
     if divisao_id:
         itens = itens.filter(divisao_id=divisao_id)
-        desejos = desejos.filter(divisao_id=divisao_id)
-
-    divisoes = Divisao.objects.all()
-
-    total_itens = Item.objects.aggregate(total=Sum("valor"))["total"] or 0
-
-    total_itens_count = Item.objects.count()
 
     context = {
         "itens": itens,
@@ -72,6 +67,7 @@ def itens(request):
     }
 
     return render(request, "inventory/itens.html", context)
+
 
 def criar_item(request):
 
@@ -118,39 +114,36 @@ def apagar_item(request, item_id):
 
 def desejos(request):
 
-    desejo_form = DesejoForm()
+    # 🔹 formulário
+    if request.method == "POST" and "add_desejo" in request.POST:
+        form = DesejoForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect("desejos")
+    else:
+        form = DesejoForm()
 
-    if request.method == "POST":
-
-        if "add_desejo" in request.POST:
-            desejo_form = DesejoForm(request.POST, request.FILES)
-            if desejo_form.is_valid():
-                desejo_form.save()
-                return redirect("desejos")
-
+    # 🔹 filtro
     divisao_id = request.GET.get("divisao")
 
-    desejos = Desejo.objects.all()
+    desejos_qs = Desejo.objects.all()
 
     if divisao_id:
-        desejos = desejos.filter(divisao_id=divisao_id)
+        desejos_qs = desejos_qs.filter(divisao_id=divisao_id)
 
-    divisoes = Divisao.objects.all()
-
-    total_desejos = Desejo.objects.aggregate(total=Sum("valor"))["total"] or 0
-
-    total_desejos_count = Desejo.objects.count()
+    # 🔹 stats (usando queryset já filtrado 👌)
+    total_desejos = desejos_qs.aggregate(total=Sum("valor"))["total"] or 0
+    total_desejos_count = desejos_qs.count()
 
     context = {
-        "desejos": desejos,
-        "divisoes": divisoes,
-        "desejo_form": desejo_form,
+        "desejos": desejos_qs,
+        "divisoes": Divisao.objects.all(),
+        "desejo_form": form,
         "total_desejos": total_desejos,
         "total_desejos_count": total_desejos_count,
     }
 
     return render(request, "inventory/desejos.html", context)
-
 
 def editar_desejo(request, desejo_id):
 
@@ -198,13 +191,16 @@ def comprar_desejo(request, desejo_id):
 
     return redirect("itens")
 
+
 ## MENU
 
 
 def menu(request):
     return render(request, "inventory/menu.html")
 
+
 ## Gastos
+
 
 def gastos(request):
     itens = Item.objects.all()
@@ -245,91 +241,46 @@ def gastos(request):
 
 ## Despensa
 
+
 def despensa(request):
-    itens = Consumivel.objects.all()
+    divisao_id = request.GET.get("divisao")
+    query = request.GET.get("q")
+
+    itens = Consumivel.objects.select_related("divisao").all()
+
+    if divisao_id:
+        itens = itens.filter(divisao_id=divisao_id)
+
+    if query:
+        itens = itens.filter(nome__icontains=query)
+
+    itens = itens.order_by("nome")
+
     divisoes = Divisao.objects.all()
 
-    return render(request, "inventory/despensa.html", {"itens": itens, "divisoes": divisoes})
+    return render(request, "inventory/despensa.html", {
+        "itens": itens,
+        "divisoes": divisoes,
+        "divisao_selecionada": divisao_id,
+        "query": query
+    })
 
 
 def consumir_consumivel(request, id):
     item = get_object_or_404(Consumivel, id=id)
 
+    # 🔒 evitar negativos + update atómico
     if item.quantidade > 0:
+        Consumivel.objects.filter(id=item.id).update(quantidade=F("quantidade") - 1)
+
+        # atualizar valor em memória
         item.quantidade -= 1
-        item.save()
 
     # 🔥 trigger automático
     if item.quantidade <= item.quantidade_minima:
         adicionar_a_lista(item)
 
     return redirect("despensa")
-
-
-## Lista Compras
-def lista_compras(request):
-    ativos = Compra.objects.filter(comprado=False).order_by("consumivel__quantidade")
-    comprados = Compra.objects.filter(comprado=True).order_by("-id")
-
-    return render(
-        request, "inventory/lista_compras.html", {"ativos": ativos, "comprados": comprados}
-    )
-
-
-def adicionar_compra(request):
-    if request.method == "POST":
-        nome = request.POST.get("nome")
-        quantidade = int(request.POST.get("quantidade") or 1)
-        divisao_id = request.POST.get("divisao")
-
-        existente = Compra.objects.filter(nome=nome, comprado=False).first()
-
-        if existente:
-            existente.quantidade += quantidade
-            existente.save()
-        else:
-            Compra.objects.create(
-                nome=nome, quantidade=quantidade, divisao_id=divisao_id  # 🔥 importante
-            )
-
-    return redirect("lista_compras")
-
-
-def adicionar_a_lista(item):
-    existente = Compra.objects.filter(consumivel=item, comprado=False).first()
-
-    if existente:
-        existente.quantidade += 1
-        existente.save()
-    else:
-        Compra.objects.create(nome=item.nome, quantidade=1, divisao=item.divisao, consumivel=item)
-
-
-
-def marcar_comprado(request, compra_id):
-    compra = get_object_or_404(Compra, id=compra_id)
-
-    if request.method == "POST":
-
-        quantidade = int(request.POST.get("quantidade") or compra.quantidade)
-        preco = request.POST.get("preco")
-        loja = request.POST.get("loja")
-
-        if compra.consumivel:
-
-            # 🔥 histórico completo
-            HistoricoCompra.objects.create(
-                consumivel=compra.consumivel, quantidade=quantidade, preco=preco, loja=loja
-            )
-
-            # 🔄 atualizar stock
-            compra.consumivel.quantidade += quantidade
-            compra.consumivel.save()
-
-        compra.comprado = True
-        compra.save()
-
-    return redirect("lista_compras")
 
 
 def adicionar_consumivel(request):
@@ -371,6 +322,85 @@ def apagar_consumivel(request, id):
         item.delete()
 
     return redirect("despensa")
+
+
+## Lista Compras
+def lista_compras(request):
+    ativos = Compra.objects.filter(comprado=False)
+    comprados = Compra.objects.filter(comprado=True)
+
+    divisoes = Divisao.objects.all()
+
+    return render(
+        request,
+        "inventory/lista_compras.html",
+        {"ativos": ativos, "comprados": comprados, "divisoes": divisoes},
+    )
+
+
+def adicionar_compra(request):
+    if request.method == "POST":
+        nome = request.POST.get("nome")
+        quantidade = int(request.POST.get("quantidade") or 1)
+        divisao_id = request.POST.get("divisao")
+
+        # opcional: tentar ligar a um consumível existente
+        consumivel = Consumivel.objects.filter(nome__iexact=nome).first()
+
+        existente = Compra.objects.filter(nome__iexact=nome, comprado=False).first()
+
+        if existente:
+            existente.quantidade += quantidade
+            existente.save()
+        else:
+            Compra.objects.create(
+                nome=nome,
+                quantidade=quantidade,
+                divisao_id=divisao_id,
+                consumivel=consumivel,  # pode ser None
+            )
+
+    return redirect("lista_compras")
+
+
+def adicionar_a_lista(item):
+    existente = Compra.objects.filter(consumivel=item, comprado=False).first()
+
+    if not existente:
+        Compra.objects.create(nome=item.nome, quantidade=1, divisao=item.divisao, consumivel=item)
+
+
+def marcar_comprado(request, compra_id):
+    compra = get_object_or_404(Compra, id=compra_id)
+
+    if request.method == "POST":
+
+        quantidade = int(request.POST.get("quantidade") or compra.quantidade)
+
+        if compra.consumivel:
+
+            # 🔥 atualizar stock corretamente
+            compra.consumivel.quantidade += quantidade
+            compra.consumivel.save()
+
+        else:
+            # 🔥 criar apenas se não existir
+            consumivel = Consumivel.objects.filter(nome=compra.nome).first()
+
+            if consumivel:
+                consumivel.quantidade += quantidade
+                consumivel.save()
+            else:
+                consumivel = Consumivel.objects.create(
+                    nome=compra.nome, quantidade=quantidade, divisao=compra.divisao
+                )
+
+            compra.consumivel = consumivel
+
+        compra.comprado = True
+        compra.save()
+
+    return redirect("lista_compras")
 
 
 def apagar_compra(request, id):
