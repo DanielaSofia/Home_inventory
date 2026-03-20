@@ -58,6 +58,38 @@
         </div>
       </div>
 
+      <div class="card p-3 mb-4">
+        <form method="POST" action="{% url 'adicionar_compra' %}">
+          {% csrf_token %}
+
+          <div class="row g-2">
+            <!-- nome -->
+            <div class="col-md-5">
+              <input type="text" name="nome" class="form-control" placeholder="Adicionar item..." required />
+            </div>
+
+            <!-- quantidade -->
+            <div class="col-md-2">
+              <input type="number" name="quantidade" class="form-control" value="1" min="1" />
+            </div>
+
+            <!-- divisão -->
+            <div class="col-md-3">
+              <select name="divisao" class="form-select" required>
+                {% for d in divisoes %}
+                  <option value="{{ d.id }}">{{ d.nome }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <!-- botão -->
+            <div class="col-md-2">
+              <button class="btn btn-primary w-100">➕</button>
+            </div>
+          </div>
+        </form>
+      </div>
+
       <!-- LISTA ATIVA -->
       <div class="card p-3 mb-4">
         <div class="section-title">🛒 Precisa de comprar</div>
@@ -85,9 +117,6 @@
               <div class="d-flex align-items-center gap-2">
                 <!-- quantidade -->
                 <span class="badge bg-warning text-dark">{{ item.quantidade }}</span>
-
-                <!-- botão -->
-                <button onclick="toggleForm({{ item.id }})" class="btn btn-success btn-sm">✔</button>
 
                 <form method="POST" action="{% url 'marcar_comprado' item.id %}">
                   {% csrf_token %}
