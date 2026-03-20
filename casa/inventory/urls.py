@@ -27,7 +27,6 @@ urlpatterns = [
     path("comprado/<int:compra_id>/", marcar_comprado, name="marcar_comprado"),
     path("criar-item/", criar_item, name="criar_item"),
     path("despensa/", despensa, name="despensa"),
-    path("comprado/<int:compra_id>/", marcar_comprado, name="marcar_comprado"),
     path("editar-item/<int:item_id>/", editar_item, name="editar_item"),
     path("apagar-item/<int:item_id>/", apagar_item, name="apagar_item"),
     path("editar-desejo/<int:desejo_id>/", editar_desejo, name="editar_desejo"),
