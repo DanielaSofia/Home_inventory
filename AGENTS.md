@@ -1,5 +1,12 @@
 # AGENTS — Orientações para agentes de IA
 
+![Check Migrations](https://github.com/DanielaSofia/Home_inventory/actions/workflows/check-migrations.yml/badge.svg?branch=master)
+
+Este arquivo dá instruções concisas para agentes automatizados (Copilot, ChatOps, etc.) trabalharem neste repositório.
+
+Objetivo rápido
+# AGENTS — Orientações para agentes de IA
+
 Este arquivo dá instruções concisas para agentes automatizados (Copilot, ChatOps, etc.) trabalharem neste repositório.
 
 Objetivo rápido
