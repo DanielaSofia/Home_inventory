@@ -5,11 +5,6 @@
 Este arquivo dá instruções concisas para agentes automatizados (Copilot, ChatOps, etc.) trabalharem neste repositório.
 
 Objetivo rápido
-# AGENTS — Orientações para agentes de IA
-
-Este arquivo dá instruções concisas para agentes automatizados (Copilot, ChatOps, etc.) trabalharem neste repositório.
-
-Objetivo rápido
 - Projeto Django simples para inventário doméstico. Use `python manage.py` para tarefas comuns.
 
 Comandos essenciais
