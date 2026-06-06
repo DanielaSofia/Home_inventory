@@ -1,21 +1,31 @@
-from django.contrib import messages
+"""Views do app inventory: views baseadas em Django e ViewSets da API.
+
+Este módulo contém as views usadas pela aplicação web (renderização
+de templates) e os ViewSets da API REST.
+"""
+
 from django.db.models import Avg, F, Sum
 from django.db.models.functions import TruncMonth
 from django.shortcuts import get_object_or_404, redirect, render
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, viewsets
+from rest_framework.response import Response
 
 from .forms import DesejoForm, DivisaoForm, ItemForm
-from .models import Compra, Consumivel, Desejo, Divisao, HistoricoCompra, Item
+from .models import Compra, Consumivel, Desejo, Divisao, Item
 from .serializers import DivisaoSerializer, ItemSerializer
 
 
 class DivisaoViewSet(viewsets.ModelViewSet):
+    """API ViewSet para gerir divisões da casa."""
+
     queryset = Divisao.objects.all()
     serializer_class = DivisaoSerializer
 
 
 class ItemViewSet(viewsets.ModelViewSet):
+    """API ViewSet para gerir itens da casa."""
+
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
@@ -23,9 +33,13 @@ class ItemViewSet(viewsets.ModelViewSet):
     filterset_fields = ["divisao"]
 
     def get_serializer_context(self):
+        """Inclui o `request` no contexto do serializer."""
+
         return {"request": self.request}
 
     def total_valor(self, request):
+        """Endpoint custom que retorna o total do valor dos itens."""
+
         if request.method == "GET":
             total = Item.objects.aggregate(Sum("valor"))
             return Response({"total_valor_casa": total["valor__sum"]})
@@ -35,6 +49,10 @@ class ItemViewSet(viewsets.ModelViewSet):
 
 
 def itens(request):
+    """Renderiza a listagem de itens e trata a criação via formulário.
+
+    Mostra também filtros por divisão e estatísticas básicas.
+    """
 
     item_form = ItemForm()
     divisao_form = DivisaoForm()
@@ -70,6 +88,10 @@ def itens(request):
 
 
 def criar_item(request):
+    """Cria um `Item` simples a partir de `POST` e redireciona para `itens`.
+
+    Usa apenas campos mínimos (`nome`, `descricao`, `quantidade`).
+    """
 
     if request.method == "POST":
 
@@ -83,6 +105,10 @@ def criar_item(request):
 
 
 def editar_item(request, item_id):
+    """Renderiza e processa o formulário de edição para um `Item`.
+
+    `item_id` identifica o item a editar.
+    """
 
     item = get_object_or_404(Item, id=item_id)
 
@@ -100,6 +126,7 @@ def editar_item(request, item_id):
 
 
 def apagar_item(request, item_id):
+    """Apaga um `Item` após confirmação via `POST` e redireciona para `itens`."""
 
     item = get_object_or_404(Item, id=item_id)
 
@@ -113,6 +140,7 @@ def apagar_item(request, item_id):
 
 
 def desejos(request):
+    """Lista desejos, processa criação e mostra estatísticas simples."""
 
     # 🔹 formulário
     if request.method == "POST" and "add_desejo" in request.POST:
@@ -145,7 +173,9 @@ def desejos(request):
 
     return render(request, "inventory/desejos.html", context)
 
+
 def editar_desejo(request, desejo_id):
+    """Edita um `Desejo` identificado por `desejo_id`."""
 
     desejo = get_object_or_404(Desejo, id=desejo_id)
 
@@ -163,6 +193,7 @@ def editar_desejo(request, desejo_id):
 
 
 def apagar_desejo(request, desejo_id):
+    """Apaga um `Desejo` após confirmação via `POST`."""
 
     desejo = get_object_or_404(Desejo, id=desejo_id)
 
@@ -173,6 +204,11 @@ def apagar_desejo(request, desejo_id):
 
 
 def comprar_desejo(request, desejo_id):
+    """Converte um `Desejo` em `Item` (compra) e remove o desejo.
+
+    Recebe dados opcionais como `data` e `preco` via `POST`.
+    """
+
     desejo = get_object_or_404(Desejo, id=desejo_id)
 
     if request.method == "POST":
@@ -196,6 +232,8 @@ def comprar_desejo(request, desejo_id):
 
 
 def menu(request):
+    """Renderiza o menu principal do app inventory."""
+
     return render(request, "inventory/menu.html")
 
 
@@ -203,6 +241,7 @@ def menu(request):
 
 
 def gastos(request):
+    """Gera a página de gastos com agregações e relatórios simples."""
     itens = Item.objects.all()
 
     # 💰 Total
@@ -243,6 +282,7 @@ def gastos(request):
 
 
 def despensa(request):
+    """Mostra a lista de consumíveis (despensa) com filtros e pesquisa."""
     divisao_id = request.GET.get("divisao")
     query = request.GET.get("q")
 
@@ -258,15 +298,16 @@ def despensa(request):
 
     divisoes = Divisao.objects.all()
 
-    return render(request, "inventory/despensa.html", {
-        "itens": itens,
-        "divisoes": divisoes,
-        "divisao_selecionada": divisao_id,
-        "query": query
-    })
+    return render(
+        request,
+        "inventory/despensa.html",
+        {"itens": itens, "divisoes": divisoes, "divisao_selecionada": divisao_id, "query": query},
+    )
 
 
 def consumir_consumivel(request, id):
+    """Decrementa a quantidade de um `Consumivel` e adiciona à lista se necessário."""
+
     item = get_object_or_404(Consumivel, id=id)
 
     # 🔒 evitar negativos + update atómico
@@ -284,6 +325,8 @@ def consumir_consumivel(request, id):
 
 
 def adicionar_consumivel(request):
+    """Adiciona um novo `Consumivel` via `POST` e redireciona para `despensa`."""
+
     if request.method == "POST":
         nome = request.POST.get("nome")
         quantidade = int(request.POST.get("quantidade") or 1)
@@ -303,6 +346,8 @@ def adicionar_consumivel(request):
 
 
 def repor_consumivel(request, id):
+    """Repondo a quantidade de um `Consumivel` e limpa a lista de compras se necessário."""
+
     item = get_object_or_404(Consumivel, id=id)
 
     item.quantidade += 1
@@ -316,6 +361,8 @@ def repor_consumivel(request, id):
 
 
 def apagar_consumivel(request, id):
+    """Apaga um `Consumivel` após confirmação via `POST`."""
+
     item = get_object_or_404(Consumivel, id=id)
 
     if request.method == "POST":
@@ -326,6 +373,8 @@ def apagar_consumivel(request, id):
 
 ## Lista Compras
 def lista_compras(request):
+    """Mostra a lista de compras dividida entre ativos e comprados."""
+
     ativos = Compra.objects.filter(comprado=False)
     comprados = Compra.objects.filter(comprado=True)
 
@@ -339,6 +388,8 @@ def lista_compras(request):
 
 
 def adicionar_compra(request):
+    """Adiciona uma `Compra` (ou incrementa se já existir) a partir de `POST`."""
+
     if request.method == "POST":
         nome = request.POST.get("nome")
         quantidade = int(request.POST.get("quantidade") or 1)
@@ -364,6 +415,8 @@ def adicionar_compra(request):
 
 
 def adicionar_a_lista(item):
+    """Adiciona um `Consumivel` à lista de compras se ainda não existir."""
+
     existente = Compra.objects.filter(consumivel=item, comprado=False).first()
 
     if not existente:
@@ -371,6 +424,8 @@ def adicionar_a_lista(item):
 
 
 def marcar_comprado(request, compra_id):
+    """Marca uma `Compra` como comprada, atualizando stock ou criando consumível."""
+
     compra = get_object_or_404(Compra, id=compra_id)
 
     if request.method == "POST":

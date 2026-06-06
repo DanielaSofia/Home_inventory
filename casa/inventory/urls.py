@@ -1,16 +1,34 @@
-from django.urls import path
+"""URLs do app inventory.
+
+Regista rotas da API e views baseadas em função usadas pela interface.
+"""
+
+from django.urls import include, path
 from rest_framework.routers import DefaultRouter
+
 from .views import (
-    DivisaoViewSet, ItemViewSet,
-    menu,
+    DivisaoViewSet,
+    ItemViewSet,
+    adicionar_compra,
+    adicionar_consumivel,
+    apagar_compra,
+    apagar_consumivel,
+    apagar_desejo,
+    apagar_item,
+    comprar_desejo,
+    consumir_consumivel,
+    criar_item,
+    desejos,
+    despensa,
     editar_desejo,
-    itens, criar_item, editar_item, apagar_item,
-    desejos, apagar_desejo, comprar_desejo,
+    editar_item,
     gastos,
-    despensa, marcar_comprado, lista_compras, adicionar_compra,  apagar_compra,
-    adicionar_consumivel, consumir_consumivel, repor_consumivel, apagar_consumivel
+    itens,
+    lista_compras,
+    marcar_comprado,
+    menu,
+    repor_consumivel,
 )
-from django.urls import include
 
 router = DefaultRouter()
 router.register(r"divisoes", DivisaoViewSet)
