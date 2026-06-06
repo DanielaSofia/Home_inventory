@@ -1,8 +1,16 @@
+"""Forms Django para o app inventory.
+
+Contém forms de modelo usados nas views para criar/editar objetos.
+"""
+
 from django import forms
-from .models import Item, Divisao, Desejo, Compra
+
+from .models import Compra, Desejo, Divisao, Item
 
 
 class ItemForm(forms.ModelForm):
+    """Formulário de `Item` usado para criação/edição via interface."""
+
     class Meta:
         model = Item
         fields = "__all__"
@@ -18,12 +26,16 @@ class ItemForm(forms.ModelForm):
 
 
 class DivisaoForm(forms.ModelForm):
+    """Formulário para criar/editar uma `Divisao`."""
+
     class Meta:
         model = Divisao
         fields = ["nome"]
 
 
 class DesejoForm(forms.ModelForm):
+    """Formulário para o modelo `Desejo`."""
+
     class Meta:
         model = Desejo
         fields = "__all__"
@@ -37,6 +49,8 @@ class DesejoForm(forms.ModelForm):
 
 
 class CompraForm(forms.ModelForm):
+    """Formulário para gerir `Compra` (lista de compras)."""
+
     class Meta:
         model = Compra
         fields = ["nome", "quantidade", "comprado", "divisao"]

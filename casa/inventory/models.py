@@ -1,7 +1,15 @@
+"""Modelos do app inventory.
+
+Define os modelos `Divisao`, `Item`, `Desejo`, `Compra`, `Consumivel` e
+`HistoricoCompra` utilizados pela aplicação.
+"""
+
 from django.db import models
 
 
 class Divisao(models.Model):
+    """Representa uma divisão/compartimento da casa (ex.: cozinha, sala)."""
+
     nome = models.CharField(max_length=255)
 
     def __str__(self):
@@ -9,6 +17,8 @@ class Divisao(models.Model):
 
 
 class Item(models.Model):
+    """Item físico registado na casa, com quantidade e valor."""
+
     divisao = models.ForeignKey(Divisao, on_delete=models.CASCADE, related_name="itens")
     nome = models.CharField(max_length=200)
     descricao = models.TextField(blank=True, null=True)
@@ -23,6 +33,8 @@ class Item(models.Model):
 
 
 class Desejo(models.Model):
+    """Representa um item desejado (wishlist) que ainda não foi comprado."""
+
     nome = models.CharField(max_length=200)
     descricao = models.TextField(blank=True)
     valor = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
@@ -33,44 +45,38 @@ class Desejo(models.Model):
     def __str__(self):
         return self.nome
 
+
 class Compra(models.Model):
+    """Entrada da lista de compras, pode referenciar um `Consumivel` existente."""
 
     nome = models.CharField(max_length=200)
     quantidade = models.IntegerField(default=1)
     comprado = models.BooleanField(default=False)
-    divisao = models.ForeignKey(
-        "Divisao",
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True
-    )
-    consumivel = models.ForeignKey(
-        "Consumivel",
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True
-    )
+    divisao = models.ForeignKey("Divisao", on_delete=models.SET_NULL, null=True, blank=True)
+    consumivel = models.ForeignKey("Consumivel", on_delete=models.SET_NULL, null=True, blank=True)
+
     def __str__(self):
         return self.nome
 
+
 class Consumivel(models.Model):
+    """Item consumível com quantidade mínima para trigger de reposição."""
+
     nome = models.CharField(max_length=100)
     quantidade = models.IntegerField(default=1)
     quantidade_minima = models.IntegerField(default=1)
-    divisao = models.ForeignKey('Divisao', on_delete=models.CASCADE)
+    divisao = models.ForeignKey("Divisao", on_delete=models.CASCADE)
     preco = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
     loja = models.CharField(max_length=200, null=True, blank=True)
 
     def __str__(self):
         return self.nome
-    
-class HistoricoCompra(models.Model):
 
-    consumivel = models.ForeignKey(
-        "Consumivel",
-        on_delete=models.CASCADE,
-        related_name="historico"
-    )
+
+class HistoricoCompra(models.Model):
+    """Registo histórico de compras de consumíveis com preço e loja."""
+
+    consumivel = models.ForeignKey("Consumivel", on_delete=models.CASCADE, related_name="historico")
 
     quantidade = models.IntegerField()
     preco = models.DecimalField(max_digits=8, decimal_places=2)
