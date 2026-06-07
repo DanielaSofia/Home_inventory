@@ -1,6 +1,4 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="pt">
+{% extends 'inventory/base.html' %}
 
 <head>
 
@@ -117,7 +115,54 @@
 
                </div>
 
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-lg-7">
+      <div class="card p-4">
+        <h3 class="mb-4">✏️ Editar Item</h3>
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label">Nome</label>{{ form.nome }}
           </div>
+          <div class="mb-3">
+            <label class="form-label">Descrição</label>{{ form.descricao }}
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Quantidade</label>{{ form.quantidade }}
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Valor (€)</label>{{ form.valor }}
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Divisão</label>{{ form.divisao }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Data de aquisição</label>{{ form.data_aquisicao }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Imagem</label>{{ form.imagem }}
+            {% if form.instance.imagem %}
+              <img id="preview" src="{{ form.instance.imagem.url }}" class="img-fluid mt-2 rounded" />
+            {% else %}
+              <img id="preview" class="img-fluid mt-2 rounded" style="display:none" />
+            {% endif %}
+          </div>
+          <div class="d-flex justify-content-between mt-4">
+            <a href="{% url 'itens' %}" class="btn btn-outline-secondary">⬅ Voltar</a>
+            <button class="btn btn-primary">💾 Guardar</button>
+          </div>
+        </form>
+        <form method="post" action="{% url 'apagar_item' form.instance.id %}" class="mt-3">
+          {% csrf_token %}
+          <button class="btn btn-danger">🗑 Apagar Item</button>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}
 
      </div>
 

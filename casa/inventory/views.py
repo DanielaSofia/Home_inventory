@@ -30,7 +30,7 @@ def service_worker(request):
 ## Item
 
 
-def itens(request):
+def listar_itens(request):
     """Renderiza a listagem de itens e trata a criação via formulário.
 
     Mostra também filtros por divisão e estatísticas básicas.
@@ -61,8 +61,17 @@ def itens(request):
         search_filter = Q(nome__icontains=search_query) | Q(descricao__icontains=search_query)
         itens = itens.filter(search_filter)
 
+    # paginação
+    paginator = Paginator(itens.order_by("nome"), 24)
+    page_number = request.GET.get("page") or 1
+    page_obj = paginator.get_page(page_number)
+
+    # fornecer `itens` como page_obj para compatibilidade com template
+    itens = page_obj
+
     context = {
         "itens": itens,
+        "page_obj": page_obj,
         "divisoes": divisoes,
         "item_form": item_form,
         "divisao_form": divisao_form,
@@ -328,6 +337,57 @@ def menu(request):
     """Renderiza o menu principal do app inventory."""
 
     return render(request, "inventory/menu.html")
+
+
+def dashboard(request):
+    """Página de dashboard com métricas rápidas do inventário."""
+
+    itens = Item.objects.all()
+
+    # total de unidades (soma das quantidades dos itens)
+    total_unidades = itens.aggregate(total=Sum("quantidade"))["total"] or 0
+
+    # valor total considerando quantidade * valor por item
+    total_valor = itens.aggregate(total=Sum(F("valor") * F("quantidade")))["total"] or 0
+
+    # divisões com maior valor
+    top_divisoes = (
+        itens.values("divisao__nome")
+        .annotate(total=Sum(F("valor") * F("quantidade")))
+        .order_by("-total")
+    )
+
+    # consumíveis em alerta (abaixo ou igual ao mínimo)
+    consumiveis_alerta = Consumivel.objects.filter(quantidade__lte=F("quantidade_minima"))
+
+    # itens adicionados recentemente
+    recentes = Item.objects.order_by("-data_adicionado")[:5]
+
+    # gastos mensais para gráfico
+    gastos_mensais_qs = (
+        itens.annotate(mes=TruncMonth("data_aquisicao"))
+        .values("mes")
+        .annotate(total=Sum(F("valor") * F("quantidade")))
+        .order_by("mes")
+    )
+
+    # preparar labels/valores para o chart (JSON)
+    import json
+
+    labels = [g["mes"].strftime("%b %Y") if g.get("mes") else "" for g in gastos_mensais_qs]
+    values = [float(g.get("total") or 0) for g in gastos_mensais_qs]
+
+    context = {
+        "total_unidades": total_unidades,
+        "total_valor": total_valor,
+        "top_divisoes": top_divisoes,
+        "consumiveis_alerta": consumiveis_alerta,
+        "recentes": recentes,
+        "gastos_mensais_labels": json.dumps(labels),
+        "gastos_mensais_values": json.dumps(values),
+    }
+
+    return render(request, "inventory/dashboard.html", context)
 
 
 ## Gastos

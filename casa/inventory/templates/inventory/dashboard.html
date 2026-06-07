@@ -1,0 +1,142 @@
+{% extends 'inventory/base.html' %}
+
+{% block title %}
+  Dashboard — Gestão da Casa
+{% endblock %}
+
+{% block content %}
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="h4 mb-0">📊 Dashboard</h3>
+    <a href="{% url 'menu' %}" class="btn btn-link">Voltar</a>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+      <div class="card p-3 shadow-sm">
+        <div class="d-flex align-items-center">
+          <div class="me-3 fs-3">📦</div>
+          <div>
+            <div class="muted-small">Total unidades</div>
+            <div class="fs-5 fw-bold">{{ total_unidades }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card p-3 shadow-sm">
+        <div class="d-flex align-items-center">
+          <div class="me-3 fs-3">€</div>
+          <div>
+            <div class="muted-small">Valor total</div>
+            <div class="fs-5 fw-bold">€ {{ total_valor|floatformat:2 }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card p-3 shadow-sm">
+        <div class="d-flex align-items-center">
+          <div class="me-3 fs-3">⚠️</div>
+          <div>
+            <div class="muted-small">Consumíveis em alerta</div>
+            <div class="fs-5 fw-bold">{{ consumiveis_alerta.count }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card p-3 shadow-sm">
+        <div class="d-flex align-items-center">
+          <div class="me-3 fs-3">🕘</div>
+          <div>
+            <div class="muted-small">Itens recentes</div>
+            <div class="fs-5 fw-bold">{{ recentes.count }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-7 mb-3">
+      <div class="card p-3 shadow-sm">
+        <h5 class="mb-3">Gastos mensais</h5>
+        <canvas id="gastosChart" width="400" height="200" data-labels="{{ gastos_mensais_labels|escapejs }}" data-values="{{ gastos_mensais_values|escapejs }}"></canvas>
+      </div>
+    </div>
+
+    <div class="col-lg-5 mb-3">
+      <div class="card p-3 shadow-sm mb-3">
+        <h5 class="mb-3">Top divisões por valor</h5>
+        <ul class="list-group list-group-flush">
+          {% for d in top_divisoes %}
+            <li class="list-group-item d-flex justify-content-between align-items-center break-word">
+              {{ d.divisao__nome|default:'(Sem divisão)' }}
+              <span>€ {{ d.total|floatformat:2 }}</span>
+            </li>
+          {% empty %}
+            <li class="list-group-item">Sem dados</li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div class="card p-3 shadow-sm">
+        <h5 class="mb-3">Consumíveis em alerta</h5>
+        <ul class="list-group list-group-flush">
+          {% for c in consumiveis_alerta %}
+            <li class="list-group-item d-flex justify-content-between align-items-center break-word">
+              <div>
+                <div>{{ c.nome }}</div>
+                <small class="text-muted">{{ c.quantidade }} / min {{ c.quantidade_minima }}</small>
+              </div>
+              <a href="{% url 'despensa' %}?q={{ c.nome }}" class="btn btn-sm btn-primary">Ver</a>
+            </li>
+          {% empty %}
+            <li class="list-group-item">Sem consumíveis em alerta</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card p-3 mt-3 shadow-sm">
+    <h5>Itens recentes</h5>
+    <div class="table-responsive">
+      <table class="table table-sm mt-2">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Divisão</th>
+            <th>Quantidade</th>
+            <th>Data</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for i in recentes %}
+            <tr>
+              <td class="break-word">{{ i.nome }}</td>
+              <td>
+                {% if i.divisao %}
+                  {{ i.divisao.nome }}
+                {% else %}
+                  —
+                {% endif %}
+              </td>
+              <td>{{ i.quantidade }}</td>
+              <td>{{ i.data_adicionado|date:'Y-m-d H:i' }}</td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="4">Nenhum item recente</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="/static/inventory/js/charts.js"></script>
+{% endblock %}

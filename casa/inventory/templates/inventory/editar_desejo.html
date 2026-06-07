@@ -99,6 +99,24 @@
 
         </div>
 
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card p-4">
+        <h3 class="mb-3">✏️ Editar Desejo</h3>
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <div class="d-flex justify-content-between mt-3">
+            <a href="{% url 'desejos' %}" class="btn btn-outline-secondary">⬅ Voltar</a>
+            <button class="btn btn-warning">Guardar</button>
+          </div>
+        </form>
+        <form method="post" action="{% url 'apagar_desejo' form.instance.id %}" class="mt-3">
+          {% csrf_token %}
+          <button class="btn btn-danger">🗑 Apagar Desejo</button>
+        </form>
+      </div>
     </div>
 
 {% include "inventory/_sidebar.html" %}

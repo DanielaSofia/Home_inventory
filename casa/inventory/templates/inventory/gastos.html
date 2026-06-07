@@ -1,6 +1,4 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="pt">
+{% extends 'inventory/base.html' %}
 
 <head>
     <meta charset="UTF-8">
@@ -51,6 +49,12 @@
             </div>
         </div>
 
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card p-3 mb-3">
+        <h5>Gastos Mensais</h5>
+        <canvas id="gastosChart" data-labels="{{ gastos_mensais_labels|escapejs }}" data-values="{{ gastos_mensais_values|escapejs }}"></canvas>
+      </div>
     </div>
 
     <!-- GRÁFICOS -->
@@ -71,6 +75,8 @@
         </div>
 
     </div>
+  </div>
+{% endblock %}
 
     <!-- LISTA -->
     <div class="section-card">
