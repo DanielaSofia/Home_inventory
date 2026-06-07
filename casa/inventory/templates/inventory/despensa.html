@@ -1,235 +1,132 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="pt">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Despensa</title>
+{% extends 'inventory/base.html' %}
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+{% block title %}
+  Despensa — Gestão da Casa
+{% endblock %}
 
-    <style>
-      body {
-        background: #f4f6fb;
-      }
-      
-      .card {
-        border: none;
-        border-radius: 16px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-      }
-      
-      .item-row {
-        transition: 0.2s;
-      }
-      
-      .item-row:hover {
-        background: #f9fafc;
-      }
-      
-      .stock-low {
-        color: #dc3545;
-        font-weight: bold;
-      }
-      
-      .stock-ok {
-        color: #198754;
-      }
-    </style>
-  </head>
-
-  <body>
-    <div class="container py-5">
-      <!-- HEADER -->
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>🍎 Despensa</h2>
-
-        <div class="d-flex gap-2">
-          <a href="{% url 'lista_compras' %}" class="btn btn-warning">🛒 Lista</a>
-          <a href="/" class="btn btn-outline-secondary">⬅ Voltar</a>
-        </div>
-      </div>
-
-      <!-- FORM -->
-      <div class="card p-3 mb-4">
-        <form method="POST" action="{% url 'adicionar_consumivel' %}">
-          {% csrf_token %}
-
-          <div class="row g-2">
-            <div class="col-md-4">
-              <input type="text" name="nome" class="form-control" placeholder="Item..." required />
-            </div>
-
-            <div class="col-md-2">
-              <input type="number" name="quantidade" class="form-control" value="1" min="1" />
-            </div>
-
-            <div class="col-md-3">
-              <select name="divisao" class="form-select" required>
-                {% for d in divisoes %}
-                  <option value="{{ d.id }}">{{ d.nome }}</option>
-                {% endfor %}
-              </select>
-            </div>
-
-            <div class="col-md-3">
-              <button class="btn btn-primary w-100">➕ Adicionar</button>
-            </div>
-          </div>
-        </form>
-      </div>
-      <form method="GET" class="mb-3">
-
-    <div class="row g-2">
-
-        <!-- 🔍 pesquisa -->
-        <div class="col-md-5">
-            <input type="text" name="q" class="form-control"
-                   placeholder="🔍 Procurar item..."
-                   value="{{ query }}">
-        </div>
-
-        <!-- 📂 divisão -->
-        <div class="col-md-4">
-            <select name="divisao" class="form-select">
-
-                <option value="">Todas as divisões</option>
-
-                {% for d in divisoes %}
-                    <option value="{{ d.id }}"
-                        {% if divisao_selecionada == d.id|stringformat:"s" %}
-                            selected
-                        {% endif %}
-                    >
-                        {{ d.nome }}
-                    </option>
-                {% endfor %}
-
-            </select>
-        </div>
-
-        <!-- botão -->
-        <div class="col-md-3">
-            <button class="btn btn-primary w-100">
-                Filtrar
-            </button>
-        </div>
-
+{% block content %}
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="h4 mb-0">🍎 Despensa</h2>
+      <div class="muted-small">Gestão de consumíveis</div>
     </div>
-
-</form>    
-  <form method="GET" class="mb-3">
-
     <div class="d-flex gap-2">
-
-        <select name="divisao" class="form-select"
-                onchange="this.form.submit()">
-
-            <option value="">Todas as divisões</option>
-
-            {% for d in divisoes %}
-                <option value="{{ d.id }}"
-                    {% if divisao_selecionada == d.id|stringformat:"s" %}
-                        selected
-                    {% endif %}
-                >
-                    {{ d.nome }}
-                </option>
-            {% endfor %}
-
-        </select>
-
+      <a href="{% url 'lista_compras' %}" class="btn btn-warning">🛒 Lista</a>
+      <a href="{% url 'menu' %}" class="btn btn-outline-secondary">⬅ Voltar</a>
     </div>
+  </div>
 
-</form>
-      <!-- LISTA -->
-      <div class="card p-3">
-        <ul class="list-group list-group-flush">
-          {% for item in itens %}
-            <li class="list-group-item item-row d-flex justify-content-between align-items-center" data-nome="{{ item.nome|lower }}">
-              <!-- INFO -->
-              <div>
-                <strong>{{ item.nome }}</strong><br />
+  <div class="card p-3 mb-4">
+    <form method="POST" action="{% url 'adicionar_consumivel' %}">
+      {% csrf_token %}
+      <div class="row g-2">
+        <div class="col-md-4">
+          <input type="text" name="nome" class="form-control" placeholder="Item..." required />
+        </div>
+        <div class="col-md-2">
+          <input type="number" name="quantidade" class="form-control" value="1" min="1" />
+        </div>
+        <div class="col-md-3">
+          <select name="divisao" class="form-select" required>
+            {% for d in divisoes %}
+              <option value="{{ d.id }}">{{ d.nome }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-3">
+          <button class="btn btn-primary w-100">➕ Adicionar</button>
+        </div>
+      </div>
+    </form>
+  </div>
 
-                <small class="text-muted">{{ item.divisao.nome }}</small><br />
+  <form method="get" class="row g-2 mb-3">
+    <div class="col-md-5">
+      <input id="searchInput" type="text" name="q" class="form-control" placeholder="🔍 Procurar item..." value="{{ query }}" />
+    </div>
+    <div class="col-md-4">
+      <select name="divisao" class="form-select">
+        <option value="">Todas as divisões</option>
+        {% for d in divisoes %}
+          {% if divisao_selecionada|stringformat:'s' == d.id|stringformat:'s' %}
+            <option value="{{ d.id }}" selected>{{ d.nome }}</option>
+          {% else %}
+            <option value="{{ d.id }}">{{ d.nome }}</option>
+          {% endif %}
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-3">
+      <button class="btn btn-primary w-100">Filtrar</button>
+    </div>
+  </form>
 
-                {% if item.quantidade <= item.quantidade_minima %}
-                  <span class="stock-low">⚠️ A acabar</span>
-                {% else %}
-                  <span class="stock-ok">✔ Em stock</span>
-                {% endif %}
+  <div class="card p-3">
+    <ul class="list-group list-group-flush">
+      {% for item in itens %}
+        <li class="list-group-item item-row d-flex justify-content-between align-items-center" data-nome="{{ item.nome|lower }}">
+          <div>
+            <strong>{{ item.nome }}</strong><br />
+            <small class="text-muted">{{ item.divisao.nome }}</small><br />
+            {% if item.quantidade <= item.quantidade_minima %}
+              <span class="text-danger">⚠️ A acabar</span>
+            {% else %}
+              <span class="text-success">✔ Em stock</span>
+            {% endif %}
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-dark">{{ item.quantidade }}</span>
+            <form method="POST" action="{% url 'consumir_consumivel' item.id %}">
+              {% csrf_token %}<button class="btn btn-danger btn-sm">➖</button>
+            </form>
+            <form method="POST" action="{% url 'repor_consumivel' item.id %}">
+              {% csrf_token %}<button class="btn btn-success btn-sm">➕</button>
+            </form>
+            <form method="POST" action="{% url 'apagar_consumivel' item.id %}">
+              {% csrf_token %}<button class="btn btn-outline-danger btn-sm" onclick="return confirm('Apagar item?')">🗑</button>
+            </form>
+            <button class="btn btn-outline-dark btn-sm" data-bs-toggle="modal" data-bs-target="#modal{{ item.id }}">📜</button>
+          </div>
+        </li>
+      {% empty %}
+        <li class="list-group-item text-center">🍃 Despensa vazia</li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  {% for item in itens %}
+    <div class="modal fade" id="modal{{ item.id }}" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">📜 Histórico — {{ item.nome }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            {% for h in item.historico.all|slice:':10' %}
+              <div class="mb-2 border-bottom pb-2">
+                <strong>{{ h.loja }}</strong><br /><small class="text-muted">{{ h.data|date:'d/m/Y' }}</small><br /><small>💰 €{{ h.preco }} • 🔢 {{ h.quantidade }}</small>
               </div>
-
-              <!-- AÇÕES -->
-              <div class="d-flex align-items-center gap-2">
-                <!-- quantidade -->
-                <span class="badge bg-dark">{{ item.quantidade }}</span>
-                <!-- usar -->
-                <form method="POST" action="{% url 'consumir_consumivel' item.id %}">
-                  {% csrf_token %}
-                  <button class="btn btn-danger btn-sm">➖</button>
-                </form>
-
-                <!-- repor -->
-                <form method="POST" action="{% url 'repor_consumivel' item.id %}">
-                  {% csrf_token %}
-                  <button class="btn btn-success btn-sm">➕</button>
-                </form>
-
-                <!-- apagar -->
-                <form method="POST" action="{% url 'apagar_consumivel' item.id %}">
-                  {% csrf_token %}
-                  <button class="btn btn-outline-danger btn-sm" onclick="return confirm('Apagar item?')">🗑</button>
-                </form>
-                <button class="btn btn-outline-dark btn-sm" data-bs-toggle="modal" data-bs-target="#modal{{ item.id }}">📜</button>
-                <div class="modal fade" id="modal{{ item.id }}" tabindex="-1">
-                  <div class="modal-dialog">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title">📜 Histórico — {{ item.nome }}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                      </div>
-
-                      <div class="modal-body">
-                        {% for h in item.historico.all|slice:':10' %}
-                          <div class="mb-2 border-bottom pb-2">
-                            <strong>{{ h.loja }}</strong><br />
-
-                            <small class="text-muted">{{ h.data|date:'d/m/Y' }}</small><br />
-
-                            <small>💰 €{{ h.preco }} • 🔢 {{ h.quantidade }}</small>
-                          </div>
-                        {% empty %}
-                          <p class="text-muted">Sem histórico</p>
-                        {% endfor %}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </li>
-          {% empty %}
-            <li class="list-group-item text-center">🍃 Despensa vazia</li>
-          {% endfor %}
-        </ul>
+            {% empty %}
+              <p class="text-muted">Sem histórico</p>
+            {% endfor %}
+          </div>
+        </div>
       </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-      const searchInput = document.getElementById('searchInput')
-      
+  {% endfor %}
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    const searchInput = document.getElementById('searchInput')
+    if (searchInput) {
       searchInput.addEventListener('keyup', function () {
         const value = this.value.toLowerCase()
-      
         document.querySelectorAll('.item-row').forEach((item) => {
           const nome = item.getAttribute('data-nome')
-      
-          if (nome.includes(value)) {
-            item.style.display = 'flex'
-          } else {
-            item.style.display = 'none'
-          }
+          item.style.display = nome.includes(value) ? 'flex' : 'none'
         })
       })
-    </script>
-  </body>
-</html>
+    }
+  </script>
+{% endblock %}

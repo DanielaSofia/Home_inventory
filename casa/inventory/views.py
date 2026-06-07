@@ -4,6 +4,7 @@ Este módulo contém as views usadas pela aplicação web (renderização
 de templates) e os ViewSets da API REST.
 """
 
+from django.core.paginator import Paginator
 from django.db.models import Avg, F, Sum
 from django.db.models.functions import TruncMonth
 from django.shortcuts import get_object_or_404, redirect, render
@@ -48,7 +49,7 @@ class ItemViewSet(viewsets.ModelViewSet):
 ## Item
 
 
-def itens(request):
+def listar_itens(request):
     """Renderiza a listagem de itens e trata a criação via formulário.
 
     Mostra também filtros por divisão e estatísticas básicas.
@@ -75,8 +76,17 @@ def itens(request):
     if divisao_id:
         itens = itens.filter(divisao_id=divisao_id)
 
+    # paginação
+    paginator = Paginator(itens.order_by("nome"), 24)
+    page_number = request.GET.get("page") or 1
+    page_obj = paginator.get_page(page_number)
+
+    # fornecer `itens` como page_obj para compatibilidade com template
+    itens = page_obj
+
     context = {
         "itens": itens,
+        "page_obj": page_obj,
         "divisoes": divisoes,
         "item_form": item_form,
         "divisao_form": divisao_form,
@@ -237,6 +247,57 @@ def menu(request):
     return render(request, "inventory/menu.html")
 
 
+def dashboard(request):
+    """Página de dashboard com métricas rápidas do inventário."""
+
+    itens = Item.objects.all()
+
+    # total de unidades (soma das quantidades dos itens)
+    total_unidades = itens.aggregate(total=Sum("quantidade"))["total"] or 0
+
+    # valor total considerando quantidade * valor por item
+    total_valor = itens.aggregate(total=Sum(F("valor") * F("quantidade")))["total"] or 0
+
+    # divisões com maior valor
+    top_divisoes = (
+        itens.values("divisao__nome")
+        .annotate(total=Sum(F("valor") * F("quantidade")))
+        .order_by("-total")
+    )
+
+    # consumíveis em alerta (abaixo ou igual ao mínimo)
+    consumiveis_alerta = Consumivel.objects.filter(quantidade__lte=F("quantidade_minima"))
+
+    # itens adicionados recentemente
+    recentes = Item.objects.order_by("-data_adicionado")[:5]
+
+    # gastos mensais para gráfico
+    gastos_mensais_qs = (
+        itens.annotate(mes=TruncMonth("data_aquisicao"))
+        .values("mes")
+        .annotate(total=Sum(F("valor") * F("quantidade")))
+        .order_by("mes")
+    )
+
+    # preparar labels/valores para o chart (JSON)
+    import json
+
+    labels = [g["mes"].strftime("%b %Y") if g.get("mes") else "" for g in gastos_mensais_qs]
+    values = [float(g.get("total") or 0) for g in gastos_mensais_qs]
+
+    context = {
+        "total_unidades": total_unidades,
+        "total_valor": total_valor,
+        "top_divisoes": top_divisoes,
+        "consumiveis_alerta": consumiveis_alerta,
+        "recentes": recentes,
+        "gastos_mensais_labels": json.dumps(labels),
+        "gastos_mensais_values": json.dumps(values),
+    }
+
+    return render(request, "inventory/dashboard.html", context)
+
+
 ## Gastos
 
 
@@ -305,10 +366,10 @@ def despensa(request):
     )
 
 
-def consumir_consumivel(request, id):
+def consumir_consumivel(_request, consumivel_id):
     """Decrementa a quantidade de um `Consumivel` e adiciona à lista se necessário."""
 
-    item = get_object_or_404(Consumivel, id=id)
+    item = get_object_or_404(Consumivel, id=consumivel_id)
 
     # 🔒 evitar negativos + update atómico
     if item.quantidade > 0:
@@ -345,10 +406,10 @@ def adicionar_consumivel(request):
     return redirect("despensa")
 
 
-def repor_consumivel(request, id):
+def repor_consumivel(_request, consumivel_id):
     """Repondo a quantidade de um `Consumivel` e limpa a lista de compras se necessário."""
 
-    item = get_object_or_404(Consumivel, id=id)
+    item = get_object_or_404(Consumivel, id=consumivel_id)
 
     item.quantidade += 1
     item.save()
@@ -360,10 +421,10 @@ def repor_consumivel(request, id):
     return redirect("despensa")
 
 
-def apagar_consumivel(request, id):
+def apagar_consumivel(request, consumivel_id):
     """Apaga um `Consumivel` após confirmação via `POST`."""
 
-    item = get_object_or_404(Consumivel, id=id)
+    item = get_object_or_404(Consumivel, id=consumivel_id)
 
     if request.method == "POST":
         item.delete()
@@ -458,8 +519,8 @@ def marcar_comprado(request, compra_id):
     return redirect("lista_compras")
 
 
-def apagar_compra(request, id):
-    compra = get_object_or_404(Compra, id=id)
+def apagar_compra(request, compra_id):
+    compra = get_object_or_404(Compra, id=compra_id)
 
     if request.method == "POST":
         compra.delete()

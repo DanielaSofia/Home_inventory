@@ -1,164 +1,253 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="pt">
-
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Inventário da Casa</title>
-    <!-- Bootstrap 5 CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <style>
-        body {
-            background-color: #f8f9fa;
-        }
-
-        .card-img-top {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-        }
+      body {
+        background-color: #f4f6f9;
+      }
+      .item-card {
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      .item-img {
+        height: 160px;
+        object-fit: cover;
+        width: 100%;
+      }
+      .muted-small {
+        font-size: 0.85rem;
+        color: #6c757d;
+      }
     </style>
-</head>
+  </head>
 
-<body>
-
+  <body>
     <div class="container py-5">
-
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="fw-bold">🏠 Inventário da Casa</h1>
-
-
-            <div class="card shadow-sm border-0 bg-success text-white">
-                <div class="card-body text-center">
-                    <h6>💰 Valor da casa</h6>
-                    <h2>€ {{ total_itens }}</h2>
-                    <p>{{ total_itens_count }} itens</p>
-                </div>
-            </div>
-
-            <a href="{% url 'menu' %}" class="btn btn-outline-secondary">
-                ⬅ Voltar
-            </a>
+      <div class="d-flex justify-content-between align-items-center mb-4 gap-3">
+        <div>
+          <h1 class="h3 mb-0">🏠 Inventário da Casa</h1>
+          <div class="muted-small">Gerencie seus itens e consumíveis</div>
         </div>
-        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addItemModal">➕ Adicionar Item</button>
-     
-        <hr class="my-4">
-        <!-- Filtros por Divisão -->
-        <div class="mb-4">
-            <strong>Filtrar por Divisão:</strong>
-            <a href="{% url 'itens' %}"
-                class="btn btn-sm btn-outline-secondary {% if not request.GET.divisao %}active{% endif %}">Todas</a>
+
+        <div class="d-flex align-items-center gap-3">
+          <div class="text-end">
+            <div class="muted-small">Valor total</div>
+            <div class="fw-bold">€ {{ total_itens|floatformat:2 }}</div>
+            <div class="muted-small">{{ total_itens_count }} itens</div>
+          </div>
+
+          <a href="{% url 'menu' %}" class="btn btn-outline-secondary">⬅ Voltar</a>
+          <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addItemModal">➕ Adicionar</button>
+        </div>
+      </div>
+
+      <div class="row mb-4">
+        <div class="col-lg-8">
+          <form method="get" class="row g-2">
+            <div class="col-md-6">
+              <input type="text" name="q" value="{{ request.GET.q|default:'' }}" class="form-control" placeholder="Pesquisar item..." />
+            </div>
+            <div class="col-md-4">
+              <select name="divisao" class="form-select">
+                <option value="">Todas as divisões</option>
+                {% for d in divisoes %}
+                  <option value="{{ d.id }}">{{ d.nome }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-2">
+              <button class="btn btn-primary w-100">🔍 Filtrar</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="col-lg-4 text-lg-end mt-2 mt-lg-0">
+          <div class="btn-group" role="group">
+            <a href="{% url 'itens' %}" class="btn btn-sm btn-outline-primary">Todas</a>
             {% for div in divisoes %}
-            <a href="?divisao={{ div.id }}"
-                class="btn btn-sm btn-outline-secondary {% if request.GET.divisao|default:'' == div.id|stringformat:'s' %}active{% endif %}">
-                {{ div.nome }}
-            </a>
+              <a href="?divisao={{ div.id }}" class="btn btn-sm btn-outline-secondary">{{ div.nome }}</a>
             {% endfor %}
+          </div>
         </div>
-        <!-- Pesquisa + Filtro -->
-        <form method="get" class="row g-3 mb-4">
+      </div>
 
-            <div class="col-md-5">
-                <input type="text" name="q" class="form-control" placeholder="Pesquisar item...">
-            </div>
-
-            <div class="col-md-4">
-                <select name="divisao" class="form-select">
-                    <option value>Todas as divisões</option>
-                    {% for d in divisoes %}
-                    <option value="{{ d.id }}">{{ d.nome }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <div class="col-md-3">
-                <button class="btn btn-primary w-100">🔍 Filtrar</button>
-            </div>
-
-        </form>
-
-        <!-- Grid de Itens -->
-        <h3>📦 Inventário</h3>
-        <div class="row">
-            {% for item in itens %}
-            <div class="col-md-4">
-                <div class="card mb-3">
-                    {% if item.imagem %}
-                    <img src="{{ item.imagem.url }}" class="card-img-top">
-                    {% endif %}
-                    <div class="card-body">
-                        <h5>{{ item.nome }}</h5>
-                        <p>{{ item.descricao }}</p>
-                        <p>Quantidade: {{ item.quantidade }}</p>
-                        <p>Valor: €{{ item.valor }}</p>
-
-                        {% if item.data_aquisicao %}
-                        <p class="text-muted">
-                            📅 {{ item.data_aquisicao }}
-                        </p>
-                        {% endif %}
-                        {% if item.divisao %}
-                        <span class="badge bg-secondary">
-                            {{ item.divisao.nome }}
-                        </span>
-                        {% endif %}
-                        <a href="{% url 'editar_item' item.id %}" class="btn btn-sm btn-primary">
-                            Editar
-                        </a>
-                    </div>
+      <div class="row g-3" id="items-row" data-current-page="{{ page_obj.number }}" data-total-pages="{{ page_obj.paginator.num_pages }}">
+        {% for item in itens %}
+          <div class="col-sm-6 col-md-4 col-lg-3">
+            <div class="card item-card shadow-sm h-100">
+              {% if item.imagem %}
+                <img src="{{ item.imagem.url }}" class="item-img" alt="{{ item.nome }}" />
+              {% else %}
+                <div class="bg-light d-flex align-items-center justify-content-center" style="height:160px">
+                  <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <rect x="3" y="7" width="18" height="11" rx="2" stroke="#ADB5BD" stroke-width="1.5" fill="#F8F9FA" />
+                    <path d="M3 7l9-4 9 4" stroke="#ADB5BD" stroke-width="1.5" fill="none" />
+                    <circle cx="8" cy="12" r="1.5" fill="#CED4DA" />
+                  </svg>
                 </div>
-            </div>
-            {% empty %}
-            <p>Sem itens nesta divisão.</p>
-            {% endfor %}
+              {% endif %}
+              <div class="card-body d-flex flex-column">
+                <h6 class="mb-1">{{ item.nome }}</h6>
+                <div class="muted-small mb-2">{{ item.descricao|truncatewords:15 }}</div>
 
-        </div>
+                <div class="mb-2">
+                  <span class="badge bg-secondary">{% if item.divisao %}{{ item.divisao.nome }}{% endif %}</span>
+                </div>
 
-        <!-- Modal -->
-        <div class="modal fade" id="addItemModal" tabindex="-1">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
+                <div class="mt-auto d-flex justify-content-between align-items-center">
+                  <div>
+                    <div class="fw-bold">{{ item.quantidade }}x</div>
+                    <div class="muted-small">€ {{ item.valor|floatformat:2 }}</div>
+                  </div>
 
-                    <div class="modal-header">
-                        <h5 class="modal-title">Adicionar Item</h5>
-                        <button class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-
-                    <form method="post" enctype="multipart/form-data">
-
-                        <div class="modal-body">
-
-                            {% csrf_token %}
-                            <input type="hidden" name="add_item" value="1">
-
-                            <!-- SCANNER -->
-                            <div id="scanner-container" class="mb-3" style="display:none;">
-                                <video id="scanner-video" style="width:100%; height:250px;"></video>
-                            </div>
-
-                            <button type="button" onclick="toggleScanner()" class="btn btn-outline-primary w-100 mb-3">
-                                📷 Scan código de barras
-                            </button>
-
-                            <!-- FORM (o teu original) -->
-                            {{ item_form.as_p }}
-
-                        </div>
-
-                        <div class="modal-footer">
-                            <button type="submit" class="btn btn-warning w-100">
-                                💾 Guardar Item
-                            </button>
-                        </div>
-
+                  <div class="btn-group">
+                    <a href="{% url 'editar_item' item.id %}" class="btn btn-sm btn-outline-primary">Editar</a>
+                    <form method="post" action="{% url 'apagar_item' item.id %}" onsubmit="return confirm('Apagar este item?');">
+                      {% csrf_token %}
+                      <button class="btn btn-sm btn-outline-danger" type="submit">Apagar</button>
                     </form>
-
+                  </div>
                 </div>
+              </div>
             </div>
-        </div>
-        <script src="https://unpkg.com/@zxing/library@latest"></script>
-        <script src="{% static 'inventory/js/barcode_scanner.js' %}"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+          </div>
+        {% empty %}
+          <div class="col-12">
+            <div class="alert alert-info mb-0">Nenhum item encontrado.</div>
+          </div>
+        {% endfor %}
+      </div>
 
+      <!-- Paginação -->
+      {% if page_obj.paginator.num_pages > 1 %}
+        <nav aria-label="Paginação" class="mt-4">
+          <ul class="pagination justify-content-center">
+            <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+              <a class="page-link"
+                href="?{% if request.GET.q %}
+                  q={{ request.GET.q }}&
+                {% endif %}{% if request.GET.divisao %}
+                  divisao={{ request.GET.divisao }}&
+                {% endif %}page={{ page_obj.previous_page_number }}"
+                aria-label="Anterior">
+                &laquo;
+              </a>
+            </li>
+
+            {% for num in page_obj.paginator.page_range %}
+              <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                <a class="page-link"
+                  href="?{% if request.GET.q %}
+                    q={{ request.GET.q }}&
+                  {% endif %}{% if request.GET.divisao %}
+                    divisao={{ request.GET.divisao }}&
+                  {% endif %}page={{ num }}">
+                  {{ num }}
+                </a>
+              </li>
+            {% endfor %}
+
+            <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+              <a class="page-link"
+                href="?{% if request.GET.q %}
+                  q={{ request.GET.q }}&
+                {% endif %}{% if request.GET.divisao %}
+                  divisao={{ request.GET.divisao }}&
+                {% endif %}page={{ page_obj.next_page_number }}"
+                aria-label="Próximo">
+                &raquo;
+              </a>
+            </li>
+          </ul>
+        </nav>
+      {% endif %}
+
+      <!-- Modal Adicionar -->
+      <div class="modal fade" id="addItemModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Adicionar Item</h5>
+              <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" enctype="multipart/form-data">
+              <div class="modal-body">
+                {% csrf_token %}
+                <input type="hidden" name="add_item" value="1" />
+                <div id="scanner-container" class="mb-3" style="display:none;">
+                  <video id="scanner-video" style="width:100%; height:250px;"></video>
+                </div>
+                <button type="button" onclick="toggleScanner()" class="btn btn-outline-primary w-100 mb-3">📷 Scan código de barras</button>
+                {{ item_form.as_p }}
+              </div>
+              <div class="modal-footer">
+                <button type="submit" class="btn btn-success w-100">💾 Guardar Item</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/@zxing/library@latest"></script>
+    <script src="{% static 'inventory/js/barcode_scanner.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      ;(function () {
+        const itemsRow = document.getElementById('items-row')
+        if (!itemsRow) return
+      
+        let currentPage = parseInt(itemsRow.dataset.currentPage || '1', 10)
+        const totalPages = parseInt(itemsRow.dataset.totalPages || '1', 10)
+        let loading = false
+      
+        function buildFetchUrl(page) {
+          const params = new URLSearchParams(window.location.search)
+          params.set('page', page)
+          return window.location.pathname + '?' + params.toString()
+        }
+      
+        async function loadNextPage() {
+          if (loading) return
+          if (currentPage >= totalPages) return
+          loading = true
+          const next = currentPage + 1
+          try {
+            const res = await fetch(buildFetchUrl(next))
+            if (!res.ok) return
+            const text = await res.text()
+            const doc = new DOMParser().parseFromString(text, 'text/html')
+            const newCols = doc.querySelectorAll('.col-sm-6.col-md-4.col-lg-3')
+            newCols.forEach((col) => itemsRow.appendChild(col))
+            currentPage = next
+            if (currentPage >= totalPages) {
+              const nav = document.querySelector('nav[aria-label="Paginação"]')
+              if (nav) nav.style.display = 'none'
+            }
+          } catch (e) {
+            console.error('Erro ao carregar próxima página', e)
+          } finally {
+            loading = false
+          }
+        }
+      
+        // iniciar escondendo a paginação (usamos infinite scroll)
+        document.addEventListener('DOMContentLoaded', () => {
+          const nav = document.querySelector('nav[aria-label="Paginação"]')
+          if (nav) nav.style.display = 'none'
+        })
+      
+        // evento de scroll
+        window.addEventListener('scroll', () => {
+          if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 600) {
+            loadNextPage()
+          }
+        })
+      })()
+    </script>
+  </body>
 </html>

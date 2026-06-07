@@ -1,192 +1,103 @@
-<!DOCTYPE html>
-<html lang="pt">
+{% extends 'inventory/base.html' %}
 
-<head>
-    <meta charset="UTF-8">
-    <title>Inventário da Casa</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Bootstrap 5 CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
+{% block title %}
+  Desejos — Gestão da Casa
+{% endblock %}
 
-        .card-img-top {
-            height: 200px;
-            object-fit: cover;
-        }
-    </style>
-</head>
+{% block content %}
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h4 mb-0">🌟 Desejos</h1>
+      <div class="text-muted">Wishlist e ideias</div>
+    </div>
 
-<body>
-
-    <div class="container py-5">
-
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="fw-bold">🏠 Desejos</h1>
-
-            <div class="card shadow-sm border-0 bg-warning">
-                <div class="card-body text-center">
-                    <h6>🌟 Wishlist</h6>
-                    <h2>€ {{ total_desejos }}</h2>
-                    <p>{{ total_desejos_count }} desejos</p>
-                </div>
-            </div>
-            <a href="{% url 'menu' %}" class="btn btn-outline-secondary">
-                ⬅ Voltar
-            </a>
-        </div>
-
-        <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#desejoModal">
-            🌟 Adicionar Desejo</button>
-
-        <hr class="my-4">
-
-        <!-- Filtros por Divisão -->
-        <div class="mb-4">
-            <strong>Filtrar por Divisão:</strong>
-            <a href="{% url 'desejos' %}"
-                class="btn btn-sm btn-outline-secondary {% if not request.GET.divisao %}active{% endif %}">Todas</a>
-            {% for div in divisoes %}
-            <a href="?divisao={{ div.id }}"
-                class="btn btn-sm btn-outline-secondary {% if request.GET.divisao|default:'' == div.id|stringformat:'s' %}active{% endif %}">
-                {{ div.nome }}
-            </a>
-            {% endfor %}
-        </div>
-        <!-- Pesquisa + Filtro -->
-        <form method="get" class="row g-3 mb-4">
-
-            <div class="col-md-5">
-                <input type="text" name="q" class="form-control" placeholder="Pesquisar item...">
-            </div>
-
-            <div class="col-md-4">
-                <select name="divisao" class="form-select">
-                    <option value>Todas as divisões</option>
-                    {% for d in divisoes %}
-                    <option value="{{ d.id }}">{{ d.nome }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <div class="col-md-3">
-                <button class="btn btn-primary w-100">🔍 Filtrar</button>
-            </div>
-
-        </form>
-
-        <h3 class="mt-5">🌟 Lista de Desejos</h3>
-        <div class="row">
-
-            {% for d in desejos %}
-
-            <div class="col-md-3">
-                <div class="card mb-3">
-
-                    {% if d.imagem %}
-                    <img src="{{ d.imagem.url }}" class="card-img-top">
-                    {% endif %}
-
-                    <div class="card-body">
-
-                        <h5>{{ d.nome }}</h5>
-                        <p>{{ d.descricao }}</p>
-
-                        {% if d.valor %}
-                        <p>€{{ d.valor }}</p>
-                        {% endif %}
-                        {% if d.divisao %}
-                        <span class="badge bg-secondary">
-                            {{ d.divisao.nome }}
-                        </span>
-
-                        {% endif %}
-                        <a href="{% url 'editar_desejo' d.id %}" class="btn btn-sm btn-warning">Editar</a>
-                    <button class="btn btn-success btn-sm"
-        data-bs-toggle="modal"
-        data-bs-target="#modal{{ item.id }}">
-    🛒 Comprar
-</button>
-<div class="modal fade" id="modal{{ item.id }}" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
-
-      <div class="modal-header">
-        <h5 class="modal-title">
-            Comprar — {{ item.nome }}
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-
-      <form method="POST" action="{% url 'comprar_desejo' d.id %}">
-        {% csrf_token %}
-
-        <div class="modal-body">
-
-            <!-- data -->
-            <label>Data de aquisição</label>
-            <input type="date" name="data" class="form-control" required>
-
-            <!-- opcional: preço -->
-            <label class="mt-2">Preço (€)</label>
-            <input type="number" step="0.01" name="preco" class="form-control">
-
-        </div>
-
-        <div class="modal-footer">
-            <button class="btn btn-success">
-                Confirmar compra
-            </button>
-        </div>
-
-      </form>
-
+    <div class="text-end">
+      <div class="badge bg-warning text-dark mb-1">🌟 € {{ total_desejos|floatformat:2 }}</div>
+      <div class="muted-small">{{ total_desejos_count }} desejos</div>
     </div>
   </div>
-</div>
-                    </div>
-                </div>
+
+  <div class="mb-3">
+    <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#desejoModal">🌟 Adicionar Desejo</button>
+    <a href="{% url 'menu' %}" class="btn btn-link">⬅ Voltar</a>
+  </div>
+
+  <div class="row g-3">
+    {% for d in desejos %}
+      <div class="col-sm-6 col-md-4 col-lg-3">
+        <div class="card shadow-sm h-100">
+          {% if d.imagem %}
+            <img src="{{ d.imagem.url }}" class="card-img-top" style="height:160px;object-fit:cover;" />
+          {% endif %}
+          <div class="card-body d-flex flex-column">
+            <h6 class="mb-1">{{ d.nome }}</h6>
+            <div class="muted-small mb-2">{{ d.descricao|truncatewords:12 }}</div>
+            <div class="mt-auto d-flex justify-content-between align-items-center">
+              <div>
+                {% if d.valor %}
+                  <div class="fw-bold">€ {{ d.valor|floatformat:2 }}</div>
+                {% endif %}
+                {% if d.divisao %}
+                  <small class="text-muted">{{ d.divisao.nome }}</small>
+                {% endif %}
+              </div>
+              <div class="btn-group">
+                <a href="{% url 'editar_desejo' d.id %}" class="btn btn-sm btn-outline-secondary">Editar</a>
+                <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#modal{{ d.id }}">🛒</button>
+              </div>
             </div>
-            {% empty %}
-            <p>Sem desejos nesta divisão.</p>
-            {% endfor %}
-
+          </div>
         </div>
+      </div>
 
-        <div class="modal fade" id="desejoModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-
-                    <div class="modal-header">
-                        <h5 class="modal-title">Adicionar Desejo</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-
-                    <form method="post" enctype="multipart/form-data">
-
-                        <div class="modal-body">
-
-                            {% csrf_token %}
-                            {{ desejo_form.as_p }}
-
-                            <input type="hidden" name="add_desejo" value="1">
-
-                        </div>
-
-                        <div class="modal-footer">
-                            <button type="submit" class="btn btn-warning">
-                                Guardar Desejo
-                            </button>
-                        </div>
-
-                    </form>
-
-                </div>
+      <!-- Modal de compra por desejo -->
+      <div class="modal fade" id="modal{{ d.id }}" tabindex="-1">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Comprar — {{ d.nome }}</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
+            <form method="POST" action="{% url 'comprar_desejo' d.id %}">
+              {% csrf_token %}
+              <div class="modal-body">
+                <label>Data de aquisição</label>
+                <input type="date" name="data" class="form-control" required />
+                <label class="mt-2">Preço (€)</label>
+                <input type="number" step="0.01" name="preco" class="form-control" />
+              </div>
+              <div class="modal-footer">
+                <button class="btn btn-success">Confirmar compra</button>
+              </div>
+            </form>
+          </div>
         </div>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+      </div>
+    {% empty %}
+      <div class="col-12">
+        <div class="alert alert-info">Sem desejos nesta divisão.</div>
+      </div>
+    {% endfor %}
+  </div>
 
-</html>
+  <!-- Modal Adicionar Desejo -->
+  <div class="modal fade" id="desejoModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Adicionar Desejo</h5><button class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form method="post" enctype="multipart/form-data">
+          <div class="modal-body">
+            {% csrf_token %}
+            {{ desejo_form.as_p }}
+            <input type="hidden" name="add_desejo" value="1" />
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-warning">Guardar Desejo</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}
