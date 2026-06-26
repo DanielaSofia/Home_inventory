@@ -1,0 +1,73 @@
+INFO 2026-06-26 16:05:41,457 autoreload 368369 124571977531520 Watching for file changes with StatReloader
+INFO 2026-06-26 16:05:49,211 log 368369 124571835430592 code 400, message Bad request version ('\xc5n\\x8d\\x1a\xd1\xe3\xdcq\xbfJ\\x8e\\x19\\x89')
+INFO 2026-06-26 16:05:49,212 log 368369 124571827037888 code 400, message Bad request version ('\\x91\xf8\xdf\xf0K-\xed')
+ERROR 2026-06-26 16:05:49,212 log 368369 124571835430592 You're accessing the development server over HTTPS, but it only supports HTTP.
+ERROR 2026-06-26 16:05:49,212 log 368369 124571827037888 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-06-26 16:05:49,472 log 368369 124571835430592 code 400, message Bad request version ('\xd7\xddX\xed')
+ERROR 2026-06-26 16:05:49,472 log 368369 124571835430592 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-06-26 16:05:49,539 log 368369 124571835430592 code 400, message Bad request version ('\\x9a\\x9a\\x13\\x01\\x13\\x02\\x13\\x03\xc0+\xc0/\xc0,\xc00\xcc\xa9\xcc\xa8\xc0\\x13\xc0\\x14\\x00\\x9c\\x00\\x9d\\x00/\\x005\\x01\\x00\\x06E\xea\xea\\x00\\x00\\x00')
+ERROR 2026-06-26 16:05:49,539 log 368369 124571835430592 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-06-26 16:05:49,540 log 368369 124571827037888 code 400, message Bad request version ('\\x89\\x91\xd7;\xdc')
+ERROR 2026-06-26 16:05:49,540 log 368369 124571827037888 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-06-26 16:05:49,784 log 368369 124571827037888 code 400, message Bad request version ('p\xb1\xcae')
+ERROR 2026-06-26 16:05:49,784 log 368369 124571827037888 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-06-26 16:06:17,546 log 368369 124571827037888 code 400, message Bad request version ('JJ\\x13\\x01\\x13\\x02\\x13\\x03\xc0+\xc0/\xc0,\xc00\xcc\xa9\xcc\xa8\xc0\\x13\xc0\\x14\\x00\\x9c\\x00\\x9d\\x00/\\x005\\x01\\x00\\x06e::\\x00\\x00\xff\\x01\\x00\\x01\\x00\\x00-\\x00\\x02\\x01\\x01\\x00')
+ERROR 2026-06-26 16:06:17,546 log 368369 124571827037888 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-06-26 16:06:17,554 log 368369 124571827037888 code 400, message Bad request version ('\\x99K\xc6*\\x17\xcbS\xa5\xc0\xc4hU\\x15\xc4\xc4D')
+ERROR 2026-06-26 16:06:17,554 log 368369 124571827037888 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-06-26 16:06:17,814 log 368369 124571827037888 code 400, message Bad request version ('localhost\\x00')
+ERROR 2026-06-26 16:06:17,815 log 368369 124571827037888 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-06-26 16:06:17,871 log 368369 124571827037888 code 400, message Bad request version ('localhost\\x00-\\x00\\x02\\x01\\x01\\x00\\x17\\x00\\x00\\x003\\x04\xef\\x04\xed\\x1a\\x1a\\x00\\x01\\x00\\x11\xec\\x04\xc0\xf0p\\x97Ub')
+ERROR 2026-06-26 16:06:17,871 log 368369 124571827037888 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-06-26 16:06:17,877 log 368369 124571827037888 code 400, message Bad request version ('\\x02h2\\x08http/1.1\\x00\\x1b\\x00\\x03\\x02\\x00\\x02\\x00+\\x00\\x07\\x06\xea\xea\\x03\\x04\\x03\\x03\\x00\\x12\\x00\\x00\\x00#\\x00\\x00\\x00')
+ERROR 2026-06-26 16:06:17,878 log 368369 124571827037888 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-06-26 16:06:18,135 log 368369 124571827037888 code 400, message Bad request version ('\\x00\\x02\\x01\\x00\\x00')
+ERROR 2026-06-26 16:06:18,135 log 368369 124571827037888 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-06-26 16:06:21,643 log 368369 124571818645184 code 400, message Bad request syntax ('\\x16\\x03\\x01\\x06\xd2\\x01\\x00\\x06\xce\\x03\\x03\xca')
+ERROR 2026-06-26 16:06:21,643 log 368369 124571818645184 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-06-26 16:06:21,905 log 368369 124571818645184 code 400, message Bad request version (',\xcf\xd6z\xddK\\x0f+\\x98{\\x7f\\x03)yg\xc1B\\x81\\x9e\\x1b\xc2\\x88?4\xc0$G')
+ERROR 2026-06-26 16:06:21,906 log 368369 124571818645184 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-06-26 16:06:21,966 log 368369 124571818645184 code 400, message Bad request version ('\\x02h2\\x08http/1.1\\x00')
+ERROR 2026-06-26 16:06:21,967 log 368369 124571818645184 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-06-26 16:06:22,219 log 368369 124571818645184 code 400, message Bad request syntax ("\\x16\\x03\\x01\\x07\\x12\\x01\\x00\\x07\\x0e\\x03\\x03s;?\xd9\xa7\xdbNG\\x18'\xa1\\x10\\x0et6(\\x18\xdc'\\x17h\xf0w\xd4\xb0")
+ERROR 2026-06-26 16:06:22,220 log 368369 124571818645184 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-06-26 16:07:23,963 autoreload 368906 139166322819200 Watching for file changes with StatReloader
+INFO 2026-06-26 16:07:30,618 log 368906 139166188828352 code 400, message Bad request version ('\xb3\xc7\xe0\\x0e\xc3/\\x9c7\xca\xc1\xf8\xfb')
+ERROR 2026-06-26 16:07:30,618 log 368906 139166188828352 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-06-26 16:07:30,620 log 368906 139166188828352 code 400, message Bad request version ('localhost\\x00\\x12\\x00\\x00\xff\\x01\\x00\\x01\\x00\\x00')
+ERROR 2026-06-26 16:07:30,620 log 368906 139166188828352 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-06-26 16:07:30,882 log 368906 139166188828352 code 400, message Bad request syntax ("\\x16\\x03\\x01\\x07\\x12\\x01\\x00\\x07\\x0e\\x03\\x03\\x11\xbc\\x1b\\x95\xa8\xe9\xd3\xd9\xc0T'h\xbd\xd5(")
+ERROR 2026-06-26 16:07:30,882 log 368906 139166188828352 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-06-26 16:07:30,928 log 368906 139166188828352 code 400, message Bad request version ('\\x00\\x02\\x01\\x00\\x00')
+ERROR 2026-06-26 16:07:30,928 log 368906 139166188828352 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-06-26 16:07:30,930 log 368906 139166188828352 code 400, message Bad request version ('\xea\xea\\x00\\x00\\x00\\x05\\x00\\x05\\x01\\x00\\x00\\x00\\x00\\x00-\\x00\\x02\\x01\\x01\\x00+\\x00\\x07\\x06\xda\xda\\x03\\x04\\x03\\x03\\x00')
+ERROR 2026-06-26 16:07:30,930 log 368906 139166188828352 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-06-26 16:07:31,192 log 368906 139166188828352 code 400, message Bad request version ('\\x8a\\x8a\\x13\\x01\\x13\\x02\\x13\\x03\xc0+\xc0/\xc0,\xc00\xcc\xa9\xcc\xa8\xc0\\x13\xc0\\x14\\x00\\x9c\\x00\\x9d\\x00/\\x005\\x01\\x00\\x06\xa5\xca\xca\\x00\\x00\\x00\\x17\\x00\\x00\\x00')
+ERROR 2026-06-26 16:07:31,193 log 368906 139166188828352 You're accessing the development server over HTTPS, but it only supports HTTP.
+INFO 2026-06-26 16:07:39,302 log 368906 139166188828352 "GET / HTTP/1.1" 200 2675
+WARNING 2026-06-26 16:07:39,667 log 368906 139166188828352 Not Found: /favicon.ico
+WARNING 2026-06-26 16:07:39,667 log 368906 139166188828352 "GET /favicon.ico HTTP/1.1" 404 8116
+INFO 2026-06-26 16:08:12,879 autoreload 368906 139166322819200 /home/danilobo/projetos/Home_inventory/casa/logging_config.py changed, reloading.
+INFO 2026-06-26 16:08:13,196 autoreload 369064 134425903145088 Watching for file changes with StatReloader
+INFO 2026-06-26 16:08:20,874 log 369064 134425765476032 "GET / HTTP/1.1" 200 2675
+INFO 2026-06-26 16:08:22,002 log 369064 134425765476032 "GET /itens/ HTTP/1.1" 200 16219
+INFO 2026-06-26 16:08:22,055 log 369064 134425765476032 "GET /media/itens/Captura_de_ecr%C3%A3_2026-03-05_115224.png HTTP/1.1" 200 26981
+INFO 2026-06-26 16:08:22,056 log 369064 134425731905216 "GET /media/itens/Captura_de_ecr%C3%A3_2026-03-09_123003.png HTTP/1.1" 200 6827
+INFO 2026-06-26 16:08:22,057 log 369064 134425723512512 "GET /static/inventory/js/barcode_scanner.js HTTP/1.1" 200 1805
+INFO 2026-06-26 16:08:22,057 log 369064 134425740297920 "GET /media/itens/Captura_de_ecr%C3%A3_2026-03-09_122956.png HTTP/1.1" 200 7813
+INFO 2026-06-26 16:08:22,059 log 369064 134425757083328 "GET /media/itens/Captura_de_ecr%C3%A3_2026-03-09_122732.png HTTP/1.1" 200 168141
+INFO 2026-06-26 16:08:22,060 log 369064 134425748690624 "GET /media/itens/Captura_de_ecr%C3%A3_2026-03-09_122846.png HTTP/1.1" 200 155432
+INFO 2026-06-26 16:08:22,065 log 369064 134425740297920 "GET /media/itens/Captura_de_ecr%C3%A3_2026-03-09_123251.png HTTP/1.1" 200 3859
+INFO 2026-06-26 16:08:22,069 log 369064 134425731905216 "GET /media/itens/Captura_de_ecr%C3%A3_2026-03-09_123302.png HTTP/1.1" 200 5927
+INFO 2026-06-26 16:08:22,069 log 369064 134425723512512 "GET /media/itens/Captura_de_ecr%C3%A3_2026-03-09_123257.png HTTP/1.1" 200 6018
+INFO 2026-06-26 16:08:22,100 log 369064 134425765476032 "GET /media/itens/Captura_de_ecr%C3%A3_2026-03-09_123308.png HTTP/1.1" 200 8373
+INFO 2026-06-26 16:08:23,542 log 369064 134425765476032 "GET / HTTP/1.1" 200 2675
+INFO 2026-06-26 16:08:24,089 log 369064 134425765476032 "GET /desejos/ HTTP/1.1" 200 8062
+INFO 2026-06-26 16:08:24,120 log 369064 134425765476032 "GET /media/desejos/Captura_de_ecr%C3%A3_2026-03-05_114950.png HTTP/1.1" 200 195617
+INFO 2026-06-26 16:08:25,713 log 369064 134425765476032 "GET / HTTP/1.1" 200 2675
+INFO 2026-06-26 16:08:26,390 log 369064 134425765476032 "GET /lista-compras/ HTTP/1.1" 200 17546
+INFO 2026-06-26 16:08:28,227 log 369064 134425765476032 "GET / HTTP/1.1" 200 2675
+INFO 2026-06-26 16:08:28,945 log 369064 134425765476032 "GET /despensa/ HTTP/1.1" 200 6103
+INFO 2026-06-26 16:08:30,462 log 369064 134425765476032 "GET / HTTP/1.1" 200 2675
+INFO 2026-06-26 16:08:31,449 log 369064 134425765476032 "GET /gastos/ HTTP/1.1" 200 6098
+INFO 2026-06-26 16:08:34,144 log 369064 134425765476032 "GET / HTTP/1.1" 200 2675

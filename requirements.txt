@@ -1,7 +1,10 @@
-
 Django
 djangorestframework
 mysqlclient
 Pillow
 django-filter
 django_extensions
+python-dotenv
+pytest
+pytest-django
+djangorestframework[clients]

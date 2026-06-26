@@ -10,3 +10,5 @@ casa/inventory/migrations/
 staticfiles/
 
 mysql-apt-config_0.8.36-1_all.deb
+# Environment variables (keep secrets private)
+.env
