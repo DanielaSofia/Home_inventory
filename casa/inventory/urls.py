@@ -5,10 +5,18 @@ Regista rotas da API e views baseadas em função usadas pela interface.
 
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
+from rest_framework.authtoken.views import obtain_auth_token
 
-from .views import (
+from .views_api import (
     DivisaoViewSet,
     ItemViewSet,
+    DesejoViewSet,
+    CompraViewSet,
+    ConsumvelViewSet,
+    HistoricoCompraViewSet,
+)
+
+from .views import (
     adicionar_compra,
     adicionar_consumivel,
     apagar_compra,
@@ -30,12 +38,21 @@ from .views import (
     repor_consumivel,
 )
 
+# API Router
 router = DefaultRouter()
-router.register(r"divisoes", DivisaoViewSet)
-router.register(r"itens", ItemViewSet)
+router.register(r"divisoes", DivisaoViewSet, basename="divisao")
+router.register(r"itens", ItemViewSet, basename="item")
+router.register(r"desejos", DesejoViewSet, basename="desejo")
+router.register(r"compras", CompraViewSet, basename="compra")
+router.register(r"consumiveis", ConsumvelViewSet, basename="consumivel")
+router.register(r"historico-compras", HistoricoCompraViewSet, basename="historico_compra")
 
 urlpatterns = [
+    # API Routes
     path("api/", include(router.urls)),
+    path("api-token-auth/", obtain_auth_token, name="api_token_auth"),
+    
+    # Web Views (Traditional Django Templates)
     path("", menu, name="menu"),
     path("itens/", itens, name="itens"),
     path("desejos/", desejos, name="desejos"),
