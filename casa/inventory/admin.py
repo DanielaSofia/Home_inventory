@@ -2,8 +2,7 @@
 
 from django.contrib import admin
 
-from .models import Compra, Consumivel, Desejo, Divisao, HistoricoCompra, Item
-
+from .models import Desejo, Divisao, Item
 
 @admin.register(Divisao)
 class DivisaoAdmin(admin.ModelAdmin):
@@ -55,53 +54,3 @@ class DesejoAdmin(admin.ModelAdmin):
             'fields': ('imagem',)
         }),
     )
-
-
-@admin.register(Compra)
-class CompraAdmin(admin.ModelAdmin):
-    """Admin para gerir lista de compras."""
-    
-    list_display = ['nome', 'quantidade', 'comprado', 'divisao']
-    list_filter = ['comprado', 'divisao']
-    search_fields = ['nome']
-    readonly_fields = ['consumivel']
-    
-    fieldsets = (
-        ('Informações da Compra', {
-            'fields': ('nome', 'quantidade', 'comprado', 'divisao')
-        }),
-        ('Relação com Consumível', {
-            'fields': ('consumivel',)
-        }),
-    )
-
-
-@admin.register(Consumivel)
-class ConsumvelAdmin(admin.ModelAdmin):
-    """Admin para gerir consumíveis (despensa)."""
-    
-    list_display = ['nome', 'divisao', 'quantidade', 'quantidade_minima', 'preco', 'loja']
-    list_filter = ['divisao']
-    search_fields = ['nome', 'loja']
-    fieldsets = (
-        ('Informações Básicas', {
-            'fields': ('nome', 'divisao', 'loja')
-        }),
-        ('Quantidades', {
-            'fields': ('quantidade', 'quantidade_minima')
-        }),
-        ('Preço', {
-            'fields': ('preco',)
-        }),
-    )
-
-
-@admin.register(HistoricoCompra)
-class HistoricoCompraAdmin(admin.ModelAdmin):
-    """Admin para visualizar histórico de compras de consumíveis."""
-    
-    list_display = ['consumivel', 'quantidade', 'preco', 'loja', 'data']
-    list_filter = ['data', 'loja']
-    search_fields = ['consumivel__nome', 'loja']
-    readonly_fields = ['data', 'consumivel']
-    date_hierarchy = 'data'

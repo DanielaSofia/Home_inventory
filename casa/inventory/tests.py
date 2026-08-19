@@ -5,8 +5,7 @@ from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from casa.inventory.models import Compra, Consumivel, Desejo, Divisao, Item
-
+from casa.inventory.models import Desejo, Divisao, Item
 
 @pytest.fixture
 def user(db):
@@ -74,7 +73,7 @@ class TestItemViewSet:
         """Testa listagem de itens."""
         response = api_client.get('/api/itens/')
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.data) == 1
+        assert len(response.data["results"]) == 1
 
     def test_create_item(self, api_client, divisao):
         """Testa criação de um item."""
@@ -97,7 +96,7 @@ class TestItemViewSet:
         """Testa filtro de itens por divisão."""
         response = api_client.get(f'/api/itens/?divisao={item.divisao.id}')
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.data) == 1
+        assert len(response.data["results"]) == 1
 
 
 @pytest.mark.django_db
@@ -119,38 +118,3 @@ class TestDesejoViewSet:
         }
         response = api_client.post('/api/desejos/', data)
         assert response.status_code == status.HTTP_201_CREATED
-
-
-@pytest.mark.django_db
-class TestConsumvelViewSet:
-    """Testes para o ViewSet de Consumíveis."""
-
-    def test_list_consumiveis(self, api_client):
-        """Testa listagem de consumíveis."""
-        response = api_client.get('/api/consumiveis/')
-        assert response.status_code == status.HTTP_200_OK
-
-    def test_create_consumivel(self, api_client, divisao):
-        """Testa criação de um consumível."""
-        data = {
-            'nome': 'Sal',
-            'quantidade': 1,
-            'quantidade_minima': 2,
-            'divisao': divisao.id,
-            'preco': 1.50,
-            'loja': 'Carrefour'
-        }
-        response = api_client.post('/api/consumiveis/', data)
-        assert response.status_code == status.HTTP_201_CREATED
-
-    def test_consumir_action(self, api_client, divisao):
-        """Testa ação de consumir um item."""
-        consumivel = Consumivel.objects.create(
-            nome='Açúcar',
-            quantidade=5,
-            divisao=divisao
-        )
-        response = api_client.post(f'/api/consumiveis/{consumivel.id}/consumir/')
-        assert response.status_code == status.HTTP_200_OK
-        consumivel.refresh_from_db()
-        assert consumivel.quantidade == 4

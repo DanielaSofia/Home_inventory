@@ -1,12 +1,11 @@
 """Serializers para a API do app inventory.
 
-Contém serializers para todos os modelos incluindo campos e helpers.
+Contém serializers para os modelos ativos incluindo campos e helpers.
 """
 
 from rest_framework import serializers
 
-from .models import Compra, Consumivel, Desejo, Divisao, HistoricoCompra, Item
-
+from .models import Desejo, Divisao, Item
 
 class DivisaoSerializer(serializers.ModelSerializer):
     """Serializer para o modelo `Divisao` incluindo os itens relacionados."""
@@ -65,52 +64,3 @@ class DesejoSerializer(serializers.ModelSerializer):
         if obj.imagem and request:
             return request.build_absolute_uri(obj.imagem.url)
         return None
-
-
-class CompraSerializer(serializers.ModelSerializer):
-    """Serializer para o modelo `Compra` (lista de compras)."""
-
-    divisao_nome = serializers.CharField(source='divisao.nome', read_only=True, required=False)
-    consumivel_nome = serializers.CharField(source='consumivel.nome', read_only=True, required=False)
-
-    class Meta:
-        model = Compra
-        fields = [
-            'id', 'nome', 'quantidade', 'comprado', 'divisao', 'divisao_nome',
-            'consumivel', 'consumivel_nome'
-        ]
-
-
-class ConsumvelSerializer(serializers.ModelSerializer):
-    """Serializer para o modelo `Consumivel` (despensa) com histórico."""
-
-    divisao_nome = serializers.CharField(source='divisao.nome', read_only=True)
-    historico = serializers.SerializerMethodField()
-    abaixo_minimo = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Consumivel
-        fields = [
-            'id', 'nome', 'quantidade', 'quantidade_minima', 'divisao',
-            'divisao_nome', 'preco', 'loja', 'historico', 'abaixo_minimo'
-        ]
-
-    def get_historico(self, obj):
-        """Retorna o histórico de compras do consumível."""
-        historico = obj.historico.all().order_by('-data')[:5]
-        return HistoricoCompraSerializer(historico, many=True, read_only=True).data
-
-    def get_abaixo_minimo(self, obj):
-        """Indica se a quantidade está abaixo do mínimo."""
-        return obj.quantidade <= obj.quantidade_minima
-
-
-class HistoricoCompraSerializer(serializers.ModelSerializer):
-    """Serializer para o modelo `HistoricoCompra`."""
-
-    consumivel_nome = serializers.CharField(source='consumivel.nome', read_only=True)
-
-    class Meta:
-        model = HistoricoCompra
-        fields = ['id', 'consumivel', 'consumivel_nome', 'quantidade', 'preco', 'loja', 'data']
-        read_only_fields = ['data']
