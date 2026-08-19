@@ -1,49 +1,11 @@
-"""Views do app inventory: views baseadas em Django e ViewSets da API.
+"""Views web do app inventory baseadas em templates Django."""
 
-Este módulo contém as views usadas pela aplicação web (renderização
-de templates) e os ViewSets da API REST.
-"""
-
-from django.db.models import Avg, F, Sum
+from django.db.models import Avg, F, Q, Sum
 from django.db.models.functions import TruncMonth
 from django.shortcuts import get_object_or_404, redirect, render
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, viewsets
-from rest_framework.response import Response
 
-from .forms import DesejoForm, DivisaoForm, ItemForm
-from .models import Compra, Consumivel, Desejo, Divisao, Item
-from .serializers import DivisaoSerializer, ItemSerializer
-
-
-class DivisaoViewSet(viewsets.ModelViewSet):
-    """API ViewSet para gerir divisões da casa."""
-
-    queryset = Divisao.objects.all()
-    serializer_class = DivisaoSerializer
-
-
-class ItemViewSet(viewsets.ModelViewSet):
-    """API ViewSet para gerir itens da casa."""
-
-    queryset = Item.objects.all()
-    serializer_class = ItemSerializer
-    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
-    search_fields = ["nome", "descricao"]
-    filterset_fields = ["divisao"]
-
-    def get_serializer_context(self):
-        """Inclui o `request` no contexto do serializer."""
-
-        return {"request": self.request}
-
-    def total_valor(self, request):
-        """Endpoint custom que retorna o total do valor dos itens."""
-
-        if request.method == "GET":
-            total = Item.objects.aggregate(Sum("valor"))
-            return Response({"total_valor_casa": total["valor__sum"]})
-
+from .forms import ConsumivelForm, DesejoForm, DivisaoForm, ItemForm
+from .models import Consumivel, Desejo, Divisao, Item
 
 ## Item
 
@@ -66,6 +28,7 @@ def itens(request):
                 return redirect("/")
 
     divisao_id = request.GET.get("divisao")
+    search_query = request.GET.get("q", "").strip()
 
     itens = Item.objects.all()
     divisoes = Divisao.objects.all()
@@ -74,6 +37,9 @@ def itens(request):
 
     if divisao_id:
         itens = itens.filter(divisao_id=divisao_id)
+    if search_query:
+        search_filter = Q(nome__icontains=search_query) | Q(descricao__icontains=search_query)
+        itens = itens.filter(search_filter)
 
     context = {
         "itens": itens,
@@ -82,6 +48,7 @@ def itens(request):
         "divisao_form": divisao_form,
         "total_itens": total_itens,
         "total_itens_count": total_itens_count,
+        "search_query": search_query,
     }
 
     return render(request, "inventory/itens.html", context)
@@ -153,11 +120,16 @@ def desejos(request):
 
     # 🔹 filtro
     divisao_id = request.GET.get("divisao")
+    search_query = request.GET.get("q", "").strip()
 
     desejos_qs = Desejo.objects.all()
 
     if divisao_id:
         desejos_qs = desejos_qs.filter(divisao_id=divisao_id)
+    if search_query:
+        desejos_qs = desejos_qs.filter(
+            Q(nome__icontains=search_query) | Q(descricao__icontains=search_query)
+        )
 
     # 🔹 stats (usando queryset já filtrado 👌)
     total_desejos = desejos_qs.aggregate(total=Sum("valor"))["total"] or 0
@@ -169,9 +141,105 @@ def desejos(request):
         "desejo_form": form,
         "total_desejos": total_desejos,
         "total_desejos_count": total_desejos_count,
+        "search_query": search_query,
     }
 
     return render(request, "inventory/desejos.html", context)
+
+
+def lista_compras(request):
+    """Lista todos os consumíveis registados."""
+
+    if request.method == "POST":
+        form = ConsumivelForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("lista_compras")
+
+    divisao_id = request.GET.get("divisao")
+    search_query = request.GET.get("q", "").strip()
+    compras = Consumivel.objects.filter(comprado=False).select_related("divisao")
+
+    if divisao_id:
+        compras = compras.filter(divisao_id=divisao_id)
+    if search_query:
+        compras = compras.filter(
+            Q(nome__icontains=search_query) | Q(descricao__icontains=search_query)
+        )
+
+    return render(
+        request,
+        "inventory/lista_compras.html",
+        {
+            "compras": compras,
+            "despensa_sugestoes": Consumivel.objects.filter(comprado=True).select_related(
+                "divisao"
+            ),
+            "divisoes": Divisao.objects.all(),
+            "search_query": search_query,
+            "total_compras": compras.count(),
+            "consumivel_form": ConsumivelForm(),
+        },
+    )
+
+
+def despensa(request):
+    """Lista os consumíveis já comprados e disponíveis na despensa."""
+
+    if request.method == "POST":
+        form = ConsumivelForm(request.POST)
+        if form.is_valid():
+            consumivel = form.save(commit=False)
+            consumivel.comprado = True
+            consumivel.save()
+            return redirect("despensa")
+
+    divisao_id = request.GET.get("divisao")
+    search_query = request.GET.get("q", "").strip()
+    consumiveis = Consumivel.objects.filter(comprado=True).select_related("divisao")
+
+    if divisao_id:
+        consumiveis = consumiveis.filter(divisao_id=divisao_id)
+    if search_query:
+        consumiveis = consumiveis.filter(nome__icontains=search_query)
+
+    return render(
+        request,
+        "inventory/despensa.html",
+        {
+            "consumiveis": consumiveis,
+            "divisoes": Divisao.objects.all(),
+            "search_query": search_query,
+            "total_consumiveis": consumiveis.count(),
+            "consumivel_form": ConsumivelForm(),
+        },
+    )
+
+
+def marcar_consumivel_comprado(request, consumivel_id):
+    """Marca a compra e atualiza o stock apenas nesse momento."""
+
+    consumivel = get_object_or_404(Consumivel, id=consumivel_id)
+    if request.method == "POST":
+        comprado = request.POST.get("comprado") == "on"
+        quantidade_compra = request.POST.get("quantidade_compra")
+        if quantidade_compra:
+            consumivel.quantidade_compra = max(int(quantidade_compra), 1)
+        if comprado and not consumivel.comprado:
+            consumivel.quantidade += consumivel.quantidade_compra
+        consumivel.comprado = comprado
+        update_fields = ["comprado", "quantidade", "quantidade_compra"]
+        consumivel.save(update_fields=update_fields)
+    return redirect("lista_compras")
+
+
+def apagar_consumivel(request, consumivel_id):
+    """Apaga um consumível pendente da lista de compras."""
+
+    consumivel = get_object_or_404(Consumivel, id=consumivel_id)
+    if request.method == "POST":
+        consumivel.delete()
+    return redirect("lista_compras")
 
 
 def editar_desejo(request, desejo_id):
@@ -276,192 +344,3 @@ def gastos(request):
             "gastos_mensais": gastos_mensais,
         },
     )
-
-
-## Despensa
-
-
-def despensa(request):
-    """Mostra a lista de consumíveis (despensa) com filtros e pesquisa."""
-    divisao_id = request.GET.get("divisao")
-    query = request.GET.get("q")
-
-    itens = Consumivel.objects.select_related("divisao").all()
-
-    if divisao_id:
-        itens = itens.filter(divisao_id=divisao_id)
-
-    if query:
-        itens = itens.filter(nome__icontains=query)
-
-    itens = itens.order_by("nome")
-
-    divisoes = Divisao.objects.all()
-
-    return render(
-        request,
-        "inventory/despensa.html",
-        {"itens": itens, "divisoes": divisoes, "divisao_selecionada": divisao_id, "query": query},
-    )
-
-
-def consumir_consumivel(request, id):
-    """Decrementa a quantidade de um `Consumivel` e adiciona à lista se necessário."""
-
-    item = get_object_or_404(Consumivel, id=id)
-
-    # 🔒 evitar negativos + update atómico
-    if item.quantidade > 0:
-        Consumivel.objects.filter(id=item.id).update(quantidade=F("quantidade") - 1)
-
-        # atualizar valor em memória
-        item.quantidade -= 1
-
-    # 🔥 trigger automático
-    if item.quantidade <= item.quantidade_minima:
-        adicionar_a_lista(item)
-
-    return redirect("despensa")
-
-
-def adicionar_consumivel(request):
-    """Adiciona um novo `Consumivel` via `POST` e redireciona para `despensa`."""
-
-    if request.method == "POST":
-        nome = request.POST.get("nome")
-        quantidade = int(request.POST.get("quantidade") or 1)
-        divisao_id = request.POST.get("divisao")
-        preco = request.POST.get("preco")
-        loja = request.POST.get("loja")
-
-        Consumivel.objects.create(
-            nome=nome,
-            quantidade=quantidade,
-            divisao_id=divisao_id,
-            preco=preco if preco else None,
-            loja=loja,
-        )
-
-    return redirect("despensa")
-
-
-def repor_consumivel(request, id):
-    """Repondo a quantidade de um `Consumivel` e limpa a lista de compras se necessário."""
-
-    item = get_object_or_404(Consumivel, id=id)
-
-    item.quantidade += 1
-    item.save()
-
-    # 🔥 remover da lista se já não está no mínimo
-    if item.quantidade > item.quantidade_minima:
-        Compra.objects.filter(consumivel=item, comprado=False).delete()
-
-    return redirect("despensa")
-
-
-def apagar_consumivel(request, id):
-    """Apaga um `Consumivel` após confirmação via `POST`."""
-
-    item = get_object_or_404(Consumivel, id=id)
-
-    if request.method == "POST":
-        item.delete()
-
-    return redirect("despensa")
-
-
-## Lista Compras
-def lista_compras(request):
-    """Mostra a lista de compras dividida entre ativos e comprados."""
-
-    ativos = Compra.objects.filter(comprado=False)
-    comprados = Compra.objects.filter(comprado=True)
-
-    divisoes = Divisao.objects.all()
-
-    return render(
-        request,
-        "inventory/lista_compras.html",
-        {"ativos": ativos, "comprados": comprados, "divisoes": divisoes},
-    )
-
-
-def adicionar_compra(request):
-    """Adiciona uma `Compra` (ou incrementa se já existir) a partir de `POST`."""
-
-    if request.method == "POST":
-        nome = request.POST.get("nome")
-        quantidade = int(request.POST.get("quantidade") or 1)
-        divisao_id = request.POST.get("divisao")
-
-        # opcional: tentar ligar a um consumível existente
-        consumivel = Consumivel.objects.filter(nome__iexact=nome).first()
-
-        existente = Compra.objects.filter(nome__iexact=nome, comprado=False).first()
-
-        if existente:
-            existente.quantidade += quantidade
-            existente.save()
-        else:
-            Compra.objects.create(
-                nome=nome,
-                quantidade=quantidade,
-                divisao_id=divisao_id,
-                consumivel=consumivel,  # pode ser None
-            )
-
-    return redirect("lista_compras")
-
-
-def adicionar_a_lista(item):
-    """Adiciona um `Consumivel` à lista de compras se ainda não existir."""
-
-    existente = Compra.objects.filter(consumivel=item, comprado=False).first()
-
-    if not existente:
-        Compra.objects.create(nome=item.nome, quantidade=1, divisao=item.divisao, consumivel=item)
-
-
-def marcar_comprado(request, compra_id):
-    """Marca uma `Compra` como comprada, atualizando stock ou criando consumível."""
-
-    compra = get_object_or_404(Compra, id=compra_id)
-
-    if request.method == "POST":
-
-        quantidade = int(request.POST.get("quantidade") or compra.quantidade)
-
-        if compra.consumivel:
-
-            # 🔥 atualizar stock corretamente
-            compra.consumivel.quantidade += quantidade
-            compra.consumivel.save()
-
-        else:
-            # 🔥 criar apenas se não existir
-            consumivel = Consumivel.objects.filter(nome=compra.nome).first()
-
-            if consumivel:
-                consumivel.quantidade += quantidade
-                consumivel.save()
-            else:
-                consumivel = Consumivel.objects.create(
-                    nome=compra.nome, quantidade=quantidade, divisao=compra.divisao
-                )
-
-            compra.consumivel = consumivel
-
-        compra.comprado = True
-        compra.save()
-
-    return redirect("lista_compras")
-
-
-def apagar_compra(request, id):
-    compra = get_object_or_404(Compra, id=id)
-
-    if request.method == "POST":
-        compra.delete()
-
-    return redirect("lista_compras")

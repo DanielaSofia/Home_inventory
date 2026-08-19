@@ -5,8 +5,7 @@ Contém forms de modelo usados nas views para criar/editar objetos.
 
 from django import forms
 
-from .models import Compra, Desejo, Divisao, Item
-
+from .models import Consumivel, Desejo, Divisao, Item
 
 class ItemForm(forms.ModelForm):
     """Formulário de `Item` usado para criação/edição via interface."""
@@ -48,9 +47,14 @@ class DesejoForm(forms.ModelForm):
         }
 
 
-class CompraForm(forms.ModelForm):
-    """Formulário para gerir `Compra` (lista de compras)."""
+class ConsumivelForm(forms.ModelForm):
+    """Formulário para cadastrar produtos consumíveis."""
 
     class Meta:
-        model = Compra
-        fields = ["nome", "quantidade", "comprado", "divisao"]
+        model = Consumivel
+        fields = ["nome", "quantidade", "divisao"]
+        widgets = {
+            "nome": forms.TextInput(attrs={"class": "form-control"}),
+            "quantidade": forms.NumberInput(attrs={"class": "form-control", "min": 0}),
+            "divisao": forms.Select(attrs={"class": "form-control"}),
+        }

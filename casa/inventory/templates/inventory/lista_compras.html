@@ -1,127 +1,144 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="pt">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Lista de Compras</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Lista de compras</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'inventory/css/ui-revamp.css' %}">
+    </head>
+<body>
+    <div class="container app-shell py-5 shopping-page">
+        <div class="shopping-page-header d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+            <div>
+                <span class="eyebrow">PLANEAMENTO</span>
+                <h1 class="page-title">Lista de compras</h1>
+                <p class="page-subtitle">Prepare a próxima compra sem perder o controlo do stock.</p>
+                </div>
+            <div class="shopping-summary">
+                <span>ITENS PENDENTES</span>
+                <strong>{{ total_compras }}</strong>
+                <small>consumíveis</small>
+            </div>
+            </div>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="{% static 'inventory/css/ui-revamp.css' %}" />
-  </head>
-
-  <body>
-    <div class="container app-shell py-5">
-      <!-- HEADER -->
-      <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
-        <div>
-          <h1 class="page-title">🛒 Lista de Compras</h1>
-          <p class="page-subtitle">Organize reposições por divisão e marque compras rapidamente.</p>
-        </div>
-
-        <div class="d-flex gap-2">
-          <a href="{% url 'despensa' %}" class="btn btn-success">🍎 Despensa</a>
-          <a href="{% url 'menu' %}" class="btn btn-outline-secondary">⬅ Voltar</a>
-        </div>
-      </div>
-
-      <div class="section-card mb-4">
-        <form method="POST" action="{% url 'adicionar_compra' %}">
-          {% csrf_token %}
-
-          <div class="row g-2">
-            <!-- nome -->
+        <form method="get" class="row g-3 mb-4 filter-bar shopping-filter">
             <div class="col-md-5">
-              <input type="text" name="nome" class="form-control" placeholder="Adicionar item..." required />
+                <input type="text" name="q" class="form-control" placeholder="Pesquisar na lista..." value="{{ search_query }}">
             </div>
-
-            <!-- quantidade -->
-            <div class="col-md-2">
-              <input type="number" name="quantidade" class="form-control" value="1" min="1" />
+            <div class="col-md-4">
+                <select name="divisao" class="form-select">
+                    <option value {% if not request.GET.divisao %}selected{% endif %}>Todas as divisões</option>
+                    {% for divisao in divisoes %}
+                    <option value="{{ divisao.id }}" {% if request.GET.divisao==divisao.id|stringformat:'s' %}selected{% endif %}>{{
+                        divisao.nome }}</option>
+                    {% endfor %}
+                </select>
             </div>
-
-            <!-- divisão -->
             <div class="col-md-3">
-              <select name="divisao" class="form-select" required>
-                {% for d in divisoes %}
-                  <option value="{{ d.id }}">{{ d.nome }}</option>
-                {% endfor %}
-              </select>
+                <button class="btn btn-primary w-100" type="submit">Filtrar</button>
             </div>
-
-            <!-- botão -->
-            <div class="col-md-2">
-              <button class="btn btn-primary w-100">➕</button>
-            </div>
-          </div>
         </form>
-      </div>
 
-      <!-- LISTA ATIVA -->
-      <div class="section-card mb-4">
-        <div class="section-title">🛒 Precisa de comprar</div>
+        <div class="section-card shopping-list-panel p-0 overflow-hidden">
+            <div class="shopping-list-header p-3 border-bottom d-flex justify-content-between align-items-center gap-3">
+                <div>
+                    <span class="eyebrow mb-1">PRÓXIMA COMPRA</span>
+                    <h2 class="h5 mb-0">A comprar</h2>
+                </div>
+                <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#novoConsumivel">Novo
+                    consumível</button>
+            </div>
+            <div class="list-group list-group-flush">
+                {% for compra in compras %}
+                <div class="list-group-item shopping-list-row py-3 px-3">
+                    <div class="shopping-item-grid">
+                        <form method="post" action="{% url 'marcar_consumivel_comprado' compra.id %}"
+                            class="shopping-check-form">
+                            {% csrf_token %}
+                            <input class="shopping-check-input" type="checkbox" name="comprado" id="comprado{{ compra.id }}" {%
+                                if compra.comprado %}checked{% endif %} onchange="this.form.submit()">
+                            <label class="visually-hidden" for="comprado{{ compra.id }}">{{ compra.nome }} comprado</label>
+                        </form>
+                        <div class="shopping-item-info">
+                            <h3 class="h6 mb-1">{{ compra.nome }}</h3>
+                            {% if compra.divisao %}<span class="badge division-badge">{{ compra.divisao.nome }}</span>{% endif
+                            %}
+                        </div>
+                        <div class="shopping-stock"><span>STOCK ATUAL</span><strong>{{ compra.quantidade }}</strong></div>
+                        <form method="post" action="{% url 'marcar_consumivel_comprado' compra.id %}" class="shopping-quantity-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="comprado" value="">
+                            <label for="quantidadeCompra{{ compra.id }}" class="small text-muted">A comprar</label>
+                            <div class="d-flex gap-2">
+                                <input class="shopping-quantity-input" id="quantidadeCompra{{ compra.id }}" type="number"
+                                    name="quantidade_compra" min="1" value="{{ compra.quantidade_compra }}">
+                                <button class="btn btn-sm btn-outline-secondary" type="submit">Atualizar</button>
+                            </div>
+                            </form>
+                        <form method="post" action="{% url 'apagar_consumivel' compra.id %}" class="shopping-delete-form"
+                            onsubmit="return confirm('Apagar este consumível da lista de compras?');">
+                            {% csrf_token %}
+                            <button class="btn btn-sm btn-outline-danger" type="submit">Apagar</button>
+                        </form>
+                        </div>
+                        </div>
+                        {% empty %}
+                        <div class="p-5 text-center">
+                            <p class="mb-2">A lista de compras está vazia.</p>
+                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#novoConsumivel">Adicionar
+                                consumível</button>
+                        </div>
+                        {% endfor %}
+                        </div>
+        </div>
 
-        <ul class="list-group list-group-flush">
-          {% for item in ativos %}
-            <li class="list-group-item item-row d-flex justify-content-between align-items-center">
-              <div>
-                <strong>{{ item.nome }}</strong><br />
+        <div class="section-card shopping-suggestions mt-4 p-0 overflow-hidden">
+            <div class="p-3 border-bottom">
+                <span class="eyebrow mb-1">REUTILIZAR</span>
+                <h2 class="h5 mb-1">Sugestões da despensa</h2>
+                <p class="text-muted small mb-0">Adicione rapidamente um consumível já cadastrado à lista.</p>
+            </div>
+            <div class="list-group list-group-flush">
+                {% for sugestao in despensa_sugestoes %}
+                <div class="list-group-item py-3 px-3 d-flex justify-content-between align-items-center gap-3">
+                    <div>
+                        <strong>{{ sugestao.nome }}</strong>
+                        <span class="d-block text-muted small">Quantidade atual: {{ sugestao.quantidade }}</span>
+                        </div>
+                    <form method="post" action="{% url 'marcar_consumivel_comprado' sugestao.id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="comprado" value="">
+                        <button type="submit" class="btn btn-sm btn-outline-primary">Adicionar à lista</button>
+                        </form>
+                        </div>
+                        {% empty %}
+                        <p class="text-muted p-3 mb-0">Ainda não existem consumíveis na despensa.</p>
+                        {% endfor %}
+                        </div>
+                        </div>
+                        </div>
 
-                <small class="text-muted">{{ item.divisao.nome }}</small>
-
-                <br />
-
-                <!-- estado -->
-                {% if item.consumivel.quantidade == 0 %}
-                  <span class="urgent">⚠️ Sem stock</span>
-                {% elif item.consumivel.quantidade <= item.consumivel.quantidade_minima %}
-                  <span class="text-warning">⚠️ A acabar</span>
-                {% else %}
-                  <span class="normal">✔ OK</span>
-                {% endif %}
-              </div>
-
-              <div class="d-flex align-items-center gap-2">
-                <!-- quantidade -->
-                <span class="badge bg-warning text-dark">{{ item.quantidade }}</span>
-
-                <form method="POST" action="{% url 'marcar_comprado' item.id %}">
-                  {% csrf_token %}
-
-                  <div class="d-flex gap-2">
-                    <!-- quantidade -->
-                    <input type="number" name="quantidade" class="form-control form-control-sm" value="{{ item.quantidade }}" min="1" required />
-
-                    <!-- preço -->
-                    <input type="number" step="0.01" name="preco" class="form-control form-control-sm" placeholder="€" required />
-
-                    <!-- loja -->
-                    <input type="text" name="loja" class="form-control form-control-sm" placeholder="Loja" required />
-
-                    <!-- botão -->
-                    <button class="btn btn-success btn-sm">✔</button>
-                  </div>
+    <div class="modal fade" id="novoConsumivel" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title h5">Novo consumível</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="modal-body">{{ consumivel_form.as_p }}</div>
+                    <div class="modal-footer"><button type="submit" class="btn btn-primary">Guardar</button></div>
                 </form>
-                <form method="POST" action="{% url 'apagar_compra' item.id %}">
-                  {% csrf_token %}
-                  <button class="btn btn-danger btn-sm">🗑</button>
-                </form>
-              </div>
-            </li>
-          {% empty %}
-            <li class="list-group-item text-center">🎉 Tudo em stock!</li>
-          {% endfor %}
-        </ul>
-      </div>
+            </div>
+        </div>
     </div>
-    <script>
-      function toggleForm(id) {
-        const f = document.getElementById('form-' + id)
-        f.style.display = f.style.display === 'none' ? 'block' : 'none'
-      }
-    </script>
-  </body>
+{% include "inventory/_sidebar.html" %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>

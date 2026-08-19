@@ -71,3 +71,710 @@ INFO 2026-06-26 16:08:28,945 log 369064 134425765476032 "GET /despensa/ HTTP/1.1
 INFO 2026-06-26 16:08:30,462 log 369064 134425765476032 "GET / HTTP/1.1" 200 2675
 INFO 2026-06-26 16:08:31,449 log 369064 134425765476032 "GET /gastos/ HTTP/1.1" 200 6098
 INFO 2026-06-26 16:08:34,144 log 369064 134425765476032 "GET / HTTP/1.1" 200 2675
+INFO 2026-07-06 17:03:36,371 autoreload 133375 136028479623296 Watching for file changes with StatReloader
+INFO 2026-07-06 17:03:42,436 log 133375 136028325148352 "GET / HTTP/1.1" 200 2642
+INFO 2026-07-06 17:03:42,483 log 133375 136028325148352 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 200 3528
+WARNING 2026-07-06 17:03:42,644 log 133375 136028325148352 Not Found: /favicon.ico
+WARNING 2026-07-06 17:03:42,644 log 133375 136028325148352 "GET /favicon.ico HTTP/1.1" 404 8116
+ERROR 2026-07-06 17:03:44,257 log 133375 136028325148352 Internal Server Error: /itens/
+Traceback (most recent call last):
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 78, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/MySQLdb/cursors.py", line 179, in execute
+    res = self._query(mogrified_query)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/MySQLdb/cursors.py", line 330, in _query
+    db.query(q)
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/MySQLdb/connections.py", line 286, in query
+    _mysql.connection.query(self, query)
+MySQLdb.ProgrammingError: (1146, "Table 'casa_inventory.inventory_item' doesn't exist")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/core/handlers/base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/casa/inventory/views.py", line 72, in itens
+    total_itens = Item.objects.aggregate(total=Sum("valor"))["total"] or 0
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/models/query.py", line 594, in aggregate
+    return self.query.chain().get_aggregation(self.db, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/models/sql/query.py", line 638, in get_aggregation
+    result = compiler.execute_sql(SINGLE)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/models/sql/compiler.py", line 1624, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/utils.py", line 94, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 78, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/MySQLdb/cursors.py", line 179, in execute
+    res = self._query(mogrified_query)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/MySQLdb/cursors.py", line 330, in _query
+    db.query(q)
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/MySQLdb/connections.py", line 286, in query
+    _mysql.connection.query(self, query)
+django.db.utils.ProgrammingError: (1146, "Table 'casa_inventory.inventory_item' doesn't exist")
+ERROR 2026-07-06 17:03:44,259 log 133375 136028325148352 "GET /itens/ HTTP/1.1" 500 164996
+INFO 2026-07-06 17:05:22,458 autoreload 133771 132594829443200 Watching for file changes with StatReloader
+INFO 2026-07-06 17:05:53,916 log 133771 132594748356288 "GET / HTTP/1.1" 200 2642
+INFO 2026-07-06 17:05:53,951 log 133771 132594748356288 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 200 3528
+WARNING 2026-07-06 17:05:54,168 log 133771 132594748356288 Not Found: /favicon.ico
+WARNING 2026-07-06 17:05:54,168 log 133771 132594748356288 "GET /favicon.ico HTTP/1.1" 404 8116
+INFO 2026-07-06 17:05:56,319 log 133771 132594748356288 "GET /itens/ HTTP/1.1" 200 5809
+INFO 2026-07-06 17:05:56,343 log 133771 132594748356288 "GET /static/inventory/js/barcode_scanner.js HTTP/1.1" 200 1805
+INFO 2026-07-06 17:05:58,127 log 133771 132594748356288 "GET / HTTP/1.1" 200 2642
+INFO 2026-07-06 17:05:58,738 log 133771 132594748356288 "GET /desejos/ HTTP/1.1" 200 4859
+INFO 2026-07-06 17:06:00,051 log 133771 132594748356288 "GET / HTTP/1.1" 200 2642
+INFO 2026-07-06 17:06:01,197 log 133771 132594748356288 "GET /lista-compras/ HTTP/1.1" 200 2754
+INFO 2026-07-06 17:06:03,135 log 133771 132594748356288 "GET / HTTP/1.1" 200 2642
+INFO 2026-07-06 17:06:21,871 autoreload 134061 124629336932480 Watching for file changes with StatReloader
+INFO 2026-07-06 17:06:42,652 log 134061 124629256500928 "GET / HTTP/1.1" 200 2642
+INFO 2026-07-06 17:08:05,761 autoreload 134061 124629336932480 /home/danilobo/Home_inventory/casa/inventory/urls.py changed, reloading.
+INFO 2026-07-06 17:08:05,956 autoreload 134349 130056308580480 Watching for file changes with StatReloader
+INFO 2026-07-06 17:09:32,683 autoreload 134349 130056308580480 /home/danilobo/Home_inventory/casa/inventory/models.py changed, reloading.
+INFO 2026-07-06 17:09:32,881 autoreload 134576 139657107767424 Watching for file changes with StatReloader
+INFO 2026-07-06 17:09:42,061 autoreload 134576 139657107767424 /home/danilobo/Home_inventory/casa/inventory/admin.py changed, reloading.
+INFO 2026-07-06 17:09:42,238 autoreload 134593 136502463885440 Watching for file changes with StatReloader
+INFO 2026-07-06 17:10:17,568 autoreload 134593 136502463885440 /home/danilobo/Home_inventory/casa/inventory/views_api.py changed, reloading.
+INFO 2026-07-06 17:10:17,754 autoreload 134639 126442705318016 Watching for file changes with StatReloader
+INFO 2026-07-06 17:10:36,970 autoreload 134639 126442705318016 /home/danilobo/Home_inventory/casa/inventory/views.py changed, reloading.
+INFO 2026-07-06 17:10:37,144 autoreload 134668 130847968583808 Watching for file changes with StatReloader
+INFO 2026-07-06 17:11:31,634 autoreload 134668 130847968583808 /home/danilobo/Home_inventory/casa/inventory/views.py changed, reloading.
+INFO 2026-07-06 17:11:31,820 autoreload 135124 140318601822336 Watching for file changes with StatReloader
+WARNING 2026-07-06 17:11:53,295 log 135188 139429227565184 Forbidden: /api/divisoes/
+INFO 2026-07-06 17:15:50,789 autoreload 135770 124204621951104 Watching for file changes with StatReloader
+INFO 2026-07-06 17:16:06,029 log 135770 124204474169024 "GET / HTTP/1.1" 200 1961
+INFO 2026-07-06 17:16:06,060 log 135770 124204474169024 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 304 0
+INFO 2026-07-06 17:16:06,243 log 135770 124204474169024 "GET / HTTP/1.1" 200 1961
+INFO 2026-07-06 17:16:09,003 log 135770 124204474169024 "GET /itens/ HTTP/1.1" 200 5809
+INFO 2026-07-06 17:16:09,021 log 135770 124204474169024 "GET /static/inventory/js/barcode_scanner.js HTTP/1.1" 304 0
+INFO 2026-07-06 17:16:10,587 log 135770 124204474169024 "GET /desejos/ HTTP/1.1" 200 4859
+INFO 2026-07-06 17:16:12,389 log 135770 124204474169024 "GET /gastos/ HTTP/1.1" 200 3016
+INFO 2026-08-19 15:28:26,860 autoreload 1030839 135940441587840 Watching for file changes with StatReloader
+INFO 2026-08-19 15:29:31,538 autoreload 1031198 132935329992832 Watching for file changes with StatReloader
+INFO 2026-08-19 15:30:35,836 autoreload 1031542 123408468635776 Watching for file changes with StatReloader
+INFO 2026-08-19 15:31:17,242 autoreload 1031748 129400943816832 Watching for file changes with StatReloader
+INFO 2026-08-19 15:31:21,441 log 1031748 129400871843520 "GET / HTTP/1.1" 200 1961
+INFO 2026-08-19 15:31:21,587 log 1031748 129400871843520 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 200 3528
+WARNING 2026-08-19 15:31:21,795 log 1031748 129400871843520 Not Found: /favicon.ico
+WARNING 2026-08-19 15:31:21,796 log 1031748 129400871843520 "GET /favicon.ico HTTP/1.1" 404 5602
+INFO 2026-08-19 15:31:23,007 log 1031748 129400871843520 "GET /itens/ HTTP/1.1" 200 5809
+INFO 2026-08-19 15:31:23,053 log 1031748 129400871843520 "GET /static/inventory/js/barcode_scanner.js HTTP/1.1" 200 1805
+INFO 2026-08-19 15:31:26,405 log 1031748 129400871843520 "GET / HTTP/1.1" 200 1961
+INFO 2026-08-19 15:31:27,157 log 1031748 129400871843520 "GET /desejos/ HTTP/1.1" 200 4859
+INFO 2026-08-19 15:31:28,825 log 1031748 129400871843520 "GET / HTTP/1.1" 200 1961
+INFO 2026-08-19 15:31:29,584 log 1031748 129400871843520 "GET /gastos/ HTTP/1.1" 200 3016
+INFO 2026-08-19 15:31:31,262 log 1031748 129400871843520 "GET / HTTP/1.1" 200 1961
+INFO 2026-08-19 15:32:45,843 autoreload 1031748 129400943816832 /home/danilobo/Home_inventory/casa/settings.py changed, reloading.
+INFO 2026-08-19 15:32:46,414 autoreload 1032606 134041346613376 Watching for file changes with StatReloader
+WARNING 2026-08-19 15:32:50,339 log 1032652 130168511426688 Forbidden: /api/divisoes/
+INFO 2026-08-19 15:33:05,962 autoreload 1032606 134041346613376 /home/danilobo/Home_inventory/casa/inventory/models.py changed, reloading.
+INFO 2026-08-19 15:33:06,396 autoreload 1032717 125893724663936 Watching for file changes with StatReloader
+WARNING 2026-08-19 15:33:09,562 log 1032719 127409654935680 Unauthorized: /api/divisoes/
+WARNING 2026-08-19 15:33:22,455 log 1032798 137106354389120 Unauthorized: /api/divisoes/
+INFO 2026-08-19 15:33:38,077 autoreload 1032717 125893724663936 /home/danilobo/Home_inventory/casa/settings.py changed, reloading.
+INFO 2026-08-19 15:33:38,524 autoreload 1032891 123594309828736 Watching for file changes with StatReloader
+WARNING 2026-08-19 15:33:42,957 log 1032908 135355766042752 Unauthorized: /api/divisoes/
+WARNING 2026-08-19 15:36:38,583 log 1033573 123517641506944 Unauthorized: /api/divisoes/
+INFO 2026-08-19 15:56:34,501 log 1032891 123594237540032 "GET /itens/ HTTP/1.1" 200 5809
+INFO 2026-08-19 15:56:36,479 log 1032891 123594237540032 "GET / HTTP/1.1" 200 1961
+INFO 2026-08-19 15:56:37,221 log 1032891 123594237540032 "GET /gastos/ HTTP/1.1" 200 3016
+INFO 2026-08-19 15:56:38,478 log 1032891 123594237540032 "GET / HTTP/1.1" 200 1961
+INFO 2026-08-19 15:56:39,047 log 1032891 123594237540032 "GET /desejos/ HTTP/1.1" 200 5408
+INFO 2026-08-19 15:56:40,405 log 1032891 123594237540032 "GET / HTTP/1.1" 200 1961
+INFO 2026-08-19 15:56:47,094 log 1032891 123594237540032 "GET /itens/ HTTP/1.1" 200 5809
+INFO 2026-08-19 15:56:49,638 log 1032891 123594237540032 "GET / HTTP/1.1" 200 1961
+INFO 2026-08-19 15:56:58,952 log 1032891 123594237540032 "GET /desejos/ HTTP/1.1" 200 5408
+INFO 2026-08-19 15:57:04,992 log 1032891 123594237540032 "GET / HTTP/1.1" 200 1961
+INFO 2026-08-19 15:57:06,070 log 1032891 123594237540032 "GET /itens/ HTTP/1.1" 200 5809
+INFO 2026-08-19 15:57:07,492 log 1032891 123594237540032 "GET / HTTP/1.1" 200 1961
+INFO 2026-08-19 15:58:36,698 log 1032891 123594237540032 "GET / HTTP/1.1" 200 1961
+INFO 2026-08-19 15:58:38,447 autoreload 1032891 123594309828736 /home/danilobo/Home_inventory/casa/inventory/views.py changed, reloading.
+INFO 2026-08-19 15:58:38,914 autoreload 1036151 127142280171648 Watching for file changes with StatReloader
+WARNING 2026-08-19 15:58:47,135 log 1036196 133899579101312 Unauthorized: /api/divisoes/
+INFO 2026-08-19 15:58:54,083 log 1036151 127142207682240 "GET / HTTP/1.1" 200 1961
+INFO 2026-08-19 15:59:05,044 log 1036151 127142207682240 "GET / HTTP/1.1" 200 1961
+INFO 2026-08-19 15:59:06,363 log 1036151 127142207682240 "GET /itens/ HTTP/1.1" 200 8536
+INFO 2026-08-19 15:59:08,596 log 1036151 127142207682240 "GET / HTTP/1.1" 200 1961
+WARNING 2026-08-19 15:59:08,979 log 1036304 138825045835904 Unauthorized: /api/divisoes/
+INFO 2026-08-19 15:59:09,305 log 1036151 127142207682240 "GET /desejos/ HTTP/1.1" 200 4859
+INFO 2026-08-19 15:59:11,055 log 1036151 127142207682240 "GET / HTTP/1.1" 200 1961
+INFO 2026-08-19 15:59:11,960 log 1036151 127142207682240 "GET /itens/ HTTP/1.1" 200 8536
+INFO 2026-08-19 16:00:14,983 log 1036151 127142207682240 "GET / HTTP/1.1" 200 1961
+INFO 2026-08-19 16:00:15,812 log 1036151 127142207682240 "GET / HTTP/1.1" 200 1961
+INFO 2026-08-19 16:00:16,433 log 1036151 127142207682240 "GET / HTTP/1.1" 200 1961
+WARNING 2026-08-19 16:00:16,928 log 1036479 123595021025408 Unauthorized: /api/divisoes/
+INFO 2026-08-19 16:00:16,994 log 1036151 127142207682240 "GET / HTTP/1.1" 200 1961
+INFO 2026-08-19 16:00:17,780 log 1036151 127142207682240 "GET / HTTP/1.1" 200 1961
+INFO 2026-08-19 16:00:20,600 log 1036151 127142207682240 "GET / HTTP/1.1" 200 1961
+INFO 2026-08-19 16:00:21,494 log 1036151 127142207682240 "GET / HTTP/1.1" 200 1961
+INFO 2026-08-19 16:00:22,034 log 1036151 127142207682240 "GET / HTTP/1.1" 200 1961
+INFO 2026-08-19 16:00:27,650 log 1036151 127142207682240 "GET / HTTP/1.1" 200 1961
+INFO 2026-08-19 16:00:28,228 log 1036151 127142207682240 "GET / HTTP/1.1" 200 1961
+INFO 2026-08-19 16:00:28,910 log 1036151 127142207682240 "GET /itens/ HTTP/1.1" 200 8536
+INFO 2026-08-19 16:00:36,649 log 1036151 127142207682240 "GET / HTTP/1.1" 200 1961
+INFO 2026-08-19 16:00:43,362 log 1036151 127142207682240 "GET /desejos/ HTTP/1.1" 200 4859
+INFO 2026-08-19 16:01:11,958 log 1036151 127142207682240 "GET / HTTP/1.1" 200 1646
+INFO 2026-08-19 16:02:45,866 log 1036151 127142207682240 "GET / HTTP/1.1" 200 3950
+WARNING 2026-08-19 16:02:49,026 log 1036783 123313280827520 Unauthorized: /api/divisoes/
+INFO 2026-08-19 16:02:49,695 log 1036151 127142207682240 "GET / HTTP/1.1" 200 3950
+INFO 2026-08-19 16:03:05,773 log 1036151 127142207682240 "GET /itens/ HTTP/1.1" 200 8536
+INFO 2026-08-19 16:03:07,047 log 1036151 127142207682240 "GET / HTTP/1.1" 200 3950
+INFO 2026-08-19 16:03:50,846 log 1036151 127142207682240 "GET / HTTP/1.1" 200 3950
+INFO 2026-08-19 16:03:51,459 log 1036151 127142207682240 "GET / HTTP/1.1" 200 3950
+INFO 2026-08-19 16:03:52,053 log 1036151 127142207682240 "GET / HTTP/1.1" 200 3950
+INFO 2026-08-19 16:03:54,266 log 1036151 127142207682240 "GET / HTTP/1.1" 200 3950
+INFO 2026-08-19 16:03:59,157 log 1036151 127142207682240 "GET / HTTP/1.1" 200 3950
+INFO 2026-08-19 16:03:59,802 log 1036151 127142207682240 "GET / HTTP/1.1" 200 3950
+INFO 2026-08-19 16:04:02,276 log 1036151 127142207682240 "GET / HTTP/1.1" 200 3950
+WARNING 2026-08-19 16:04:05,801 log 1037014 131406556356736 Unauthorized: /api/divisoes/
+INFO 2026-08-19 16:05:40,327 autoreload 1037401 140518962933888 Watching for file changes with StatReloader
+INFO 2026-08-19 16:05:46,590 log 1037401 140518890665664 "GET / HTTP/1.1" 200 3950
+INFO 2026-08-19 16:05:48,572 log 1037401 140518890665664 "GET / HTTP/1.1" 200 3950
+INFO 2026-08-19 16:08:41,400 log 1037401 140518890665664 "GET / HTTP/1.1" 200 3950
+INFO 2026-08-19 16:09:18,742 log 1037401 140518872831680 "GET / HTTP/1.1" 200 3950
+INFO 2026-08-19 16:09:18,803 log 1037401 140518872831680 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 200 9783
+WARNING 2026-08-19 16:09:19,294 log 1037401 140518872831680 Not Found: /favicon.ico
+WARNING 2026-08-19 16:09:19,295 log 1037401 140518872831680 "GET /favicon.ico HTTP/1.1" 404 5602
+INFO 2026-08-19 16:09:23,103 autoreload 1037401 140518962933888 /home/danilobo/Home_inventory/casa/urls.py changed, reloading.
+INFO 2026-08-19 16:09:23,553 autoreload 1038136 130004406702208 Watching for file changes with StatReloader
+INFO 2026-08-19 16:09:40,305 log 1038136 130004334671552 "GET /itens/ HTTP/1.1" 200 10244
+INFO 2026-08-19 16:09:40,402 log 1038136 130004334671552 "GET /static/inventory/js/barcode_scanner.js HTTP/1.1" 200 1805
+INFO 2026-08-19 16:09:50,519 log 1038136 130004334671552 "GET / HTTP/1.1" 200 3950
+INFO 2026-08-19 16:09:50,619 log 1038136 130004334671552 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 304 0
+INFO 2026-08-19 16:09:54,173 log 1038136 130004334671552 "GET /itens/ HTTP/1.1" 200 10244
+INFO 2026-08-19 16:09:55,493 log 1038136 130004334671552 "GET / HTTP/1.1" 200 3950
+WARNING 2026-08-19 16:10:32,132 log 1038820 126165527388288 Unauthorized: /api/divisoes/
+INFO 2026-08-19 16:10:44,761 log 1038136 130004334671552 "GET / HTTP/1.1" 200 3950
+INFO 2026-08-19 16:10:44,846 log 1038136 130004334671552 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 200 12830
+WARNING 2026-08-19 16:11:29,728 log 1039149 124563138560128 Unauthorized: /api/divisoes/
+INFO 2026-08-19 16:11:46,947 log 1038136 130004334671552 "GET / HTTP/1.1" 200 3849
+INFO 2026-08-19 16:11:47,018 log 1038136 130004334671552 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 200 11772
+INFO 2026-08-19 16:12:37,667 log 1038136 130004334671552 "GET / HTTP/1.1" 200 3849
+INFO 2026-08-19 16:12:37,739 log 1038136 130004334671552 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 304 0
+INFO 2026-08-19 16:12:46,817 autoreload 1038136 130004406702208 /home/danilobo/Home_inventory/casa/inventory/views.py changed, reloading.
+INFO 2026-08-19 16:12:47,276 autoreload 1039483 139654806102144 Watching for file changes with StatReloader
+INFO 2026-08-19 16:12:52,132 log 1039483 139654734018240 "GET / HTTP/1.1" 200 3965
+INFO 2026-08-19 16:12:52,222 log 1039483 139654734018240 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 304 0
+INFO 2026-08-19 16:12:52,814 log 1039483 139654734018240 "GET / HTTP/1.1" 200 3965
+INFO 2026-08-19 16:12:53,802 log 1039483 139654734018240 "GET / HTTP/1.1" 200 3965
+INFO 2026-08-19 16:12:55,275 log 1039483 139654734018240 "GET / HTTP/1.1" 200 3965
+INFO 2026-08-19 16:12:57,869 log 1039483 139654734018240 "GET / HTTP/1.1" 200 3965
+INFO 2026-08-19 16:13:09,897 autoreload 1039483 139654806102144 /home/danilobo/Home_inventory/casa/inventory/views.py changed, reloading.
+INFO 2026-08-19 16:13:10,335 autoreload 1039502 128698875764864 Watching for file changes with StatReloader
+WARNING 2026-08-19 16:13:26,072 log 1039624 137008228794496 Unauthorized: /api/divisoes/
+INFO 2026-08-19 16:13:46,884 log 1039502 128698803025600 "GET / HTTP/1.1" 200 4210
+INFO 2026-08-19 16:13:46,925 log 1039502 128698803025600 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 304 0
+INFO 2026-08-19 16:14:25,699 autoreload 1039502 128698875764864 /home/danilobo/Home_inventory/casa/inventory/urls.py changed, reloading.
+INFO 2026-08-19 16:14:26,154 autoreload 1039799 131073332973696 Watching for file changes with StatReloader
+INFO 2026-08-19 16:14:56,176 log 1039799 131073260385984 "GET / HTTP/1.1" 200 4656
+INFO 2026-08-19 16:14:56,276 log 1039799 131073260385984 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 200 12000
+INFO 2026-08-19 16:15:02,978 autoreload 1039799 131073332973696 /home/danilobo/Home_inventory/casa/inventory/models.py changed, reloading.
+INFO 2026-08-19 16:15:03,543 autoreload 1039934 137181095579776 Watching for file changes with StatReloader
+INFO 2026-08-19 16:15:05,591 log 1039934 137181022648000 "GET / HTTP/1.1" 200 4656
+INFO 2026-08-19 16:15:05,666 log 1039934 137181022648000 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 304 0
+INFO 2026-08-19 16:15:13,995 autoreload 1039934 137181095579776 /home/danilobo/Home_inventory/casa/inventory/views.py changed, reloading.
+INFO 2026-08-19 16:15:14,491 autoreload 1039954 126987868819584 Watching for file changes with StatReloader
+INFO 2026-08-19 16:15:17,597 log 1039954 126987796477632 "GET / HTTP/1.1" 200 4656
+INFO 2026-08-19 16:15:17,680 log 1039954 126987796477632 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 304 0
+INFO 2026-08-19 16:15:20,371 log 1039954 126987796477632 "GET / HTTP/1.1" 200 4656
+INFO 2026-08-19 16:15:25,144 log 1039954 126987796477632 "GET / HTTP/1.1" 200 4656
+INFO 2026-08-19 16:15:25,225 log 1039954 126987796477632 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 304 0
+WARNING 2026-08-19 16:15:26,847 log 1040051 136465412550784 Unauthorized: /api/divisoes/
+INFO 2026-08-19 16:15:28,604 log 1039954 126987796477632 "GET / HTTP/1.1" 200 4656
+ERROR 2026-08-19 16:15:29,741 log 1039954 126987796477632 Internal Server Error: /lista-compras/
+Traceback (most recent call last):
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 78, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/MySQLdb/cursors.py", line 179, in execute
+    res = self._query(mogrified_query)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/MySQLdb/cursors.py", line 330, in _query
+    db.query(q)
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/MySQLdb/connections.py", line 286, in query
+    _mysql.connection.query(self, query)
+MySQLdb.ProgrammingError: (1146, "Table 'casa_inventory.inventory_consumivel' doesn't exist")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/core/handlers/base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/casa/inventory/views.py", line 179, in lista_compras
+    "total_compras": compras.count(),
+                     ^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/models/query.py", line 610, in count
+    return self.query.get_count(using=self.db)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/models/sql/query.py", line 656, in get_count
+    return obj.get_aggregation(using, {"__count": Count("*")})["__count"]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/models/sql/query.py", line 638, in get_aggregation
+    result = compiler.execute_sql(SINGLE)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/models/sql/compiler.py", line 1624, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/utils.py", line 94, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 78, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/MySQLdb/cursors.py", line 179, in execute
+    res = self._query(mogrified_query)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/MySQLdb/cursors.py", line 330, in _query
+    db.query(q)
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/MySQLdb/connections.py", line 286, in query
+    _mysql.connection.query(self, query)
+django.db.utils.ProgrammingError: (1146, "Table 'casa_inventory.inventory_consumivel' doesn't exist")
+ERROR 2026-08-19 16:15:29,745 log 1039954 126987796477632 "GET /lista-compras/ HTTP/1.1" 500 165205
+ERROR 2026-08-19 16:15:39,090 log 1039954 126987796477632 Internal Server Error: /lista-compras/
+Traceback (most recent call last):
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 78, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/MySQLdb/cursors.py", line 179, in execute
+    res = self._query(mogrified_query)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/MySQLdb/cursors.py", line 330, in _query
+    db.query(q)
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/MySQLdb/connections.py", line 286, in query
+    _mysql.connection.query(self, query)
+MySQLdb.ProgrammingError: (1146, "Table 'casa_inventory.inventory_consumivel' doesn't exist")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/core/handlers/base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/casa/inventory/views.py", line 179, in lista_compras
+    "total_compras": compras.count(),
+                     ^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/models/query.py", line 610, in count
+    return self.query.get_count(using=self.db)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/models/sql/query.py", line 656, in get_count
+    return obj.get_aggregation(using, {"__count": Count("*")})["__count"]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/models/sql/query.py", line 638, in get_aggregation
+    result = compiler.execute_sql(SINGLE)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/models/sql/compiler.py", line 1624, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/utils.py", line 94, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 78, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/MySQLdb/cursors.py", line 179, in execute
+    res = self._query(mogrified_query)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/MySQLdb/cursors.py", line 330, in _query
+    db.query(q)
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/MySQLdb/connections.py", line 286, in query
+    _mysql.connection.query(self, query)
+django.db.utils.ProgrammingError: (1146, "Table 'casa_inventory.inventory_consumivel' doesn't exist")
+ERROR 2026-08-19 16:15:39,093 log 1039954 126987796477632 "GET /lista-compras/ HTTP/1.1" 500 165342
+INFO 2026-08-19 16:15:55,559 log 1039954 126987796477632 "GET / HTTP/1.1" 200 4656
+INFO 2026-08-19 16:15:55,634 log 1039954 126987796477632 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 304 0
+INFO 2026-08-19 16:15:56,517 log 1039954 126987796477632 "GET /lista-compras/ HTTP/1.1" 200 6594
+WARNING 2026-08-19 16:16:03,201 log 1040418 132725618626688 Unauthorized: /api/divisoes/
+INFO 2026-08-19 16:16:57,311 autoreload 1039954 126987868819584 /home/danilobo/Home_inventory/casa/inventory/models.py changed, reloading.
+INFO 2026-08-19 16:16:57,795 autoreload 1040585 128523839553664 Watching for file changes with StatReloader
+WARNING 2026-08-19 16:17:19,403 log 1040765 138317373558912 Unauthorized: /api/divisoes/
+INFO 2026-08-19 16:17:27,696 log 1040585 128523767379648 "GET /lista-compras/ HTTP/1.1" 200 6082
+INFO 2026-08-19 16:17:27,801 log 1040585 128523767379648 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 304 0
+INFO 2026-08-19 16:17:34,258 log 1040585 128523767379648 "GET /lista-compras/ HTTP/1.1" 200 6082
+INFO 2026-08-19 16:18:49,999 log 1040585 128523767379648 "GET /itens/ HTTP/1.1" 200 9077
+INFO 2026-08-19 16:18:50,096 log 1040585 128523767379648 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 304 0
+INFO 2026-08-19 16:18:53,863 log 1040585 128523767379648 "GET /lista-compras/ HTTP/1.1" 200 6647
+INFO 2026-08-19 16:18:56,659 log 1040585 128523767379648 "GET / HTTP/1.1" 200 4656
+INFO 2026-08-19 16:18:58,710 log 1040585 128523767379648 "GET /lista-compras/ HTTP/1.1" 200 6647
+WARNING 2026-08-19 16:18:59,757 log 1041178 130807387873408 Unauthorized: /api/divisoes/
+INFO 2026-08-19 16:19:09,804 log 1040585 128523767379648 "GET /itens/ HTTP/1.1" 200 9077
+INFO 2026-08-19 16:19:15,504 log 1040585 128523767379648 "GET /lista-compras/ HTTP/1.1" 200 6647
+INFO 2026-08-19 16:19:15,572 log 1040585 128523767379648 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 304 0
+INFO 2026-08-19 16:19:16,619 log 1040585 128523767379648 "GET /lista-compras/?q=&divisao= HTTP/1.1" 200 6647
+INFO 2026-08-19 16:19:24,514 log 1040585 128523767379648 "POST /lista-compras/?q=&divisao= HTTP/1.1" 302 0
+INFO 2026-08-19 16:19:24,530 log 1040585 128523767379648 "GET /lista-compras/ HTTP/1.1" 200 8280
+INFO 2026-08-19 16:20:14,982 autoreload 1040585 128523839553664 /home/danilobo/Home_inventory/casa/inventory/urls.py changed, reloading.
+INFO 2026-08-19 16:20:15,444 autoreload 1041309 126598834630784 Watching for file changes with StatReloader
+ERROR 2026-08-19 16:20:23,507 log 1041309 126598762198720 Internal Server Error: /lista-compras/
+Traceback (most recent call last):
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 78, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/MySQLdb/cursors.py", line 179, in execute
+    res = self._query(mogrified_query)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/MySQLdb/cursors.py", line 330, in _query
+    db.query(q)
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/MySQLdb/connections.py", line 286, in query
+    _mysql.connection.query(self, query)
+MySQLdb.OperationalError: (1054, "Unknown column 'inventory_consumivel.comprado' in 'SELECT'")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/core/handlers/base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/casa/inventory/views.py", line 170, in lista_compras
+    return render(
+           ^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/template/backends/django.py", line 107, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/template/base.py", line 174, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/template/base.py", line 166, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/template/defaulttags.py", line 202, in render
+    len_values = len(values)
+                 ^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/models/query.py", line 372, in __len__
+    self._fetch_all()
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/models/query.py", line 2000, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/models/query.py", line 95, in __iter__
+    results = compiler.execute_sql(
+              ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/models/sql/compiler.py", line 1624, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/utils.py", line 94, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 78, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/MySQLdb/cursors.py", line 179, in execute
+    res = self._query(mogrified_query)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/MySQLdb/cursors.py", line 330, in _query
+    db.query(q)
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/MySQLdb/connections.py", line 286, in query
+    _mysql.connection.query(self, query)
+django.db.utils.OperationalError: (1054, "Unknown column 'inventory_consumivel.comprado' in 'SELECT'")
+ERROR 2026-08-19 16:20:23,516 log 1041309 126598762198720 "GET /lista-compras/ HTTP/1.1" 500 209406
+ERROR 2026-08-19 16:20:24,926 log 1041309 126598762198720 Internal Server Error: /lista-compras/
+Traceback (most recent call last):
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 78, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/MySQLdb/cursors.py", line 179, in execute
+    res = self._query(mogrified_query)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/MySQLdb/cursors.py", line 330, in _query
+    db.query(q)
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/MySQLdb/connections.py", line 286, in query
+    _mysql.connection.query(self, query)
+MySQLdb.OperationalError: (1054, "Unknown column 'inventory_consumivel.comprado' in 'SELECT'")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/core/handlers/base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/casa/inventory/views.py", line 170, in lista_compras
+    return render(
+           ^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/template/backends/django.py", line 107, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/template/base.py", line 174, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/template/base.py", line 166, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/template/defaulttags.py", line 202, in render
+    len_values = len(values)
+                 ^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/models/query.py", line 372, in __len__
+    self._fetch_all()
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/models/query.py", line 2000, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/models/query.py", line 95, in __iter__
+    results = compiler.execute_sql(
+              ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/models/sql/compiler.py", line 1624, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/utils.py", line 94, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/django/db/backends/mysql/base.py", line 78, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/MySQLdb/cursors.py", line 179, in execute
+    res = self._query(mogrified_query)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/MySQLdb/cursors.py", line 330, in _query
+    db.query(q)
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.12/site-packages/MySQLdb/connections.py", line 286, in query
+    _mysql.connection.query(self, query)
+django.db.utils.OperationalError: (1054, "Unknown column 'inventory_consumivel.comprado' in 'SELECT'")
+ERROR 2026-08-19 16:20:24,929 log 1041309 126598762198720 "GET /lista-compras/ HTTP/1.1" 500 209406
+WARNING 2026-08-19 16:20:40,288 log 1041556 123383729016960 Unauthorized: /api/divisoes/
+INFO 2026-08-19 16:20:55,263 log 1041309 126598762198720 "GET /lista-compras/ HTTP/1.1" 200 7465
+INFO 2026-08-19 16:20:55,373 log 1041309 126598762198720 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 200 12150
+INFO 2026-08-19 16:20:58,254 log 1041309 126598762198720 "POST /marcar-consumivel-comprado/1/ HTTP/1.1" 302 0
+INFO 2026-08-19 16:20:58,276 log 1041309 126598762198720 "GET /lista-compras/ HTTP/1.1" 200 7471
+INFO 2026-08-19 16:21:00,570 log 1041309 126598762198720 "POST /marcar-consumivel-comprado/1/ HTTP/1.1" 302 0
+INFO 2026-08-19 16:21:00,586 log 1041309 126598762198720 "GET /lista-compras/ HTTP/1.1" 200 7465
+INFO 2026-08-19 16:21:00,712 log 1041309 126598762198720 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 304 0
+INFO 2026-08-19 16:21:02,671 log 1041309 126598762198720 "POST /marcar-consumivel-comprado/1/ HTTP/1.1" 302 0
+INFO 2026-08-19 16:21:02,689 log 1041309 126598762198720 "GET /lista-compras/ HTTP/1.1" 200 7471
+INFO 2026-08-19 16:21:03,834 log 1041309 126598762198720 "POST /marcar-consumivel-comprado/1/ HTTP/1.1" 302 0
+INFO 2026-08-19 16:21:03,851 log 1041309 126598762198720 "GET /lista-compras/ HTTP/1.1" 200 7465
+WARNING 2026-08-19 16:21:09,755 log 1041810 133051879641216 Unauthorized: /api/divisoes/
+INFO 2026-08-19 16:21:44,089 autoreload 1041309 126598834630784 /home/danilobo/Home_inventory/casa/inventory/urls.py changed, reloading.
+INFO 2026-08-19 16:21:44,534 autoreload 1041931 123933350895744 Watching for file changes with StatReloader
+WARNING 2026-08-19 16:21:59,673 log 1042001 133939972165760 Unauthorized: /api/divisoes/
+INFO 2026-08-19 16:22:25,483 log 1041931 123933278860992 "GET / HTTP/1.1" 200 5089
+INFO 2026-08-19 16:22:25,549 log 1041931 123933278860992 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 304 0
+INFO 2026-08-19 16:22:28,270 log 1041931 123933278860992 "GET /despensa/ HTTP/1.1" 200 5057
+INFO 2026-08-19 16:22:29,989 log 1041931 123933278860992 "GET /lista-compras/ HTTP/1.1" 200 7597
+INFO 2026-08-19 16:22:32,169 log 1041931 123933278860992 "POST /marcar-consumivel-comprado/1/ HTTP/1.1" 302 0
+INFO 2026-08-19 16:22:32,184 log 1041931 123933278860992 "GET /lista-compras/ HTTP/1.1" 200 7603
+INFO 2026-08-19 16:22:35,683 log 1041931 123933278860992 "GET /despensa/ HTTP/1.1" 200 5841
+INFO 2026-08-19 16:22:38,890 log 1041931 123933278860992 "POST /marcar-consumivel-comprado/1/ HTTP/1.1" 302 0
+INFO 2026-08-19 16:22:38,908 log 1041931 123933278860992 "GET /lista-compras/ HTTP/1.1" 200 7597
+INFO 2026-08-19 16:22:39,019 log 1041931 123933278860992 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 304 0
+INFO 2026-08-19 16:22:42,153 log 1041931 123933278860992 "GET /despensa/ HTTP/1.1" 200 5057
+INFO 2026-08-19 16:22:44,986 log 1041931 123933278860992 "GET /lista-compras/ HTTP/1.1" 200 7597
+INFO 2026-08-19 16:22:46,351 log 1041931 123933278860992 "POST /marcar-consumivel-comprado/1/ HTTP/1.1" 302 0
+INFO 2026-08-19 16:22:46,365 log 1041931 123933278860992 "GET /lista-compras/ HTTP/1.1" 200 7603
+INFO 2026-08-19 16:22:48,413 log 1041931 123933278860992 "GET /despensa/ HTTP/1.1" 200 5841
+INFO 2026-08-19 16:23:37,283 log 1041931 123933278860992 "GET /despensa/ HTTP/1.1" 200 5373
+INFO 2026-08-19 16:23:37,341 log 1041931 123933278860992 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 200 12321
+INFO 2026-08-19 16:23:40,758 log 1041931 123933278860992 "GET /lista-compras/ HTTP/1.1" 200 7603
+INFO 2026-08-19 16:23:40,801 log 1041931 123933278860992 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 304 0
+INFO 2026-08-19 16:23:43,349 log 1041931 123933278860992 "GET /despensa/ HTTP/1.1" 200 5373
+INFO 2026-08-19 16:23:43,410 log 1041931 123933278860992 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 304 0
+INFO 2026-08-19 16:23:45,242 log 1041931 123933278860992 "GET /lista-compras/ HTTP/1.1" 200 7603
+INFO 2026-08-19 16:24:08,956 autoreload 1041931 123933350895744 /home/danilobo/Home_inventory/casa/inventory/views.py changed, reloading.
+INFO 2026-08-19 16:24:09,419 autoreload 1042396 129194301325440 Watching for file changes with StatReloader
+WARNING 2026-08-19 16:24:17,873 log 1042453 134129596665984 Unauthorized: /api/divisoes/
+INFO 2026-08-19 16:24:36,925 log 1042396 129194159765184 "GET /lista-compras/ HTTP/1.1" 200 6773
+INFO 2026-08-19 16:24:36,980 log 1042396 129194159765184 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 304 0
+INFO 2026-08-19 16:24:41,437 log 1042396 129194159765184 "GET /despensa/ HTTP/1.1" 200 5373
+INFO 2026-08-19 16:24:51,604 log 1042396 129194159765184 "GET /lista-compras/ HTTP/1.1" 200 6773
+INFO 2026-08-19 16:24:51,701 log 1042396 129194159765184 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 304 0
+INFO 2026-08-19 16:25:48,139 autoreload 1042396 129194301325440 /home/danilobo/Home_inventory/casa/inventory/views.py changed, reloading.
+INFO 2026-08-19 16:25:48,640 autoreload 1042681 139394800140416 Watching for file changes with StatReloader
+WARNING 2026-08-19 16:25:58,345 log 1042738 123873339252864 Unauthorized: /api/divisoes/
+INFO 2026-08-19 16:26:06,190 log 1042681 139394728064704 "GET /lista-compras/ HTTP/1.1" 200 7971
+INFO 2026-08-19 16:26:06,283 log 1042681 139394728064704 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 304 0
+INFO 2026-08-19 16:26:15,770 log 1042681 139394728064704 "POST /marcar-consumivel-comprado/1/ HTTP/1.1" 302 0
+INFO 2026-08-19 16:26:15,790 log 1042681 139394728064704 "GET /lista-compras/ HTTP/1.1" 200 8117
+INFO 2026-08-19 16:26:49,924 autoreload 1042681 139394800140416 /home/danilobo/Home_inventory/casa/inventory/views.py changed, reloading.
+INFO 2026-08-19 16:26:50,476 autoreload 1042905 130451885543552 Watching for file changes with StatReloader
+INFO 2026-08-19 16:27:05,635 log 1042905 130451813430976 "GET /lista-compras/ HTTP/1.1" 200 8507
+INFO 2026-08-19 16:27:05,689 log 1042905 130451813430976 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 200 12525
+WARNING 2026-08-19 16:27:07,448 log 1043037 126593483931776 Unauthorized: /api/divisoes/
+INFO 2026-08-19 16:27:15,696 log 1042905 130451813430976 "POST /marcar-consumivel-comprado/1/ HTTP/1.1" 302 0
+INFO 2026-08-19 16:27:15,717 log 1042905 130451813430976 "GET /lista-compras/ HTTP/1.1" 200 8507
+INFO 2026-08-19 16:27:15,839 log 1042905 130451813430976 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 304 0
+INFO 2026-08-19 16:27:19,432 log 1042905 130451813430976 "GET /lista-compras/ HTTP/1.1" 200 8507
+INFO 2026-08-19 16:27:19,502 log 1042905 130451813430976 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 304 0
+INFO 2026-08-19 16:27:21,726 log 1042905 130451813430976 "POST /marcar-consumivel-comprado/1/ HTTP/1.1" 302 0
+INFO 2026-08-19 16:27:21,746 log 1042905 130451813430976 "GET /lista-compras/ HTTP/1.1" 200 8507
+INFO 2026-08-19 16:28:22,144 autoreload 1042905 130451885543552 /home/danilobo/Home_inventory/casa/inventory/views.py changed, reloading.
+INFO 2026-08-19 16:28:22,621 autoreload 1043216 133662031638656 Watching for file changes with StatReloader
+WARNING 2026-08-19 16:28:34,913 log 1043352 136679101370496 Unauthorized: /api/divisoes/
+INFO 2026-08-19 16:28:39,185 log 1043216 133661959648960 "GET /lista-compras/ HTTP/1.1" 200 8892
+INFO 2026-08-19 16:28:39,268 log 1043216 133661959648960 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 200 12558
+INFO 2026-08-19 16:28:49,687 log 1043216 133661959648960 "GET /despensa/ HTTP/1.1" 200 5057
+INFO 2026-08-19 16:28:49,759 log 1043216 133661959648960 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 304 0
+INFO 2026-08-19 16:28:52,054 log 1043216 133661959648960 "GET /lista-compras/ HTTP/1.1" 200 8892
+INFO 2026-08-19 16:28:52,125 log 1043216 133661959648960 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 304 0
+INFO 2026-08-19 16:28:55,987 log 1043216 133661959648960 "GET /despensa/ HTTP/1.1" 200 5057
+INFO 2026-08-19 16:28:56,058 log 1043216 133661959648960 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 304 0
+WARNING 2026-08-19 16:29:36,459 log 1043551 130703762411648 Unauthorized: /api/divisoes/
+INFO 2026-08-19 16:29:38,188 log 1043216 133661959648960 "GET /lista-compras/ HTTP/1.1" 200 9462
+INFO 2026-08-19 16:29:38,290 log 1043216 133661959648960 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 200 12604
+INFO 2026-08-19 16:29:44,475 log 1043216 133661959648960 "GET /despensa/ HTTP/1.1" 200 5057
+INFO 2026-08-19 16:29:44,538 log 1043216 133661959648960 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 304 0
+INFO 2026-08-19 16:30:22,857 autoreload 1043216 133662031638656 /home/danilobo/Home_inventory/casa/inventory/views.py changed, reloading.
+INFO 2026-08-19 16:30:23,351 autoreload 1043711 136755903860864 Watching for file changes with StatReloader
+INFO 2026-08-19 16:30:30,510 log 1043711 136755831371456 "GET /despensa/ HTTP/1.1" 200 6940
+INFO 2026-08-19 16:30:30,602 log 1043711 136755831371456 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 304 0
+WARNING 2026-08-19 16:30:32,595 log 1043795 131011899703424 Unauthorized: /api/divisoes/
+INFO 2026-08-19 16:30:39,672 log 1043711 136755831371456 "GET /lista-compras/ HTTP/1.1" 200 9462
+INFO 2026-08-19 16:30:39,769 log 1043711 136755831371456 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 304 0
+INFO 2026-08-19 16:30:43,580 log 1043711 136755831371456 "GET /lista-compras/ HTTP/1.1" 200 9462
+WARNING 2026-08-19 16:31:14,605 log 1043966 127399387230336 Unauthorized: /api/divisoes/
+INFO 2026-08-19 16:31:15,694 log 1043711 136755831371456 "GET /lista-compras/ HTTP/1.1" 200 8892
+INFO 2026-08-19 16:31:15,825 log 1043711 136755831371456 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 200 12558
+INFO 2026-08-19 16:31:18,106 log 1043711 136755831371456 "GET /despensa/ HTTP/1.1" 200 6940
+INFO 2026-08-19 16:31:18,168 log 1043711 136755831371456 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 304 0
+INFO 2026-08-19 16:31:55,558 log 1043711 136755831371456 "GET /despensa/ HTTP/1.1" 200 6995
+INFO 2026-08-19 16:31:55,640 log 1043711 136755831371456 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 304 0
+INFO 2026-08-19 16:32:05,996 log 1043711 136755831371456 "GET /despensa/ HTTP/1.1" 200 6995
+INFO 2026-08-19 16:32:06,081 log 1043711 136755831371456 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 304 0
+INFO 2026-08-19 16:32:14,297 log 1043711 136755831371456 "GET /lista-compras/ HTTP/1.1" 200 8892
+INFO 2026-08-19 16:32:14,373 log 1043711 136755831371456 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 304 0
+INFO 2026-08-19 16:32:28,169 log 1043711 136755831371456 "GET /despensa/ HTTP/1.1" 200 6995
+INFO 2026-08-19 16:32:28,238 log 1043711 136755831371456 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 304 0
+INFO 2026-08-19 16:33:28,596 log 1043711 136755831371456 "GET /despensa/ HTTP/1.1" 200 6856
+INFO 2026-08-19 16:33:28,671 log 1043711 136755831371456 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 304 0
+INFO 2026-08-19 16:34:27,122 log 1043711 136755831371456 "GET /despensa/ HTTP/1.1" 200 6961
+INFO 2026-08-19 16:34:27,234 log 1043711 136755831371456 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 304 0
+INFO 2026-08-19 16:34:50,207 log 1043711 136755831371456 "POST /despensa/ HTTP/1.1" 302 0
+INFO 2026-08-19 16:34:50,223 log 1043711 136755831371456 "GET /despensa/ HTTP/1.1" 200 7277
+INFO 2026-08-19 16:34:50,341 log 1043711 136755831371456 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 304 0
+INFO 2026-08-19 16:34:56,308 log 1043711 136755831371456 "GET /lista-compras/ HTTP/1.1" 200 9565
+INFO 2026-08-19 16:35:33,260 autoreload 1043711 136755903860864 /home/danilobo/Home_inventory/casa/inventory/urls.py changed, reloading.
+INFO 2026-08-19 16:35:33,717 autoreload 1044820 132151019868288 Watching for file changes with StatReloader
+WARNING 2026-08-19 16:35:42,052 log 1044862 135032578777216 Unauthorized: /api/divisoes/
+INFO 2026-08-19 16:36:02,258 log 1044820 132150946952896 "GET /lista-compras/ HTTP/1.1" 200 10031
+INFO 2026-08-19 16:36:02,338 log 1044820 132150946952896 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 304 0
+WARNING 2026-08-19 16:37:06,883 log 1045196 127558281752704 Unauthorized: /api/divisoes/
+INFO 2026-08-19 16:37:13,516 log 1044820 132150946952896 "GET /lista-compras/ HTTP/1.1" 200 10298
+INFO 2026-08-19 16:37:13,626 log 1044820 132150946952896 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 200 14031
+INFO 2026-08-19 16:37:21,201 log 1044820 132150946952896 "POST /apagar-consumivel/1/ HTTP/1.1" 302 0
+INFO 2026-08-19 16:37:21,217 log 1044820 132150946952896 "GET /lista-compras/ HTTP/1.1" 200 8234
+INFO 2026-08-19 16:37:21,333 log 1044820 132150946952896 "GET /static/inventory/css/ui-revamp.css HTTP/1.1" 304 0
+INFO 2026-08-19 16:37:35,759 autoreload 1044820 132151019868288 /home/danilobo/Home_inventory/casa/inventory/forms.py changed, reloading.
+INFO 2026-08-19 16:37:36,241 autoreload 1045476 135788126392448 Watching for file changes with StatReloader
+INFO 2026-08-19 16:37:38,589 autoreload 1045476 135788126392448 /home/danilobo/Home_inventory/casa/inventory/models.py changed, reloading.
+INFO 2026-08-19 16:37:39,060 autoreload 1045514 140024646656128 Watching for file changes with StatReloader

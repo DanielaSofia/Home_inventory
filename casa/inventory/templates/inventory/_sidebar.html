@@ -1,0 +1,50 @@
+<button class="menu-toggle" type="button" aria-controls="main-sidebar" aria-expanded="false" title="Abrir menu">
+    <span></span><span></span><span></span>
+</button>
+<div class="menu-backdrop" aria-hidden="true"></div>
+
+<aside class="main-sidebar" id="main-sidebar" aria-label="Navegação principal">
+    <div class="sidebar-brand">
+        <a href="{% url 'menu' %}" class="sidebar-brand-link">
+            <span class="sidebar-brand-mark">⌂</span>
+            <span><strong>Casa</strong><small>gestão simples</small></span>
+        </a>
+    </div>
+    <nav class="sidebar-nav">
+        <span class="sidebar-label">NAVEGAÇÃO</span>
+        <a href="{% url 'itens' %}" class="sidebar-link">
+            <span class="sidebar-link-icon">📦</span> Itens
+        </a>
+        <a href="{% url 'desejos' %}" class="sidebar-link">
+            <span class="sidebar-link-icon">⭐</span> Desejos
+        </a>
+        <a href="{% url 'lista_compras' %}" class="sidebar-link">
+            <span class="sidebar-link-icon">🛒</span> Lista de compras
+        </a>
+        <a href="{% url 'despensa' %}" class="sidebar-link">
+            <span class="sidebar-link-icon">🗄️</span> Despensa
+        </a>
+        <a href="{% url 'gastos' %}" class="sidebar-link">
+            <span class="sidebar-link-icon">€</span> Gastos
+        </a>
+    </nav>
+    <button class="sidebar-close" type="button" title="Fechar menu">Fechar menu <span>×</span></button>
+</aside>
+
+<script>
+    (() => {
+        const toggle = document.querySelector('.menu-toggle');
+        const backdrop = document.querySelector('.menu-backdrop');
+        const close = document.querySelector('.sidebar-close');
+
+        function setMenu(open) {
+            document.body.classList.toggle('menu-open', open);
+            toggle.setAttribute('aria-expanded', open);
+            backdrop.setAttribute('aria-hidden', !open);
+        }
+
+        toggle.addEventListener('click', () => setMenu(!document.body.classList.contains('menu-open')));
+        close.addEventListener('click', () => setMenu(false));
+        backdrop.addEventListener('click', () => setMenu(false));
+    })();
+</script>

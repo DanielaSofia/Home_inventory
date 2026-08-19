@@ -4,6 +4,7 @@ A comprehensive Django application for managing household inventory, pantry item
 
 ## Table of Contents
 
+- [Automated Setup Script](#automated-setup-script)
 - [Quick Start](#quick-start)
 - [Requirements](#requirements)
 - [Installation](#installation)
@@ -15,6 +16,10 @@ A comprehensive Django application for managing household inventory, pantry item
 - [Project Structure](#project-structure)
 - [Deployment](#deployment)
 - [Troubleshooting](#troubleshooting)
+
+## Automated Setup Script
+
+For a one-command setup (virtual environment, dependencies, `.env`, database auto-detection, migrations, and runserver), see [`README_SETUP.md`](README_SETUP.md).
 
 ## Quick Start
 
