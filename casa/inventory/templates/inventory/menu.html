@@ -1,6 +1,4 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="pt">
+{% extends 'inventory/base.html' %}
 
 {% block title %}
   Menu — Gestão da Casa
@@ -20,64 +18,50 @@
         </a>
       </div>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'inventory/css/ui-revamp.css' %}">
+      <div class="col-6 col-md-4">
+        <a href="{% url 'itens' %}" class="text-decoration-none">
+          <div class="card menu-card p-4 text-center">
+            <div class="icon">📦</div>
+            <h5 class="mt-2">Itens</h5>
+          </div>
+        </a>
+      </div>
 
-</head>
+      <div class="col-6 col-md-4">
+        <a href="{% url 'desejos' %}" class="text-decoration-none">
+          <div class="card menu-card p-4 text-center">
+            <div class="icon">⭐</div>
+            <h5 class="mt-2">Desejos</h5>
+          </div>
+        </a>
+      </div>
 
-<body>
+      <div class="col-6 col-md-4">
+        <a href="{% url 'lista_compras' %}" class="text-decoration-none">
+          <div class="card menu-card p-4 text-center">
+            <div class="icon">🛒</div>
+            <h5 class="mt-2">Lista de Compras</h5>
+          </div>
+        </a>
+      </div>
 
-    {% include "inventory/_sidebar.html" %}
+      <div class="col-6 col-md-4">
+        <a href="{% url 'despensa' %}" class="text-decoration-none">
+          <div class="card menu-card p-4 text-center">
+            <div class="icon">💰</div>
+            <h5 class="mt-2">Despensa</h5>
+          </div>
+        </a>
+      </div>
 
-    <main class="menu-main">
-        <div class="menu-main-inner">
-            <span class="eyebrow">PAINEL DA CASA</span>
-            <h1 class="page-title">Tudo em ordem.</h1>
-            <p class="page-subtitle">Escolha uma área para acompanhar os seus itens, desejos e gastos.</p>
-
-            <div class="menu-overview">
-                <div>
-                    <span class="overview-kicker">INVENTÁRIO</span>
-                    <h2>Itens</h2>
-                    <p>Consulte tudo o que já está registado no inventário da casa.</p>
-                    <a href="{% url 'itens' %}" class="btn btn-primary">Abrir itens <span aria-hidden="true">→</span></a>
-                </div>
-                <div class="overview-symbol" aria-hidden="true">⌂</div>
-            </div>
-
-            <div class="menu-quick-grid">
-                <a href="{% url 'itens' %}" class="menu-quick-link">
-                    <span class="menu-quick-icon">📦</span>
-                    <span><strong>Itens</strong><small>Inventário da casa</small></span>
-                    <span class="quick-arrow">↗</span>
-                </a>
-                <a href="{% url 'desejos' %}" class="menu-quick-link">
-                    <span class="menu-quick-icon">⭐</span>
-                    <span><strong>Desejos</strong><small>Lista de compras futuras</small></span>
-                    <span class="quick-arrow">↗</span>
-                </a>
-                <a href="{% url 'lista_compras' %}" class="menu-quick-link">
-                    <span class="menu-quick-icon">🛒</span>
-                    <span><strong>Lista de compras</strong><small>Itens pendentes</small></span>
-                    <span class="quick-arrow">↗</span>
-                </a>
-                <a href="{% url 'despensa' %}" class="menu-quick-link">
-                    <span class="menu-quick-icon">🗄️</span>
-                    <span><strong>Despensa</strong><small>Consumíveis comprados</small></span>
-                    <span class="quick-arrow">↗</span>
-                </a>
-                <a href="{% url 'gastos' %}" class="menu-quick-link">
-                    <span class="menu-quick-icon">€</span>
-                    <span><strong>Gastos</strong><small>Veja os custos da casa</small></span>
-                    <span class="quick-arrow">↗</span>
-                </a>
-            </div>
-        </div>
-    </main>
-
-</body>
-
-</html>
+      <div class="col-6 col-md-4">
+        <a href="{% url 'gastos' %}" class="text-decoration-none">
+          <div class="card menu-card p-4 text-center">
+            <div class="icon">💰</div>
+            <h5 class="mt-2">Gastos</h5>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+{% endblock %}

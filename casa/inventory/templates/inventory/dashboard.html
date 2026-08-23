@@ -87,7 +87,7 @@
             <li class="list-group-item d-flex justify-content-between align-items-center break-word">
               <div>
                 <div>{{ c.nome }}</div>
-                <small class="text-muted">{{ c.quantidade }} / min {{ c.quantidade_minima }}</small>
+                <small class="text-muted">{{ c.quantidade }} / compra {{ c.quantidade_compra }}</small>
               </div>
               <a href="{% url 'despensa' %}?q={{ c.nome }}" class="btn btn-sm btn-primary">Ver</a>
             </li>

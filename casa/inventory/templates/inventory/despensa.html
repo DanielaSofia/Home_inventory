@@ -1,100 +1,111 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="pt">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Despensa</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'inventory/css/ui-revamp.css' %}">
-    </head>
-<body>
-    <div class="container app-shell py-5">
-        <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
-            <div>
-                <span class="eyebrow">STOCK DA CASA</span>
-                <h1 class="page-title">Despensa</h1>
-                <p class="page-subtitle">Todos os consumíveis comprados e disponíveis em casa.</p>
-                </div>
-            <div class="card metric-card">
-                <div class="card-body text-center">
-                    <h6>Consumíveis</h6>
-                    <h2>{{ total_consumiveis }}</h2>
-                </div>
-            </div>
-        </div>
+{% extends 'inventory/base.html' %}
 
-        <form method="get" class="row g-3 mb-4 filter-bar">
-            <div class="col-md-5">
-                <input type="text" name="q" class="form-control" placeholder="Pesquisar na despensa..."
-                    value="{{ search_query }}">
-            </div>
-            <div class="col-md-4">
-                <select name="divisao" class="form-select">
-                    <option value {% if not request.GET.divisao %}selected{% endif %}>Todas as divisões</option>
-                    {% for divisao in divisoes %}
-                    <option value="{{ divisao.id }}" {% if request.GET.divisao == divisao.id|stringformat:'s' %}selected{% endif %}>{{
-                        divisao.nome }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-md-3">
-                <button class="btn btn-primary w-100" type="submit">Filtrar</button>
-                </div>
-        </form>
+{% block title %}
+  Despensa — Gestão da Casa
+{% endblock %}
 
-        <div class="section-card p-0 overflow-hidden">
-            <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
-                <h2 class="h5 mb-0">Consumíveis comprados</h2>
-                <div class="d-flex gap-2">
-                    <a href="{% url 'lista_compras' %}" class="btn btn-sm btn-outline-secondary">Lista de compras</a>
-                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#novoConsumivelDespensa">Novo
-                        consumível</button>
-                </div>
-            </div>
-            <div class="list-group list-group-flush">
-                {% for consumivel in consumiveis %}
-                <div class="list-group-item shopping-list-row py-3 px-3">
-                    <div class="d-flex align-items-start gap-3">
-                        <span class="shopping-status-dot" aria-hidden="true"></span>
-                        <div class="flex-grow-1">
-                            <h3 class="h6 mb-1">{{ consumivel.nome }}</h3>
-                            <p class="text-muted small mb-0">Quantidade: {{ consumivel.quantidade }}</p>
-                        </div>
-                        {% if consumivel.divisao %}<span class="badge division-badge">{{ consumivel.divisao.nome }}</span>{% endif %}
-                    </div>
-                </div>
-                {% empty %}
-                <div class="p-5 text-center">
-                    <p class="mb-2">Ainda não existem consumíveis comprados.</p>
-                    <a href="{% url 'lista_compras' %}" class="btn btn-primary btn-sm">Abrir lista de compras</a>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
+{% block content %}
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="h4 mb-0">🍎 Despensa</h2>
+      <div class="muted-small">Gestão de consumíveis</div>
     </div>
+    <div class="d-flex gap-2">
+      <a href="{% url 'lista_compras' %}" class="btn btn-warning">🛒 Lista</a>
+      <a href="{% url 'menu' %}" class="btn btn-outline-secondary">⬅ Voltar</a>
+    </div>
+  </div>
 
-    <div class="modal fade" id="novoConsumivelDespensa" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 class="modal-title h5">Novo consumível</h2>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                <form method="post">
-                    {% csrf_token %}
-                    <div class="modal-body">
-                        {{ consumivel_form.as_p }}
-                        </div>
-                    <div class="modal-footer"><button type="submit" class="btn btn-primary">Guardar</button></div>
-                    </form>
-                    </div>
+  <div class="card p-3 mb-4">
+    <form method="POST" action="{% url 'adicionar_consumivel' %}">
+      {% csrf_token %}
+      <div class="row g-2">
+        <div class="col-md-4">
+          <input type="text" name="nome" class="form-control" placeholder="Item..." required />
         </div>
+        <div class="col-md-2">
+          <input type="number" name="quantidade" class="form-control" value="1" min="1" />
         </div>
-{% include "inventory/_sidebar.html" %}
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+        <div class="col-md-3">
+          <select name="divisao" class="form-select" required>
+            {% for d in divisoes %}
+              <option value="{{ d.id }}">{{ d.nome }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-3">
+          <button class="btn btn-primary w-100">➕ Adicionar</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <form method="get" class="row g-2 mb-3">
+    <div class="col-md-5">
+      <input id="searchInput" type="text" name="q" class="form-control" placeholder="🔍 Procurar item..." value="{{ query }}" />
+    </div>
+    <div class="col-md-4">
+      <select name="divisao" class="form-select">
+        <option value="">Todas as divisões</option>
+        {% for d in divisoes %}
+          {% if divisao_selecionada|stringformat:'s' == d.id|stringformat:'s' %}
+            <option value="{{ d.id }}" selected>{{ d.nome }}</option>
+          {% else %}
+            <option value="{{ d.id }}">{{ d.nome }}</option>
+          {% endif %}
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-3">
+      <button class="btn btn-primary w-100">Filtrar</button>
+    </div>
+  </form>
+
+  <div class="card p-3">
+    <ul class="list-group list-group-flush">
+      {% for item in itens %}
+        <li class="list-group-item item-row d-flex justify-content-between align-items-center" data-nome="{{ item.nome|lower }}">
+          <div>
+            <strong>{{ item.nome }}</strong><br />
+            <small class="text-muted">{{ item.divisao.nome }}</small><br />
+            {% if item.quantidade == 0 %}
+              <span class="text-danger">⚠️ A acabar</span>
+            {% else %}
+              <span class="text-success">✔ Em stock</span>
+            {% endif %}
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-dark">{{ item.quantidade }}</span>
+            <form method="POST" action="{% url 'consumir_consumivel' item.id %}">
+              {% csrf_token %}<button class="btn btn-danger btn-sm">➖</button>
+            </form>
+            <form method="POST" action="{% url 'repor_consumivel' item.id %}">
+              {% csrf_token %}<button class="btn btn-success btn-sm">➕</button>
+            </form>
+            <form method="POST" action="{% url 'apagar_consumivel' item.id %}">
+              {% csrf_token %}<button class="btn btn-outline-danger btn-sm" onclick="return confirm('Apagar item?')">🗑</button>
+            </form>
+          </div>
+        </li>
+      {% empty %}
+        <li class="list-group-item text-center">🍃 Despensa vazia</li>
+      {% endfor %}
+    </ul>
+  </div>
+
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    const searchInput = document.getElementById('searchInput')
+    if (searchInput) {
+      searchInput.addEventListener('keyup', function () {
+        const value = this.value.toLowerCase()
+        document.querySelectorAll('.item-row').forEach((item) => {
+          const nome = item.getAttribute('data-nome')
+          item.style.display = nome.includes(value) ? 'flex' : 'none'
+        })
+      })
+    }
+  </script>
+{% endblock %}

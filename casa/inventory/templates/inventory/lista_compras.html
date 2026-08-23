@@ -1,160 +1,73 @@
 {% extends 'inventory/base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="pt">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Lista de compras</title>
-    <link rel="manifest" href="{% static 'inventory/manifest.json' %}">
-    <link rel="apple-touch-icon" href="{% static 'inventory/icons/icon.svg' %}">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#0d6efd">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'inventory/css/ui-revamp.css' %}">
-    </head>
-<body>
-    <div class="container app-shell py-5 shopping-page">
-        <div class="shopping-page-header d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
-            <div>
-                <span class="eyebrow">PLANEAMENTO</span>
-                <h1 class="page-title">Lista de compras</h1>
-                <p class="page-subtitle">Prepare a próxima compra sem perder o controlo do stock.</p>
-                <span id="sync-status" class="sync-status">A verificar ligação...</span>
-                </div>
-            <div class="shopping-summary">
-                <span>ITENS PENDENTES</span>
-                <strong>{{ total_compras }}</strong>
-                <small>consumíveis</small>
-            </div>
-            </div>
 
-        <div id="offline-pendentes" class="d-none"></div>
+{% block title %}
+  Lista de Compras — Gestão da Casa
+{% endblock %}
 
-        <form method="get" class="row g-3 mb-4 filter-bar shopping-filter">
-            <div class="col-md-5">
-                <input type="text" name="q" class="form-control" placeholder="Pesquisar na lista..." value="{{ search_query }}">
-            </div>
-            <div class="col-md-4">
-                <select name="divisao" class="form-select">
-                    <option value {% if not request.GET.divisao %}selected{% endif %}>Todas as divisões</option>
-                    {% for divisao in divisoes %}
-                    <option value="{{ divisao.id }}" {% if request.GET.divisao==divisao.id|stringformat:'s' %}selected{% endif %}>{{
-                        divisao.nome }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-md-3">
-                <button class="btn btn-primary w-100" type="submit">Filtrar</button>
-            </div>
-        </form>
+{% block content %}
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h4 mb-0">🛒 Lista de Compras</h2>
+    <a href="{% url 'despensa' %}" class="btn btn-link">⬅ Voltar</a>
+  </div>
 
-        <div class="section-card shopping-list-panel p-0 overflow-hidden">
-            <div class="shopping-list-header p-3 border-bottom d-flex justify-content-between align-items-center gap-3">
-                <div>
-                    <span class="eyebrow mb-1">PRÓXIMA COMPRA</span>
-                    <h2 class="h5 mb-0">A comprar</h2>
-                </div>
-                <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#novoConsumivel">Novo
-                    consumível</button>
-            </div>
-            <div class="list-group list-group-flush">
-                {% for compra in compras %}
-                <div class="list-group-item shopping-list-row py-3 px-3" data-uuid="{{ compra.uuid }}">
-                    <div class="shopping-item-grid">
-                        <form method="post" action="{% url 'marcar_consumivel_comprado' compra.id %}"
-                            class="shopping-check-form" data-offline-form="comprado" data-uuid="{{ compra.uuid }}">
-                            {% csrf_token %}
-                            <input class="shopping-check-input" type="checkbox" name="comprado" id="comprado{{ compra.id }}" {% if compra.comprado
-                                %}checked{% endif %} onchange="this.form.submit()">
-                            <label class="visually-hidden" for="comprado{{ compra.id }}">{{ compra.nome }} comprado</label>
-                        </form>
-                        <div class="shopping-item-info">
-                            <h3 class="h6 mb-1">{{ compra.nome }}</h3>
-                            {% if compra.divisao %}<span class="badge division-badge">{{ compra.divisao.nome }}</span>{% endif %}
-                        </div>
-                        <div class="shopping-stock"><span>STOCK ATUAL</span><strong>{{ compra.quantidade }}</strong></div>
-                        <form method="post" action="{% url 'marcar_consumivel_comprado' compra.id %}" class="shopping-quantity-form"
-                            data-offline-form="quantidade" data-uuid="{{ compra.uuid }}">
-                            {% csrf_token %}
-                            <input type="hidden" name="comprado" value="">
-                            <label for="quantidadeCompra{{ compra.id }}" class="small text-muted">A comprar</label>
-                            <div class="d-flex gap-2">
-                                <input class="shopping-quantity-input" id="quantidadeCompra{{ compra.id }}" type="text" name="quantidade_compra"
-                                    inputmode="decimal" value="{{ compra.quantidade_compra }}">
-                                <button class="btn btn-sm btn-outline-secondary" type="submit">Atualizar</button>
-                            </div>
-                            </form>
-                        <form method="post" action="{% url 'apagar_consumivel' compra.id %}" class="shopping-delete-form"
-                            data-offline-form="apagar" data-uuid="{{ compra.uuid }}"
-                            onsubmit="return confirm('Apagar este consumível da lista de compras?');">
-                            {% csrf_token %}
-                            <button class="btn btn-sm btn-outline-danger" type="submit">Apagar</button>
-                        </form>
-                        </div>
-                        </div>
-                        {% empty %}
-                        <div class="p-5 text-center">
-                            <p class="mb-2">A lista de compras está vazia.</p>
-                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#novoConsumivel">Adicionar
-                                consumível</button>
-                        </div>
-                        {% endfor %}
-                        </div>
+  <div class="card p-3 mb-3">
+    <form method="POST" action="{% url 'adicionar_compra' %}">
+      {% csrf_token %}
+      <div class="row g-2">
+        <div class="col-md-5">
+          <input type="text" name="nome" class="form-control" placeholder="Adicionar item..." required />
         </div>
-
-        <div class="section-card shopping-suggestions mt-4 p-0 overflow-hidden">
-            <div class="p-3 border-bottom">
-                <span class="eyebrow mb-1">REUTILIZAR</span>
-                <h2 class="h5 mb-1">Sugestões da despensa</h2>
-                <p class="text-muted small mb-0">Adicione rapidamente um consumível já cadastrado à lista.</p>
-            </div>
-            <div class="list-group list-group-flush">
-                {% for sugestao in despensa_sugestoes %}
-                <div class="list-group-item py-3 px-3 d-flex justify-content-between align-items-center gap-3">
-                    <div>
-                        <strong>{{ sugestao.nome }}</strong>
-                        <span class="d-block text-muted small">Quantidade atual: {{ sugestao.quantidade }}</span>
-                        </div>
-                    <form method="post" action="{% url 'marcar_consumivel_comprado' sugestao.id %}">
-                        {% csrf_token %}
-                        <input type="hidden" name="comprado" value="">
-                        <button type="submit" class="btn btn-sm btn-outline-primary">Adicionar à lista</button>
-                        </form>
-                        </div>
-                        {% empty %}
-                        <p class="text-muted p-3 mb-0">Ainda não existem consumíveis na despensa.</p>
-                        {% endfor %}
-                        </div>
-                        </div>
-                        </div>
-
-    <div class="modal fade" id="novoConsumivel" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 class="modal-title h5">Novo consumível</h2>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <form method="post">
-                    {% csrf_token %}
-                    <div class="modal-body">{{ consumivel_form.as_p }}</div>
-                    <div class="modal-footer"><button type="submit" class="btn btn-primary">Guardar</button></div>
-                </form>
-            </div>
+        <div class="col-md-2">
+          <input type="number" name="quantidade" class="form-control" value="1" min="1" />
         </div>
-    </div>
-{% include "inventory/_sidebar.html" %}
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/dexie@3/dist/dexie.min.js"></script>
-<script src="{% static 'inventory/js/sync.js' %}"></script>
-<script>
-    if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("/service-worker.js");
-    }
-</script>
-</body>
-</html>
+        <div class="col-md-3">
+          <select name="divisao" class="form-select" required>
+            {% for d in divisoes %}
+              <option value="{{ d.id }}" {% if request.GET.divisao|stringformat:'s' == d.id|stringformat:'s' %}selected{% endif %}>{{ d.nome }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-2">
+          <button class="btn btn-primary w-100">➕</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="card p-3 mb-4">
+    <div class="section-title">🛒 Precisa de comprar</div>
+    <ul class="list-group list-group-flush">
+      {% for item in ativos %}
+        <li class="list-group-item item-row d-flex justify-content-between align-items-center">
+          <div>
+            <strong>{{ item.nome }}</strong><br />
+            <small class="text-muted">{% if item.divisao %}{{ item.divisao.nome }}{% endif %}</small>
+            <br />
+            {% if item.quantidade == 0 %}
+              <span class="text-danger">⚠️ Sem stock</span>
+            {% elif item.quantidade <= item.quantidade_compra %}
+              <span class="text-warning">⚠️ A acabar</span>
+            {% else %}
+              <span class="text-success">✔ OK</span>
+            {% endif %}
+          </div>
+
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-warning text-dark">{{ item.quantidade }}</span>
+
+            <form method="POST" action="{% url 'marcar_comprado' item.id %}">
+              {% csrf_token %}
+              <div class="d-flex gap-2">
+                <input type="text" name="quantidade" class="form-control form-control-sm" value="{{ item.quantidade_compra }}" required />
+                <button class="btn btn-sm btn-success">Marcar</button>
+              </div>
+            </form>
+          </div>
+        </li>
+      {% empty %}
+        <li class="list-group-item">Nenhum item ativo</li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endblock %}

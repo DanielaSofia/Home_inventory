@@ -1,53 +1,14 @@
 {% extends 'inventory/base.html' %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Gastos</title>
+{% block title %}
+  Gastos — Gestão da Casa
+{% endblock %}
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'inventory/css/ui-revamp.css' %}">
-
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-</head>
-
-<body>
-
-<div class="container app-shell py-5">
-
-    <h1 class="page-title mb-1">💰 Dashboard de Gastos</h1>
-    <p class="page-subtitle mb-4">Visualize despesas totais, média por item e tendências por período.</p>
-
-    <a href="{% url 'menu' %}" class="btn btn-outline-secondary mb-4">⬅ Voltar</a>
-
-    <!-- DASHBOARD -->
-    <div class="row text-center mb-4">
-
-        <div class="col-md-4 mb-3">
-            <div class="card p-3 metric-card">
-                <h6>Total gasto</h6>
-                <h3>€ {{ total }}</h3>
-            </div>
-        </div>
-
-        <div class="col-md-4 mb-3">
-            <div class="card p-3">
-                <h6>Média</h6>
-                <h3>€ {{ media|floatformat:2 }}</h3>
-            </div>
-        </div>
-
-        <div class="col-md-4 mb-3">
-            <div class="card p-3">
-                <h6>Nº de itens</h6>
-                <h3>{{ itens|length }}</h3>
-            </div>
-        </div>
+{% block content %}
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="h4 mb-0">💸 Gastos</h2>
+    <a href="{% url 'menu' %}" class="btn btn-link">⬅ Voltar</a>
+  </div>
 
   <div class="row">
     <div class="col-md-6">
@@ -56,110 +17,17 @@
         <canvas id="gastosChart" data-labels="{{ gastos_mensais_labels|escapejs }}" data-values="{{ gastos_mensais_values|escapejs }}"></canvas>
       </div>
     </div>
-
-    <!-- GRÁFICOS -->
-    <div class="row mb-4">
-
-        <div class="col-md-6">
-            <div class="section-card">
-                <h5>🏷️ Gastos por divisão</h5>
-                <canvas id="graficoDivisao"></canvas>
-            </div>
-        </div>
-
-        <div class="col-md-6">
-            <div class="section-card">
-                <h5>📅 Gastos por mês</h5>
-                <canvas id="graficoMes"></canvas>
-            </div>
-        </div>
-
+    <div class="col-md-6">
+      <div class="card p-3 mb-3">
+        <h5>Resumo</h5>
+        <p>Total gasto: € {{ total_gastos|floatformat:2 }}</p>
+        <p>Média mensal: € {{ media_mensal|floatformat:2 }}</p>
+      </div>
     </div>
   </div>
 {% endblock %}
 
-    <!-- LISTA -->
-    <div class="section-card">
-
-        <h5 class="mb-3">📦 Lista de Itens</h5>
-
-        <ul class="list-group list-group-flush">
-
-            {% for item in itens %}
-
-            <li class="list-group-item d-flex justify-content-between">
-
-                <div>
-                    <strong>{{ item.nome }}</strong><br>
-                    <small>{{ item.quantidade }} unidade(s)</small>
-                </div>
-
-                <span class="badge bg-primary">
-                    € {{ item.valor }}
-                </span>
-
-            </li>
-
-            {% endfor %}
-
-        </ul>
-
-    </div>
-
-</div>
-
-<!-- SCRIPT GRÁFICOS -->
-<script>
-
-    // 📊 Divisões
-    const divisaoLabels = [
-        {% for g in gastos_por_divisao %}
-            "{{ g.divisao__nome }}",
-
-        {% endfor %}
-    ];
-    const divisaoData = [
-        {% for g in gastos_por_divisao %}
-            {{ g.total }},
-        {% endfor %}
-    ];
-
-    new Chart(document.getElementById('graficoDivisao'), {
-        type: 'pie',
-        data: {
-            labels: divisaoLabels,
-            datasets: [{
-                data: divisaoData
-            }]
-        }
-    });
-
-    // 📅 Meses
-    const mesLabels = [
-        {% for g in gastos_mensais %}
-            "{{ g.mes|date:'M Y' }}",
-        {% endfor %}
-    ];
-
-    const mesData = [
-        {% for g in gastos_mensais %}
-            {{ g.total }},
-        {% endfor %}
-    ];
-
-    new Chart(document.getElementById('graficoMes'), {
-        type: 'bar',
-        data: {
-            labels: mesLabels,
-            datasets: [{
-                label: "Gastos (€)",
-                data: mesData
-            }]
-        }
-    });
-
-</script>
-
-{% include "inventory/_sidebar.html" %}
-</body>
-</html>
+{% block scripts %}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="/static/inventory/js/charts.js"></script>
+{% endblock %}

@@ -8,10 +8,14 @@ from rest_framework.authtoken.views import obtain_auth_token
 from rest_framework.routers import DefaultRouter
 
 from .views import (
+    adicionar_compra,
+    adicionar_consumivel,
     apagar_consumivel,
+    apagar_compra,
     apagar_desejo,
     apagar_item,
     comprar_desejo,
+    consumir_consumivel,
     criar_item,
     dashboard,
     desejos,
@@ -20,8 +24,11 @@ from .views import (
     editar_item,
     gastos,
     lista_compras,
+    listar_itens,
+    marcar_comprado,
     marcar_consumivel_comprado,
     menu,
+    repor_consumivel,
     service_worker,
 )
 from .views_api import (
@@ -66,4 +73,10 @@ urlpatterns = [
     path("apagar-item/<int:item_id>/", apagar_item, name="apagar_item"),
     path("editar-desejo/<int:desejo_id>/", editar_desejo, name="editar_desejo"),
     path("apagar-desejo/<int:desejo_id>/", apagar_desejo, name="apagar_desejo"),
+    path("adicionar-compra/", adicionar_compra, name="adicionar_compra"),
+    path("adicionar-consumivel/", adicionar_consumivel, name="adicionar_consumivel"),
+    path("consumir/<int:consumivel_id>/", consumir_consumivel, name="consumir_consumivel"),
+    path("repor/<int:consumivel_id>/", repor_consumivel, name="repor_consumivel"),
+    path("apagar-consumivel/<int:consumivel_id>/", apagar_consumivel, name="apagar_consumivel"),
+    path("apagar-compra/<int:compra_id>/", apagar_compra, name="apagar_compra"),
 ]

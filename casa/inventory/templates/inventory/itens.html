@@ -1,149 +1,108 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="pt">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <head>
+    <meta charset="UTF-8" />
     <title>Inventário da Casa</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'inventory/css/ui-revamp.css' %}">
-</head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+      body {
+        background-color: #f4f6f9;
+      }
+      .item-card {
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      .item-img {
+        height: 160px;
+        object-fit: cover;
+        width: 100%;
+      }
+      .muted-small {
+        font-size: 0.85rem;
+        color: #6c757d;
+      }
+    </style>
+  </head>
 
-<body>
-
-    <div class="container app-shell py-5">
-
-        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
-            <div>
-                <h1 class="page-title">🏠 Inventário da Casa</h1>
-                <p class="page-subtitle">Acompanhe tudo que já existe em casa com pesquisa e filtros rápidos.</p>
-            </div>
-
-
-            <div class="card metric-card">
-                <div class="card-body text-center">
-                    <h6>💰 Valor da casa</h6>
-                    <h2>€ {{ total_itens }}</h2>
-                    <p>{{ total_itens_count }} itens</p>
-                </div>
-            </div>
-
-            <a href="{% url 'menu' %}" class="btn btn-outline-secondary">
-                ⬅ Voltar
-            </a>
+  <body>
+    <div class="container py-5">
+      <div class="d-flex justify-content-between align-items-center mb-4 gap-3">
+        <div>
+          <h1 class="h3 mb-0">🏠 Inventário da Casa</h1>
+          <div class="muted-small">Gerencie seus itens e consumíveis</div>
         </div>
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addItemModal">➕ Adicionar Item</button>
-     
-        <hr class="my-4">
-        <!-- Filtros por Divisão -->
-        <div class="mb-4 tag-filter">
-            <strong>Filtrar por Divisão:</strong>
-            <a href="{% url 'itens' %}"
-                class="btn btn-sm btn-outline-secondary {% if not request.GET.divisao %}active{% endif %}">Todas</a>
+
+        <div class="d-flex align-items-center gap-3">
+          <div class="text-end">
+            <div class="muted-small">Valor total</div>
+            <div class="fw-bold">€ {{ total_itens|floatformat:2 }}</div>
+            <div class="muted-small">{{ total_itens_count }} itens</div>
+          </div>
+
+          <a href="{% url 'menu' %}" class="btn btn-outline-secondary">⬅ Voltar</a>
+          <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addItemModal">➕ Adicionar</button>
+        </div>
+      </div>
+
+      <div class="row mb-4">
+        <div class="col-lg-8">
+          <form method="get" class="row g-2">
+            <div class="col-md-6">
+              <input type="text" name="q" value="{{ request.GET.q|default:'' }}" class="form-control" placeholder="Pesquisar item..." />
+            </div>
+            <div class="col-md-4">
+              <select name="divisao" class="form-select">
+                <option value="">Todas as divisões</option>
+                {% for d in divisoes %}
+                  <option value="{{ d.id }}" {% if request.GET.divisao|stringformat:'s' == d.id|stringformat:'s' %}selected{% endif %}>{{ d.nome }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-2">
+              <button class="btn btn-primary w-100">🔍 Filtrar</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="col-lg-4 text-lg-end mt-2 mt-lg-0">
+          <div class="btn-group" role="group">
+            <a href="{% url 'itens' %}" class="btn btn-sm btn-outline-primary">Todas</a>
             {% for div in divisoes %}
               <a href="?divisao={{ div.id }}" class="btn btn-sm btn-outline-secondary">{{ div.nome }}</a>
             {% endfor %}
           </div>
         </div>
-        <!-- Pesquisa + Filtro -->
-        <form method="get" class="row g-3 mb-4 filter-bar">
+      </div>
 
-            <div class="col-md-5">
-                <input type="text" name="q" class="form-control" placeholder="Pesquisar item..." value="{{ search_query }}">
-            </div>
-
-            <div class="col-md-4">
-                <select name="divisao" class="form-select">
-                    <option value {% if not request.GET.divisao %}selected{% endif %}>Todas as divisões</option>
-                    {% for d in divisoes %}
-                    <option value="{{ d.id }}" {% if request.GET.divisao == d.id|stringformat:'s' %}selected{% endif %}>{{ d.nome }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <div class="col-md-3">
-                <button class="btn btn-primary w-100">🔍 Filtrar</button>
-            </div>
-
-        </form>
-
-        <!-- Grid de Itens -->
-        <h3 class="mb-3">📦 Itens</h3>
-        <div class="row">
-            {% for item in itens %}
-            <div class="col-md-4 col-lg-3">
-                <div class="card shopping-card mb-3 h-100">
-                    {% if item.imagem %}
-                    <img src="{{ item.imagem.url }}" class="card-img-top">
-                    {% endif %}
-                    <div class="card-body d-flex flex-column">
-                        <span class="card-kind card-kind-owned">EM CASA</span>
-                        <h5 class="shopping-card-title">{{ item.nome }}</h5>
-                        <p class="shopping-card-description">{{ item.descricao|default:'Sem descrição adicionada.' }}</p>
-                        <p class="card-detail">Quantidade: {{ item.quantidade }}</p>
-                        <p class="card-detail">Valor: €{{ item.valor }}</p>
-
-                        {% if item.data_aquisicao %}
-                        <p class="text-muted">
-                            📅 {{ item.data_aquisicao }}
-                        </p>
-                        {% endif %}
-                        {% if item.divisao %}
-                        <span class="badge division-badge">
-                            {{ item.divisao.nome }}
-                        </span>
-                        {% endif %}
-                        <a href="{% url 'editar_item' item.id %}" class="btn btn-sm btn-primary mt-auto">
-                            Editar
-                        </a>
-                    </div>
+      <div class="row g-3" id="items-row" data-current-page="{{ page_obj.number }}" data-total-pages="{{ page_obj.paginator.num_pages }}">
+        {% for item in itens %}
+          <div class="col-sm-6 col-md-4 col-lg-3">
+            <div class="card item-card shadow-sm h-100">
+              {% if item.imagem %}
+                <img src="{{ item.imagem.url }}" class="item-img" alt="{{ item.nome }}" />
+              {% else %}
+                <div class="bg-light d-flex align-items-center justify-content-center" style="height:160px">
+                  <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <rect x="3" y="7" width="18" height="11" rx="2" stroke="#ADB5BD" stroke-width="1.5" fill="#F8F9FA" />
+                    <path d="M3 7l9-4 9 4" stroke="#ADB5BD" stroke-width="1.5" fill="none" />
+                    <circle cx="8" cy="12" r="1.5" fill="#CED4DA" />
+                  </svg>
                 </div>
               {% endif %}
               <div class="card-body d-flex flex-column">
                 <h6 class="mb-1">{{ item.nome }}</h6>
                 <div class="muted-small mb-2">{{ item.descricao|truncatewords:15 }}</div>
 
-        </div>
-        <!-- Modal -->
-        <div class="modal fade" id="addItemModal" tabindex="-1">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
+                <div class="mb-2">
+                  <span class="badge bg-secondary">{% if item.divisao %}{{ item.divisao.nome }}{% endif %}</span>
+                </div>
 
-                    <div class="modal-header">
-                        <h5 class="modal-title">Adicionar Item</h5>
-                        <button class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-
-                    <form method="post" enctype="multipart/form-data">
-
-                        <div class="modal-body">
-
-                            {% csrf_token %}
-                            <input type="hidden" name="add_item" value="1">
-
-                            <!-- SCANNER -->
-                            <div id="scanner-container" class="mb-3" style="display:none;">
-                                <video id="scanner-video" style="width:100%; height:250px;"></video>
-                            </div>
-
-                            <button type="button" onclick="toggleScanner()" class="btn btn-outline-primary w-100 mb-3">
-                                📷 Scan código de barras
-                            </button>
-
-                            <!-- FORM (o teu original) -->
-                            {{ item_form.as_p }}
-
-                        </div>
-
-                        <div class="modal-footer">
-                            <button type="submit" class="btn btn-warning w-100">
-                                💾 Guardar Item
-                            </button>
-                        </div>
+                <div class="mt-auto d-flex justify-content-between align-items-center">
+                  <div>
+                    <div class="fw-bold">{{ item.quantidade }}x</div>
+                    <div class="muted-small">€ {{ item.valor|floatformat:2 }}</div>
+                  </div>
 
                   <div class="btn-group">
                     <a href="{% url 'editar_item' item.id %}" class="btn btn-sm btn-outline-primary">Editar</a>
@@ -155,13 +114,13 @@
                 </div>
               </div>
             </div>
-        </div>
-
-        <script src="https://unpkg.com/@zxing/library@latest"></script>
-        <script src="{% static 'inventory/js/barcode_scanner.js' %}"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-        {% include "inventory/_sidebar.html" %}
-</body>
+          </div>
+        {% empty %}
+          <div class="col-12">
+            <div class="alert alert-info mb-0">Nenhum item encontrado.</div>
+          </div>
+        {% endfor %}
+      </div>
 
       <!-- Paginação -->
       {% if page_obj.paginator.num_pages > 1 %}

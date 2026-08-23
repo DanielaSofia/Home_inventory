@@ -1,146 +1,15 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="pt">
+{% extends 'inventory/base.html' %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Inventário da Casa</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'inventory
-   º.            º/css/ui-revamp.css' %}">
-</head>
+{% block title %}
+  Desejos — Gestão da Casa
+{% endblock %}
 
-<body>
-
-    <div class="container app-shell py-5">
-
-        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
-            <div>
-                <h1 class="page-title">🌟 Desejos</h1>
-                <p class="page-subtitle">Planeie compras futuras e acompanhe o custo total da wishlist.</p>
-            </div>
-
-            <div class="card metric-card metric-warning">
-                <div class="card-body text-center">
-                    <h6>🌟 Wishlist</h6>
-                    <h2>€ {{ total_desejos }}</h2>
-                    <p>{{ total_desejos_count }} desejos</p>
-                </div>
-            </div>
-            <a href="{% url 'menu' %}" class="btn btn-outline-secondary">
-                ⬅ Voltar
-            </a>
-        </div>
-
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#desejoModal">
-            🌟 Adicionar Desejo</button>
-
-        <hr class="my-4">
-
-        <!-- Filtros por Divisão -->
-        <div class="mb-4 tag-filter">
-            <strong>Filtrar por Divisão:</strong>
-            <a href="{% url 'desejos' %}"
-                class="btn btn-sm btn-outline-secondary {% if not request.GET.divisao %}active{% endif %}">Todas</a>
-            {% for div in divisoes %}
-            <a href="?divisao={{ div.id }}"
-                class="btn btn-sm btn-outline-secondary {% if request.GET.divisao|default:'' == div.id|stringformat:'s' %}active{% endif %}">
-                {{ div.nome }}
-            </a>
-            {% endfor %}
-        </div>
-        <!-- Pesquisa + Filtro -->
-        <form method="get" class="row g-3 mb-4 filter-bar">
-
-            <div class="col-md-5">
-                <input type="text" name="q" class="form-control" placeholder="Pesquisar desejo..." value="{{ search_query }}">
-            </div>
-
-            <div class="col-md-4">
-                <select name="divisao" class="form-select">
-                    <option value {% if not request.GET.divisao %}selected{% endif %}>Todas as divisões</option>
-                    {% for d in divisoes %}
-                    <option value="{{ d.id }}" {% if request.GET.divisao == d.id|stringformat:'s' %}selected{% endif %}>{{ d.nome }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <div class="col-md-3">
-                <button class="btn btn-primary w-100">🔍 Filtrar</button>
-            </div>
-
-        </form>
-
-        <h3 class="mt-5 mb-3">🌟 Lista de Desejos</h3>
-        <div class="row">
-
-            {% for d in desejos %}
-
-            <div class="col-md-4 col-lg-3">
-                <div class="card mb-3 h-100">
-
-                    {% if d.imagem %}
-                    <img src="{{ d.imagem.url }}" class="card-img-top">
-                    {% endif %}
-
-                    <div class="card-body">
-
-                        <h5>{{ d.nome }}</h5>
-                        <p>{{ d.descricao }}</p>
-
-                        {% if d.valor %}
-                        <p>€{{ d.valor }}</p>
-                        {% endif %}
-                        {% if d.divisao %}
-                        <span class="badge bg-secondary">
-                            {{ d.divisao.nome }}
-                        </span>
-
-                        {% endif %}
-                        <a href="{% url 'editar_desejo' d.id %}" class="btn btn-sm btn-outline-secondary">Editar</a>
-                    <button class="btn btn-success btn-sm"
-        data-bs-toggle="modal"
-                data-bs-target="#modal{{ d.id }}">
-    🛒 Comprar
-</button>
-                    
-<div class="modal fade" id="modal{{ d.id }}" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
-
-      <div class="modal-header">
-        <h5 class="modal-title">
-            Comprar — {{ d.nome }}
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-
-      <form method="POST" action="{% url 'comprar_desejo' d.id %}">
-        {% csrf_token %}
-
-        <div class="modal-body">
-
-            <!-- data -->
-            <label>Data de aquisição</label>
-            <input type="date" name="data" class="form-control" required>
-
-            <!-- opcional: preço -->
-            <label class="mt-2">Preço (€)</label>
-            <input type="number" step="0.01" name="preco" class="form-control">
-
-        </div>
-
-        <div class="modal-footer">
-            <button class="btn btn-success">
-                Confirmar compra
-            </button>
-        </div>
-
-      </form>
+{% block content %}
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h4 mb-0">🌟 Desejos</h1>
+      <div class="text-muted">Wishlist e ideias</div>
+    </div>
 
     <div class="text-end">
       <div class="badge bg-warning text-dark mb-1">🌟 € {{ total_desejos|floatformat:2 }}</div>
@@ -152,6 +21,21 @@
     <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#desejoModal">🌟 Adicionar Desejo</button>
     <a href="{% url 'menu' %}" class="btn btn-link">⬅ Voltar</a>
   </div>
+
+  <form method="get" class="row g-2 mb-3">
+    <div class="col-md-5">
+      <input type="text" name="q" value="{{ search_query }}" class="form-control" placeholder="Pesquisar desejo..." />
+    </div>
+    <div class="col-md-5">
+      <select name="divisao" class="form-select">
+        <option value="">Todas as divisões</option>
+        {% for d in divisoes %}
+          <option value="{{ d.id }}" {% if divisao_selecionada|stringformat:'s' == d.id|stringformat:'s' %}selected{% endif %}>{{ d.nome }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2"><button class="btn btn-primary w-100">Filtrar</button></div>
+  </form>
 
   <div class="row g-3">
     {% for d in desejos %}
@@ -203,9 +87,13 @@
             </form>
           </div>
         </div>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-        {% include "inventory/_sidebar.html" %}
-</body>
+      </div>
+    {% empty %}
+      <div class="col-12">
+        <div class="alert alert-info">Sem desejos nesta divisão.</div>
+      </div>
+    {% endfor %}
+  </div>
 
   <!-- Modal Adicionar Desejo -->
   <div class="modal fade" id="desejoModal" tabindex="-1">
