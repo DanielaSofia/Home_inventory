@@ -3,9 +3,42 @@
 Contém forms de modelo usados nas views para criar/editar objetos.
 """
 
+from decimal import Decimal, InvalidOperation
+
 from django import forms
+from django.core.exceptions import ValidationError
 
 from .models import Consumivel, Desejo, Divisao, Item
+
+
+def parse_fractional_decimal(value):
+    """Converte valores decimais ou frações simples em Decimal."""
+    value = str(value).strip().replace(",", ".")
+    if "/" not in value:
+        return Decimal(value)
+
+    numerator, *denominators = value.split("/")
+    if len(denominators) != 1:
+        raise InvalidOperation
+
+    denominator = denominators[0].strip()
+    if Decimal(denominator) == 0:
+        raise InvalidOperation
+    return Decimal(numerator.strip()) / Decimal(denominator)
+
+
+class FractionalDecimalField(forms.DecimalField):
+    """Campo decimal que também aceita frações, como ``1/2``."""
+
+    def to_python(self, value):
+        if value in self.empty_values:
+            return None
+
+        try:
+            return parse_fractional_decimal(value)
+        except (InvalidOperation, ValueError, TypeError):
+            raise ValidationError(self.error_messages["invalid"], code="invalid")
+
 
 class ItemForm(forms.ModelForm):
     """Formulário de `Item` usado para criação/edição via interface."""
@@ -50,11 +83,19 @@ class DesejoForm(forms.ModelForm):
 class ConsumivelForm(forms.ModelForm):
     """Formulário para cadastrar produtos consumíveis."""
 
+    quantidade = FractionalDecimalField(max_digits=10, decimal_places=2, min_value=0)
+
     class Meta:
         model = Consumivel
         fields = ["nome", "quantidade", "divisao"]
         widgets = {
             "nome": forms.TextInput(attrs={"class": "form-control"}),
-            "quantidade": forms.NumberInput(attrs={"class": "form-control", "min": 0}),
+            "quantidade": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "inputmode": "decimal",
+                    "placeholder": "Ex.: 0,5 ou 1/2",
+                }
+            ),
             "divisao": forms.Select(attrs={"class": "form-control"}),
         }

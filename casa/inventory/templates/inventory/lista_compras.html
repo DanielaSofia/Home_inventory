@@ -5,6 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Lista de compras</title>
+    <link rel="manifest" href="{% static 'inventory/manifest.json' %}">
+    <link rel="apple-touch-icon" href="{% static 'inventory/icons/icon.svg' %}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0d6efd">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,6 +22,7 @@
                 <span class="eyebrow">PLANEAMENTO</span>
                 <h1 class="page-title">Lista de compras</h1>
                 <p class="page-subtitle">Prepare a próxima compra sem perder o controlo do stock.</p>
+                <span id="sync-status" class="sync-status">A verificar ligação...</span>
                 </div>
             <div class="shopping-summary">
                 <span>ITENS PENDENTES</span>
@@ -25,6 +30,8 @@
                 <small>consumíveis</small>
             </div>
             </div>
+
+        <div id="offline-pendentes" class="d-none"></div>
 
         <form method="get" class="row g-3 mb-4 filter-bar shopping-filter">
             <div class="col-md-5">
@@ -55,32 +62,33 @@
             </div>
             <div class="list-group list-group-flush">
                 {% for compra in compras %}
-                <div class="list-group-item shopping-list-row py-3 px-3">
+                <div class="list-group-item shopping-list-row py-3 px-3" data-uuid="{{ compra.uuid }}">
                     <div class="shopping-item-grid">
                         <form method="post" action="{% url 'marcar_consumivel_comprado' compra.id %}"
-                            class="shopping-check-form">
+                            class="shopping-check-form" data-offline-form="comprado" data-uuid="{{ compra.uuid }}">
                             {% csrf_token %}
-                            <input class="shopping-check-input" type="checkbox" name="comprado" id="comprado{{ compra.id }}" {%
-                                if compra.comprado %}checked{% endif %} onchange="this.form.submit()">
+                            <input class="shopping-check-input" type="checkbox" name="comprado" id="comprado{{ compra.id }}" {% if compra.comprado
+                                %}checked{% endif %} onchange="this.form.submit()">
                             <label class="visually-hidden" for="comprado{{ compra.id }}">{{ compra.nome }} comprado</label>
                         </form>
                         <div class="shopping-item-info">
                             <h3 class="h6 mb-1">{{ compra.nome }}</h3>
-                            {% if compra.divisao %}<span class="badge division-badge">{{ compra.divisao.nome }}</span>{% endif
-                            %}
+                            {% if compra.divisao %}<span class="badge division-badge">{{ compra.divisao.nome }}</span>{% endif %}
                         </div>
                         <div class="shopping-stock"><span>STOCK ATUAL</span><strong>{{ compra.quantidade }}</strong></div>
-                        <form method="post" action="{% url 'marcar_consumivel_comprado' compra.id %}" class="shopping-quantity-form">
+                        <form method="post" action="{% url 'marcar_consumivel_comprado' compra.id %}" class="shopping-quantity-form"
+                            data-offline-form="quantidade" data-uuid="{{ compra.uuid }}">
                             {% csrf_token %}
                             <input type="hidden" name="comprado" value="">
                             <label for="quantidadeCompra{{ compra.id }}" class="small text-muted">A comprar</label>
                             <div class="d-flex gap-2">
-                                <input class="shopping-quantity-input" id="quantidadeCompra{{ compra.id }}" type="number"
-                                    name="quantidade_compra" min="1" value="{{ compra.quantidade_compra }}">
+                                <input class="shopping-quantity-input" id="quantidadeCompra{{ compra.id }}" type="text" name="quantidade_compra"
+                                    inputmode="decimal" value="{{ compra.quantidade_compra }}">
                                 <button class="btn btn-sm btn-outline-secondary" type="submit">Atualizar</button>
                             </div>
                             </form>
                         <form method="post" action="{% url 'apagar_consumivel' compra.id %}" class="shopping-delete-form"
+                            data-offline-form="apagar" data-uuid="{{ compra.uuid }}"
                             onsubmit="return confirm('Apagar este consumível da lista de compras?');">
                             {% csrf_token %}
                             <button class="btn btn-sm btn-outline-danger" type="submit">Apagar</button>
@@ -140,5 +148,12 @@
     </div>
 {% include "inventory/_sidebar.html" %}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dexie@3/dist/dexie.min.js"></script>
+<script src="{% static 'inventory/js/sync.js' %}"></script>
+<script>
+    if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("/service-worker.js");
+    }
+</script>
 </body>
 </html>

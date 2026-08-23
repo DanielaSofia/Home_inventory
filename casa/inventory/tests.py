@@ -1,11 +1,13 @@
 """Testes para o app inventory."""
 
+from decimal import Decimal
+
 import pytest
 from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from casa.inventory.models import Desejo, Divisao, Item
+from casa.inventory.models import Consumivel, Desejo, Divisao, Item
 
 @pytest.fixture
 def user(db):
@@ -118,3 +120,57 @@ class TestDesejoViewSet:
         }
         response = api_client.post('/api/desejos/', data)
         assert response.status_code == status.HTTP_201_CREATED
+
+
+@pytest.mark.django_db
+class TestDespensaView:
+    """Testes da página de consumíveis comprados."""
+
+    @pytest.mark.parametrize("path", ["/itens/", "/desejos/", "/lista-compras/", "/despensa/"])
+    def test_filter_by_divisao_renders_selected_option(self, client, divisao, path):
+        """Renderiza filtros de divisão sem erros de sintaxe nos templates."""
+        Consumivel.objects.create(
+            nome="Arroz",
+            divisao=divisao,
+            comprado=True,
+        )
+
+        response = client.get(path, {"divisao": divisao.id})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert f'<option value="{divisao.id}" selected>' in response.content.decode()
+
+
+@pytest.mark.django_db
+class TestConsumivelQuantities:
+    """Testes para quantidades fracionárias de consumíveis."""
+
+    @pytest.mark.parametrize("quantidade", ["0.5", "1/2"])
+    def test_creates_consumivel_with_fractional_quantity(self, client, divisao, quantidade):
+        """Aceita valores decimais e frações na criação de um consumível."""
+        response = client.post(
+            "/lista-compras/",
+            {"nome": "Pizza", "quantidade": quantidade, "divisao": divisao.id},
+        )
+
+        consumivel = Consumivel.objects.get(nome="Pizza")
+        assert response.status_code == status.HTTP_302_FOUND
+        assert consumivel.quantidade == Decimal("0.50")
+
+    def test_adds_fractional_purchase_quantity_to_stock(self, client, divisao):
+        """Soma uma quantidade fracionária ao marcar uma compra."""
+        consumivel = Consumivel.objects.create(
+            nome="Pizza",
+            quantidade=Decimal("1.00"),
+            divisao=divisao,
+        )
+
+        response = client.post(
+            f"/marcar-consumivel-comprado/{consumivel.id}/",
+            {"comprado": "on", "quantidade_compra": "1/2"},
+        )
+
+        consumivel.refresh_from_db()
+        assert response.status_code == status.HTTP_302_FOUND
+        assert consumivel.quantidade_compra == Decimal("0.50")
+        assert consumivel.quantidade == Decimal("1.50")

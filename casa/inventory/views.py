@@ -1,11 +1,31 @@
 """Views web do app inventory baseadas em templates Django."""
 
+from decimal import InvalidOperation
+
+from django.conf import settings
 from django.db.models import Avg, F, Q, Sum
 from django.db.models.functions import TruncMonth
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import ConsumivelForm, DesejoForm, DivisaoForm, ItemForm
+from .forms import ConsumivelForm, DesejoForm, DivisaoForm, ItemForm, parse_fractional_decimal
 from .models import Consumivel, Desejo, Divisao, Item
+
+
+def service_worker(request):
+    """Serve o service worker a partir da raiz para que o seu scope cubra todo o site."""
+
+    sw_path = (
+        settings.BASE_DIR
+        / "casa"
+        / "inventory"
+        / "static"
+        / "inventory"
+        / "js"
+        / "service-worker.js"
+    )
+    return HttpResponse(sw_path.read_text(), content_type="application/javascript")
+
 
 ## Item
 
@@ -224,7 +244,12 @@ def marcar_consumivel_comprado(request, consumivel_id):
         comprado = request.POST.get("comprado") == "on"
         quantidade_compra = request.POST.get("quantidade_compra")
         if quantidade_compra:
-            consumivel.quantidade_compra = max(int(quantidade_compra), 1)
+            try:
+                quantidade_compra = parse_fractional_decimal(quantidade_compra)
+            except (InvalidOperation, ValueError, TypeError):
+                quantidade_compra = None
+            if quantidade_compra and quantidade_compra > 0:
+                consumivel.quantidade_compra = quantidade_compra
         if comprado and not consumivel.comprado:
             consumivel.quantidade += consumivel.quantidade_compra
         consumivel.comprado = comprado

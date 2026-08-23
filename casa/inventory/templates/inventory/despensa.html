@@ -36,7 +36,7 @@
                 <select name="divisao" class="form-select">
                     <option value {% if not request.GET.divisao %}selected{% endif %}>Todas as divisões</option>
                     {% for divisao in divisoes %}
-                    <option value="{{ divisao.id }}" {% if request.GET.divisao==divisao.id|stringformat:'s' %}selected{% endif %}>{{
+                    <option value="{{ divisao.id }}" {% if request.GET.divisao == divisao.id|stringformat:'s' %}selected{% endif %}>{{
                         divisao.nome }}</option>
                     {% endfor %}
                 </select>
@@ -64,8 +64,7 @@
                             <h3 class="h6 mb-1">{{ consumivel.nome }}</h3>
                             <p class="text-muted small mb-0">Quantidade: {{ consumivel.quantidade }}</p>
                         </div>
-                        {% if consumivel.divisao %}<span class="badge division-badge">{{ consumivel.divisao.nome }}</span>{% endif
-                        %}
+                        {% if consumivel.divisao %}<span class="badge division-badge">{{ consumivel.divisao.nome }}</span>{% endif %}
                     </div>
                 </div>
                 {% empty %}

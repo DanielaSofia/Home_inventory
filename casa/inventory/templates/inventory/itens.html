@@ -62,7 +62,7 @@
                 <select name="divisao" class="form-select">
                     <option value {% if not request.GET.divisao %}selected{% endif %}>Todas as divisões</option>
                     {% for d in divisoes %}
-                    <option value="{{ d.id }}" {% if request.GET.divisao==d.id|stringformat:'s' %}selected{% endif %}>{{ d.nome }}</option>
+                    <option value="{{ d.id }}" {% if request.GET.divisao == d.id|stringformat:'s' %}selected{% endif %}>{{ d.nome }}</option>
                     {% endfor %}
                 </select>
             </div>
