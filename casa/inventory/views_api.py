@@ -7,14 +7,17 @@ com autenticação, permissões e filtros configurados.
 import logging
 
 from django.db.models import Avg, Sum
+from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from .models import Desejo, Divisao, Item
-from .serializers import DesejoSerializer, DivisaoSerializer, ItemSerializer
+from .models import Consumivel, Desejo, Divisao, Item
+from .serializers import ConsumivelSerializer, DesejoSerializer, DivisaoSerializer, ItemSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -104,3 +107,62 @@ class DesejoViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
     search_fields = ["nome", "descricao"]
     filterset_fields = ["divisao"]
+
+
+class ConsumivelViewSet(viewsets.ModelViewSet):
+    """API ViewSet para gerir consumíveis (lista de compras / despensa)."""
+
+    queryset = Consumivel.objects.all()
+    serializer_class = ConsumivelSerializer
+    permission_classes = [IsAuthenticated]
+    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
+    search_fields = ["nome"]
+    filterset_fields = ["divisao", "comprado"]
+
+
+class ConsumivelSyncView(APIView):
+    """Sincronização offline-first de `Consumivel` para a PWA.
+
+    GET  ?since=<isoformat> -> alterações no servidor desde essa data.
+    POST {"consumiveis": [...], "apagados": [uuid, ...]} -> aplica alterações feitas offline.
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        since = parse_datetime(request.query_params.get("since", "") or "")
+        queryset = Consumivel.objects.select_related("divisao").all()
+        if since:
+            queryset = queryset.filter(updated_at__gt=since)
+        return Response({
+            "server_time": timezone.now().isoformat(),
+            "consumiveis": ConsumivelSerializer(queryset, many=True).data,
+        })
+
+    def post(self, request):
+        aplicados = []
+        erros = []
+
+        for item in request.data.get("consumiveis", []):
+            item_uuid = item.get("uuid")
+            if not item_uuid:
+                erros.append({"uuid": None, "erro": "uuid em falta"})
+                continue
+            instance = Consumivel.objects.filter(uuid=item_uuid).first()
+            serializer = ConsumivelSerializer(instance, data=item, partial=True)
+            if serializer.is_valid():
+                serializer.save(uuid=item_uuid)
+                aplicados.append(item_uuid)
+            else:
+                erros.append({"uuid": item_uuid, "erro": serializer.errors})
+
+        apagados = request.data.get("apagados", [])
+        if apagados:
+            Consumivel.objects.filter(uuid__in=apagados).delete()
+
+        return Response({
+            "server_time": timezone.now().isoformat(),
+            "aplicados": aplicados,
+            "apagados": apagados,
+            "erros": erros,
+        }, status=status.HTTP_207_MULTI_STATUS if erros else status.HTTP_200_OK)

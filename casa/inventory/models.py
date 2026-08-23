@@ -3,6 +3,8 @@
 Define os modelos `Divisao`, `Item` e `Desejo` utilizados pela aplicação.
 """
 
+import uuid
+
 from django.db import models
 
 
@@ -40,11 +42,14 @@ class Item(models.Model):
 class Consumivel(models.Model):
     """Produto consumível identificado por nome, quantidade e divisão."""
 
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     nome = models.CharField(max_length=100)
-    quantidade = models.IntegerField(default=1)
-    quantidade_compra = models.IntegerField(default=1)
+    quantidade = models.DecimalField(max_digits=10, decimal_places=2, default=1)
+    quantidade_compra = models.DecimalField(max_digits=10, decimal_places=2, default=1)
     comprado = models.BooleanField(default=False)
     divisao = models.ForeignKey(Divisao, on_delete=models.CASCADE, related_name="consumiveis")
+    # usado para saber o que sincronizar (offline-first / PWA)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["nome", "id"]

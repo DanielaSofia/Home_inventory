@@ -23,19 +23,30 @@ from .views import (
     listar_itens,
     marcar_comprado,
     menu,
+    service_worker,
 )
-from .views_api import DesejoViewSet, DivisaoViewSet, ItemViewSet
+from .views_api import (
+    ConsumivelSyncView,
+    ConsumivelViewSet,
+    DesejoViewSet,
+    DivisaoViewSet,
+    ItemViewSet,
+)
 
 # API Router
 router = DefaultRouter()
 router.register(r"divisoes", DivisaoViewSet, basename="divisao")
 router.register(r"itens", ItemViewSet, basename="item")
 router.register(r"desejos", DesejoViewSet, basename="desejo")
+router.register(r"consumiveis", ConsumivelViewSet, basename="consumivel")
 
 urlpatterns = [
     # API Routes
     path("api/", include(router.urls)),
+    path("api/sync/consumiveis/", ConsumivelSyncView.as_view(), name="sync_consumiveis"),
     path("api-token-auth/", obtain_auth_token, name="api_token_auth"),
+    # PWA
+    path("service-worker.js", service_worker, name="service_worker"),
     # Web Views (Traditional Django Templates)
     path("", menu, name="menu"),
     path("dashboard/", dashboard, name="dashboard"),
