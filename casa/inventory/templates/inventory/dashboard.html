@@ -4,16 +4,19 @@
   Dashboard — Gestão da Casa
 {% endblock %}
 {% block content %}
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h3 class="h4 mb-0">📊 Dashboard</h3>
-    <a href="{% url 'menu' %}" class="btn btn-link">Voltar</a>
-  </div>
+  <header class="page-heading">
+    <div>
+      <span class="eyebrow">RESUMO</span>
+      <h1 class="page-title">Dashboard</h1>
+      <p class="page-subtitle">Uma visão rápida do inventário e do stock da casa.</p>
+    </div>
+  </header>
 
   <div class="row g-3 mb-4">
     <div class="col-6 col-md-3">
-      <div class="card p-3 shadow-sm">
+      <div class="card metric-card p-3">
         <div class="d-flex align-items-center">
-          <div class="me-3 fs-3">📦</div>
+          <div class="metric-icon">□</div>
           <div>
             <div class="muted-small">Total unidades</div>
             <div class="fs-5 fw-bold">{{ total_unidades }}</div>
@@ -22,9 +25,9 @@
       </div>
     </div>
     <div class="col-6 col-md-3">
-      <div class="card p-3 shadow-sm">
+      <div class="card metric-card p-3">
         <div class="d-flex align-items-center">
-          <div class="me-3 fs-3">€</div>
+          <div class="metric-icon">€</div>
           <div>
             <div class="muted-small">Valor total</div>
             <div class="fs-5 fw-bold">€ {{ total_valor|floatformat:2 }}</div>
@@ -33,9 +36,9 @@
       </div>
     </div>
     <div class="col-6 col-md-3">
-      <div class="card p-3 shadow-sm">
+      <div class="card metric-card metric-warning p-3">
         <div class="d-flex align-items-center">
-          <div class="me-3 fs-3">⚠️</div>
+          <div class="metric-icon">!</div>
           <div>
             <div class="muted-small">Consumíveis em alerta</div>
             <div class="fs-5 fw-bold">{{ consumiveis_alerta.count }}</div>
@@ -44,9 +47,9 @@
       </div>
     </div>
     <div class="col-6 col-md-3">
-      <div class="card p-3 shadow-sm">
+      <div class="card metric-card p-3">
         <div class="d-flex align-items-center">
-          <div class="me-3 fs-3">🕘</div>
+          <div class="metric-icon">◷</div>
           <div>
             <div class="muted-small">Itens recentes</div>
             <div class="fs-5 fw-bold">{{ recentes.count }}</div>
@@ -58,8 +61,8 @@
 
   <div class="row">
     <div class="col-lg-6 mb-3">
-      <div class="card p-3 shadow-sm">
-        <h5 class="mb-3">Consumíveis em alerta</h5>
+      <div class="card list-card p-3">
+        <h2 class="section-heading">Consumíveis em alerta</h2>
         <ul class="list-group list-group-flush">
           {% for c in consumiveis_alerta %}
             <li class="list-group-item d-flex justify-content-between align-items-center break-word">
@@ -70,15 +73,15 @@
               <a href="{% url 'despensa' %}?q={{ c.nome }}" class="btn btn-sm btn-primary">Ver</a>
             </li>
           {% empty %}
-            <li class="list-group-item">Sem consumíveis em alerta</li>
+            <li class="list-group-item text-muted">Sem consumíveis em alerta.</li>
           {% endfor %}
         </ul>
       </div>
     </div>
   </div>
 
-  <div class="card p-3 mt-3 shadow-sm">
-    <h5>Itens recentes</h5>
+  <div class="card list-card p-3 mt-3">
+    <h2 class="section-heading">Itens recentes</h2>
     <div class="table-responsive">
       <table class="table table-sm mt-2">
         <thead>

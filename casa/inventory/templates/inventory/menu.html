@@ -6,14 +6,11 @@
 
 {% block content %}
   <div class="menu-shell">
-    <section class="menu-overview">
-      <div class="menu-overview-copy">
-        <span class="overview-kicker">GESTÃO DA CASA</span>
-        <h2>Bem-vindo(a) de volta</h2>
-        <p>Centralize os itens, compras, desejos e a despensa da casa em um único ponto de controlo, com uma visão simples e rápida.</p>
-      </div>
-      <div class="overview-symbol" aria-hidden="true">⌂</div>
-    </section>
+    <header class="menu-header">
+      <span class="overview-kicker">GESTÃO DA CASA</span>
+      <h1>Visão geral</h1>
+      <p>Escolha uma área para continuar.</p>
+    </header>
     <section class="menu-summary-grid" aria-label="Resumo da casa">
       <a class="menu-summary-card" href="{% url 'itens' %}">
         <span>Itens</span><strong>{{ total_itens }}</strong>

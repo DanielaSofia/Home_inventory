@@ -7,29 +7,23 @@
 
 {% block content %}
     <div class="items-page">
-      <div class="d-flex justify-content-between align-items-center mb-4 gap-3">
+      <header class="page-header">
         <div>
-          <h1 class="h3 mb-0">🏠 Inventário da Casa</h1>
-          <div class="muted-small">Gerencie seus itens e consumíveis</div>
+          <span class="eyebrow">INVENTÁRIO</span>
+          <h1 class="page-title">Itens da casa</h1>
+          <p class="page-subtitle">Organize os objetos, o respetivo valor e a localização.</p>
         </div>
-
-        <div class="d-flex align-items-center gap-3">
-          <div class="text-end">
-            <div class="muted-small">Valor total</div>
-            <div class="fw-bold">€ {{ total_itens|floatformat:2 }}</div>
-            <div class="muted-small">{{ total_itens_count }} itens</div>
-          </div>
-
-          <a href="{% url 'menu' %}" class="btn btn-outline-secondary">⬅ Voltar</a>
-          <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addItemModal">➕ Adicionar</button>
+        <div class="page-header-actions">
+          <div class="page-stat"><span>Valor total</span><strong>€ {{ total_itens|floatformat:2 }}</strong><small>{{ total_itens_count }} itens</small></div>
+          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addItemModal">Adicionar item</button>
         </div>
-      </div>
+      </header>
 
-      <div class="row mb-4">
-        <div class="col-lg-8">
-          <form method="get" class="row g-2">
+      <section class="filter-bar mb-4" aria-label="Filtrar itens">
+          <form method="get" class="row g-2 align-items-center">
             <div class="col-md-6">
-              <input type="text" name="q" value="{{ request.GET.q|default:'' }}" class="form-control" placeholder="Pesquisar item..." />
+              <label class="visually-hidden" for="item-search">Pesquisar item</label>
+              <input id="item-search" type="search" name="q" value="{{ request.GET.q|default:'' }}" class="form-control" placeholder="Pesquisar por nome ou descrição" />
             </div>
             <div class="col-md-4">
               <select name="divisao" class="form-select">
@@ -40,20 +34,16 @@
               </select>
             </div>
             <div class="col-md-2">
-              <button class="btn btn-primary w-100">🔍 Filtrar</button>
+              <button class="btn btn-primary w-100">Filtrar</button>
             </div>
           </form>
-        </div>
-
-        <div class="col-lg-4 text-lg-end mt-2 mt-lg-0">
-          <div class="btn-group" role="group">
-            <a href="{% url 'itens' %}" class="btn btn-sm btn-outline-primary">Todas</a>
+          <div class="tag-filter mt-3" aria-label="Atalho por divisão">
+            <a href="{% url 'itens' %}" class="btn btn-sm btn-outline-secondary">Todas</a>
             {% for div in divisoes %}
-              <a href="?divisao={{ div.id }}" class="btn btn-sm btn-outline-secondary">{{ div.nome }}</a>
+              <a href="?divisao={{ div.id }}" class="btn btn-sm btn-outline-secondary{% if request.GET.divisao|stringformat:'s' == div.id|stringformat:'s' %} active{% endif %}">{{ div.nome }}</a>
             {% endfor %}
           </div>
-        </div>
-      </div>
+      </section>
 
       <div class="row g-3" id="items-row" data-current-page="{{ page_obj.number }}" data-total-pages="{{ page_obj.paginator.num_pages }}">
         {% for item in itens %}
@@ -85,7 +75,7 @@
                   </div>
 
                   <div class="btn-group">
-                    <a href="{% url 'editar_item' item.id %}" class="btn btn-sm btn-outline-primary">Editar</a>
+                    <a href="{% url 'editar_item' item.id %}" class="btn btn-sm btn-outline-secondary">Editar</a>
                     <form method="post" action="{% url 'apagar_item' item.id %}" onsubmit="return confirm('Apagar este item?');">
                       {% csrf_token %}
                       <button class="btn btn-sm btn-outline-danger" type="submit">Apagar</button>
@@ -97,7 +87,7 @@
           </div>
         {% empty %}
           <div class="col-12">
-            <div class="alert alert-info mb-0">Nenhum item encontrado.</div>
+            <div class="empty-state"><div class="empty-state-icon">⌕</div><h2>Nenhum item encontrado</h2><p>Experimente ajustar a pesquisa ou adicione o primeiro item ao inventário.</p><button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addItemModal">Adicionar item</button></div>
           </div>
         {% endfor %}
       </div>
@@ -151,7 +141,7 @@
         <div class="modal-dialog modal-lg">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title">Adicionar Item</h5>
+              <h5 class="modal-title">Adicionar item</h5>
               <button class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form method="post" enctype="multipart/form-data">
@@ -161,11 +151,11 @@
                 <div id="scanner-container" class="mb-3" style="display:none;">
                   <video id="scanner-video" style="width:100%; height:250px;"></video>
                 </div>
-                <button type="button" onclick="toggleScanner()" class="btn btn-outline-primary w-100 mb-3">📷 Scan código de barras</button>
+                <button type="button" onclick="toggleScanner()" class="btn btn-outline-secondary w-100 mb-3">Ler código de barras</button>
                 {{ item_form.as_p }}
               </div>
               <div class="modal-footer">
-                <button type="submit" class="btn btn-success w-100">💾 Guardar Item</button>
+                <button type="submit" class="btn btn-primary w-100">Guardar item</button>
               </div>
             </form>
           </div>

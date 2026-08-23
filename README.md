@@ -384,6 +384,18 @@ Home_inventory/
 
 ## Deployment
 
+Para atualizar um servidor já configurado, execute no diretório do projeto:
+
+```bash
+./scripts/update_server.sh
+```
+
+O script interrompe a atualização se existirem alterações locais, faz um `git pull --ff-only`, atualiza dependências, corre as migrações, recolhe os ficheiros estáticos e reinicia o serviço `gunicorn`. Para usar outro serviço ou branch:
+
+```bash
+SERVICE_NAME=home-inventory GIT_BRANCH=main ./scripts/update_server.sh
+```
+
 ### Pre-Deployment Checklist
 
 Before deploying to production:

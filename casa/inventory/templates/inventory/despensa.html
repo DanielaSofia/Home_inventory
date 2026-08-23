@@ -5,18 +5,20 @@
 {% endblock %}
 
 {% block content %}
-  <div class="d-flex justify-content-between align-items-center mb-4">
+  <header class="page-header">
     <div>
-      <h2 class="h4 mb-0">🍎 Despensa</h2>
-      <div class="muted-small">Gestão de consumíveis</div>
+      <span class="eyebrow">CONSUMÍVEIS</span>
+      <h1 class="page-title">Despensa</h1>
+      <p class="page-subtitle">Controle o stock e mantenha o essencial sempre disponível.</p>
     </div>
-    <div class="d-flex gap-2">
-      <a href="{% url 'lista_compras' %}" class="btn btn-warning">🛒 Lista</a>
-      <a href="{% url 'menu' %}" class="btn btn-outline-secondary">⬅ Voltar</a>
+    <div class="page-header-actions">
+      <div class="page-stat"><span>Em stock</span><strong>{{ total_consumiveis }}</strong><small>referências ativas</small></div>
+      <a href="{% url 'lista_compras' %}" class="btn btn-primary">Lista de compras</a>
     </div>
-  </div>
+  </header>
 
-  <div class="card p-3 mb-4">
+  <section class="card form-card p-3 mb-4" aria-labelledby="add-pantry-item">
+    <h2 id="add-pantry-item" class="section-heading">Adicionar à despensa</h2>
     <form method="POST" action="{% url 'adicionar_consumivel' %}">
       {% csrf_token %}
       <div class="row g-2">
@@ -34,13 +36,13 @@
           </select>
         </div>
         <div class="col-md-3">
-          <button class="btn btn-primary w-100">➕ Adicionar</button>
+          <button class="btn btn-primary w-100">Adicionar</button>
         </div>
       </div>
     </form>
-  </div>
+  </section>
 
-  <form method="get" class="row g-2 mb-3">
+  <form method="get" class="filter-bar row g-2 mb-3" aria-label="Filtrar despensa">
     <div class="col-md-5">
       <input id="searchInput" type="text" name="q" class="form-control" placeholder="🔍 Procurar item..." value="{{ query }}" />
     </div>
@@ -61,7 +63,7 @@
     </div>
   </form>
 
-  <div class="card p-3">
+  <section class="card list-card p-3">
     <ul class="list-group list-group-flush">
       {% for item in itens %}
         <li class="list-group-item item-row d-flex justify-content-between align-items-center" data-nome="{{ item.nome|lower }}">
@@ -69,29 +71,29 @@
             <strong>{{ item.nome }}</strong><br />
             <small class="text-muted">{{ item.divisao.nome }}</small><br />
             {% if item.quantidade == 0 %}
-              <span class="text-danger">⚠️ A acabar</span>
+              <span class="stock-low">Sem stock</span>
             {% else %}
-              <span class="text-success">✔ Em stock</span>
+              <span class="stock-ok">Em stock</span>
             {% endif %}
           </div>
           <div class="d-flex align-items-center gap-2">
-            <span class="badge bg-dark">{{ item.quantidade }}</span>
+            <span class="quantity-badge">{{ item.quantidade }}</span>
             <form method="POST" action="{% url 'consumir_consumivel' item.id %}">
-              {% csrf_token %}<button class="btn btn-danger btn-sm">➖</button>
+              {% csrf_token %}<button class="btn btn-outline-secondary btn-sm" aria-label="Consumir uma unidade de {{ item.nome }}">−</button>
             </form>
             <form method="POST" action="{% url 'repor_consumivel' item.id %}">
-              {% csrf_token %}<button class="btn btn-success btn-sm">➕</button>
+              {% csrf_token %}<button class="btn btn-primary btn-sm" aria-label="Repor uma unidade de {{ item.nome }}">+</button>
             </form>
             <form method="POST" action="{% url 'apagar_consumivel' item.id %}">
-              {% csrf_token %}<button class="btn btn-outline-danger btn-sm" onclick="return confirm('Apagar item?')">🗑</button>
+              {% csrf_token %}<button class="btn btn-outline-danger btn-sm" onclick="return confirm('Apagar item?')" aria-label="Apagar {{ item.nome }}">×</button>
             </form>
           </div>
         </li>
       {% empty %}
-        <li class="list-group-item text-center">🍃 Despensa vazia</li>
+        <li class="list-group-item"><div class="empty-state compact"><div class="empty-state-icon">⌂</div><h2>Despensa vazia</h2><p>Adicione o primeiro consumível para começar a controlar o stock.</p></div></li>
       {% endfor %}
     </ul>
-  </div>
+  </section>
 
 {% endblock %}
 

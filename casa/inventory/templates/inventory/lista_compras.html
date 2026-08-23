@@ -6,12 +6,20 @@
 {% endblock %}
 
 {% block content %}
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 class="h4 mb-0">🛒 Lista de Compras</h2>
-    <a href="{% url 'despensa' %}" class="btn btn-link">⬅ Voltar</a>
-  </div>
+  <header class="page-header">
+    <div>
+      <span class="eyebrow">PLANEAMENTO</span>
+      <h1 class="page-title">Lista de compras</h1>
+      <p class="page-subtitle">Reúna o que falta e atualize o stock assim que comprar.</p>
+    </div>
+    <div class="page-header-actions">
+      <div class="page-stat"><span>Por comprar</span><strong>{{ total_compras }}</strong><small>itens pendentes</small></div>
+      <a href="{% url 'despensa' %}" class="btn btn-outline-secondary">Ver despensa</a>
+    </div>
+  </header>
 
-  <div class="card p-3 mb-3">
+  <section class="card form-card p-3 mb-4" aria-labelledby="add-shopping-item">
+    <h2 id="add-shopping-item" class="section-heading">Adicionar à lista</h2>
     <form method="POST" action="{% url 'adicionar_compra' %}">
       {% csrf_token %}
       <div class="row g-2">
@@ -29,45 +37,44 @@
           </select>
         </div>
         <div class="col-md-2">
-          <button class="btn btn-primary w-100">➕</button>
+          <button class="btn btn-primary w-100">Adicionar</button>
         </div>
       </div>
     </form>
-  </div>
+  </section>
 
-  <div class="card p-3 mb-4">
-    <div class="section-title">🛒 Precisa de comprar</div>
+  <section class="card list-card p-3 mb-4">
+    <h2 class="section-heading">Por comprar</h2>
     <ul class="list-group list-group-flush">
       {% for item in ativos %}
         <li class="list-group-item item-row d-flex justify-content-between align-items-center">
           <div>
             <strong>{{ item.nome }}</strong><br />
-            <small class="text-muted">{% if item.divisao %}{{ item.divisao.nome }}{% endif %}</small>
-            <br />
+            {% if item.divisao %}<span class="division-badge badge">{{ item.divisao.nome }}</span>{% endif %}
             {% if item.quantidade == 0 %}
-              <span class="text-danger">⚠️ Sem stock</span>
+              <span class="stock-low d-block mt-1">Sem stock</span>
             {% elif item.quantidade <= item.quantidade_compra %}
-              <span class="text-warning">⚠️ A acabar</span>
+              <span class="stock-warning d-block mt-1">A terminar</span>
             {% else %}
-              <span class="text-success">✔ OK</span>
+              <span class="stock-ok d-block mt-1">Em stock</span>
             {% endif %}
           </div>
 
           <div class="d-flex align-items-center gap-2">
-            <span class="badge bg-warning text-dark">{{ item.quantidade }}</span>
+            <span class="quantity-badge">{{ item.quantidade }}</span>
 
             <form method="POST" action="{% url 'marcar_comprado' item.id %}">
               {% csrf_token %}
               <div class="d-flex gap-2">
                 <input type="text" name="quantidade" class="form-control form-control-sm" value="{{ item.quantidade_compra }}" required />
-                <button class="btn btn-sm btn-success">Marcar</button>
+                <button class="btn btn-sm btn-primary">Comprado</button>
               </div>
             </form>
           </div>
         </li>
       {% empty %}
-        <li class="list-group-item">Nenhum item ativo</li>
+        <li class="list-group-item"><div class="empty-state compact"><div class="empty-state-icon">✓</div><h2>Lista concluída</h2><p>Não há compras pendentes.</p></div></li>
       {% endfor %}
     </ul>
-  </div>
+  </section>
 {% endblock %}

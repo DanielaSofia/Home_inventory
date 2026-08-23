@@ -388,7 +388,16 @@ def comprar_desejo(request, desejo_id):
 def menu(request):
     """Renderiza o menu principal do app inventory."""
 
-    return render(request, "inventory/menu.html")
+    return render(
+        request,
+        "inventory/menu.html",
+        {
+            "total_itens": Item.objects.count(),
+            "total_desejos": Desejo.objects.count(),
+            "total_compras": Consumivel.objects.filter(comprado=False).count(),
+            "total_despensa": Consumivel.objects.filter(comprado=True).count(),
+        },
+    )
 
 
 def dashboard(request):
