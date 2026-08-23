@@ -1009,6 +1009,34 @@ body {
   display: block;
 }
 
+.menu-suggestion-panel {
+  align-items: end;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(180px, 0.7fr) minmax(0, 1.8fr);
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+}
+
+.menu-suggestion-panel h2 {
+  font-size: 1.15rem;
+  margin: 0.2rem 0;
+}
+
+.menu-suggestion-panel p {
+  color: var(--muted);
+  margin: 0;
+}
+
+@media (max-width: 800px) {
+  .menu-suggestion-panel {
+    grid-template-columns: 1fr;
+  }
+}
 .menu-summary-card span {
   color: var(--muted);
   font-size: 0.72rem;

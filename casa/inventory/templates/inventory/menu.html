@@ -25,5 +25,29 @@
         <span>Despensa</span><strong>{{ total_despensa }}</strong>
       </a>
     </section>
+
+    <section class="menu-suggestion-panel" aria-labelledby="suggestion-title">
+      <div>
+        <span class="overview-kicker">MELHORIAS</span>
+        <h2 id="suggestion-title">Tem uma sugestão?</h2>
+        <p>Envie uma ideia diretamente para o projeto.</p>
+      </div>
+      <form action="https://github.com/DanielaSofia/Home_inventory/issues/new" method="get" target="_blank">
+        <input type="hidden" name="labels" value="enhancement" />
+        <div class="row g-2">
+          <div class="col-md-4">
+            <label class="visually-hidden" for="suggestion-title-input">Título da sugestão</label>
+            <input id="suggestion-title-input" class="form-control" type="text" name="title" placeholder="Título da sugestão" required />
+          </div>
+          <div class="col-md-6">
+            <label class="visually-hidden" for="suggestion-body-input">Descrição da sugestão</label>
+            <textarea id="suggestion-body-input" class="form-control" name="body" rows="1" placeholder="Descreva a sua ideia..." required></textarea>
+          </div>
+          <div class="col-md-2">
+            <button class="btn btn-primary w-100" type="submit">Abrir ticket</button>
+          </div>
+        </div>
+      </form>
+    </section>
   </div>
 {% endblock %}
