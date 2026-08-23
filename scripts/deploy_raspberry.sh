@@ -10,10 +10,6 @@ SERVICE_NAME="${SERVICE_NAME:-gunicorn}"
 
 cd "$ROOT_DIR"
 
-echo "[1/5] git pull (branch: $GIT_BRANCH)..."
-git fetch origin "$GIT_BRANCH"
-git checkout "$GIT_BRANCH"
-git pull origin "$GIT_BRANCH"
 
 if [ -f "$VENV_DIR/bin/activate" ]; then
   echo "[2/5] Ativando virtualenv em $VENV_DIR..."
@@ -28,7 +24,7 @@ echo "[3/5] Instalando dependências..."
 pip install -r requirements.txt
 
 echo "[4/5] Aplicando migrações..."
-python manage.py migrate
+python manage.py migrate inventory
 
 echo "[5/5] Recolhendo ficheiros estáticos..."
 python manage.py collectstatic --noinput

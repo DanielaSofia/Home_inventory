@@ -8,10 +8,14 @@ from rest_framework.authtoken.views import obtain_auth_token
 from rest_framework.routers import DefaultRouter
 
 from .views import (
+    adicionar_compra,
+    adicionar_consumivel,
     apagar_consumivel,
+    apagar_compra,
     apagar_desejo,
     apagar_item,
     comprar_desejo,
+    consumir_consumivel,
     criar_item,
     dashboard,
     desejos,
@@ -22,7 +26,9 @@ from .views import (
     lista_compras,
     listar_itens,
     marcar_comprado,
+    marcar_consumivel_comprado,
     menu,
+    repor_consumivel,
     service_worker,
 )
 from .views_api import (

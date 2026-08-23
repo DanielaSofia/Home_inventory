@@ -12,41 +12,6 @@
   </div>
 
   <div class="card p-3 mb-3">
-    <form method="post" action="{% url 'adicionar_compra' %}">
-      {% csrf_token %}
-      <div class="row g-2">
-        <div class="col-md-8">
-          <input type="text" name="nome" class="form-control" placeholder="Item" required />
-        </div>
-        <div class="col-md-2">
-          <input type="number" name="quantidade" class="form-control" value="1" min="1" />
-        </div>
-        <div class="col-md-2">
-          <button class="btn btn-primary w-100">Adicionar</button>
-        </div>
-      </div>
-    </form>
-  </div>
-
-  <ul class="list-group mb-4">
-    {% for l in lista %}
-      <li class="list-group-item d-flex justify-content-between align-items-center">
-        <div>
-          <strong>{{ l.nome }}</strong><div class="text-muted small">{{ l.quantidade }}</div>
-        </div>
-        <div>
-          <form method="post" action="{% url 'apagar_compra' l.id %}" style="display:inline">
-            {% csrf_token %}<button class="btn btn-sm btn-danger">🗑</button>
-          </form>
-        </div>
-      </li>
-    {% empty %}
-      <li class="list-group-item text-center">Sem itens na lista</li>
-    {% endfor %}
-  </ul>
-
-  <!-- Formulário rápido para criação de compras diretas e seção de itens ativos -->
-  <div class="card p-3 mb-3">
     <form method="POST" action="{% url 'adicionar_compra' %}">
       {% csrf_token %}
       <div class="row g-2">
@@ -59,7 +24,7 @@
         <div class="col-md-3">
           <select name="divisao" class="form-select" required>
             {% for d in divisoes %}
-              <option value="{{ d.id }}">{{ d.nome }}</option>
+              <option value="{{ d.id }}" {% if request.GET.divisao|stringformat:'s' == d.id|stringformat:'s' %}selected{% endif %}>{{ d.nome }}</option>
             {% endfor %}
           </select>
         </div>
@@ -79,9 +44,9 @@
             <strong>{{ item.nome }}</strong><br />
             <small class="text-muted">{% if item.divisao %}{{ item.divisao.nome }}{% endif %}</small>
             <br />
-            {% if item.consumivel.quantidade == 0 %}
+            {% if item.quantidade == 0 %}
               <span class="text-danger">⚠️ Sem stock</span>
-            {% elif item.consumivel.quantidade <= item.consumivel.quantidade_minima %}
+            {% elif item.quantidade <= item.quantidade_compra %}
               <span class="text-warning">⚠️ A acabar</span>
             {% else %}
               <span class="text-success">✔ OK</span>
@@ -94,8 +59,7 @@
             <form method="POST" action="{% url 'marcar_comprado' item.id %}">
               {% csrf_token %}
               <div class="d-flex gap-2">
-                <input type="number" name="quantidade" class="form-control form-control-sm" value="{{ item.quantidade }}" min="1" required />
-                <input type="number" step="0.01" name="preco" class="form-control form-control-sm" placeholder="€" required />
+                <input type="text" name="quantidade" class="form-control form-control-sm" value="{{ item.quantidade_compra }}" required />
                 <button class="btn btn-sm btn-success">Marcar</button>
               </div>
             </form>
