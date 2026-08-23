@@ -35,7 +35,7 @@ if [ ! -x "$VENV_DIR/bin/python" ]; then
 fi
 
 if [ "$SKIP_GIT_UPDATE" = true ]; then
-  echo "[1/8] A ignorar Git: serão usadas as alterações locais do servidor."
+  echo "[1/9] A ignorar Git: serão usadas as alterações locais do servidor."
 else
   if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     echo "ERRO: $ROOT_DIR não é um repositório Git." >&2
@@ -54,35 +54,38 @@ else
     exit 1
   fi
 
-  echo "[1/8] A obter alterações de $REMOTE_NAME/$GIT_BRANCH..."
+  echo "[1/9] A obter alterações de $REMOTE_NAME/$GIT_BRANCH..."
   git fetch --prune "$REMOTE_NAME"
   git pull --ff-only "$REMOTE_NAME" "$GIT_BRANCH"
 fi
 
-echo "[2/8] A ativar ambiente virtual..."
+echo "[2/9] A ativar ambiente virtual..."
 # shellcheck source=/dev/null
 source "$VENV_DIR/bin/activate"
 
-echo "[3/8] A atualizar dependências..."
+echo "[3/9] A atualizar dependências..."
 python -m pip install --requirement requirements.txt
 
-echo "[4/8] A validar configuração Django..."
+echo "[4/9] A validar configuração Django..."
 python manage.py check
 
-echo "[5/8] A criar migrações pendentes..."
+echo "[5/9] A executar testes..."
+python -m pytest
+
+echo "[6/9] A criar migrações pendentes..."
 python manage.py makemigrations inventory --noinput
 
-echo "[6/8] A aplicar migrações..."
+echo "[7/9] A aplicar migrações..."
 python manage.py migrate --noinput
 
-echo "[7/8] A recolher ficheiros estáticos..."
+echo "[8/9] A recolher ficheiros estáticos..."
 python manage.py collectstatic --noinput
 
 if [ -n "$SERVICE_NAME" ]; then
-  echo "[8/8] A reiniciar $SERVICE_NAME..."
+  echo "[9/9] A reiniciar $SERVICE_NAME..."
   sudo systemctl restart "$SERVICE_NAME"
   sudo systemctl is-active --quiet "$SERVICE_NAME"
   echo "Atualização concluída — serviço $SERVICE_NAME ativo."
 else
-  echo "[8/8] SERVICE_NAME vazio — serviço não reiniciado."
+  echo "[9/9] SERVICE_NAME vazio — serviço não reiniciado."
 fi

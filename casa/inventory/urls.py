@@ -14,6 +14,7 @@ from .views import (
     apagar_consumivel,
     apagar_desejo,
     apagar_item,
+    atualizar_quantidade_consumivel,
     comprar_desejo,
     consumir_consumivel,
     criar_item,
@@ -24,7 +25,6 @@ from .views import (
     editar_item,
     lista_compras,
     listar_itens,
-    marcar_comprado,
     marcar_consumivel_comprado,
     menu,
     repor_consumivel,
@@ -75,6 +75,11 @@ urlpatterns = [
     path("adicionar-consumivel/", adicionar_consumivel, name="adicionar_consumivel"),
     path("consumir/<int:consumivel_id>/", consumir_consumivel, name="consumir_consumivel"),
     path("repor/<int:consumivel_id>/", repor_consumivel, name="repor_consumivel"),
+    path(
+        "atualizar-quantidade/<int:consumivel_id>/",
+        atualizar_quantidade_consumivel,
+        name="atualizar_quantidade_consumivel",
+    ),
     path("apagar-consumivel/<int:consumivel_id>/", apagar_consumivel, name="apagar_consumivel"),
     path("apagar-compra/<int:compra_id>/", apagar_compra, name="apagar_compra"),
 ]

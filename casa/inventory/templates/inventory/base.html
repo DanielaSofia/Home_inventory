@@ -11,6 +11,7 @@
     </title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="{% static 'inventory/css/ui-revamp.css' %}" rel="stylesheet" />
+    <link rel="manifest" href="{% static 'inventory/manifest.json' %}" />
     {% block head %}
     {% endblock %}
   </head>
@@ -20,6 +21,11 @@
 
     <main class="menu-main" id="conteudo-principal">
       <div class="container container-main">
+      <div class="sync-controls d-flex align-items-center justify-content-end gap-2 mb-3">
+        <div id="sync-status" class="sync-status" role="status" aria-live="polite"></div>
+        <button id="refresh-button" class="btn btn-sm btn-outline-secondary" type="button" title="Atualizar página" aria-label="Atualizar página">↻</button>
+        <button id="sync-button" class="btn btn-sm btn-outline-primary" type="button">Sincronizar</button>
+      </div>
       {% if messages %}
         <div class="app-messages" aria-live="polite">
           {% for message in messages %}
@@ -36,6 +42,14 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/dexie@4.0.8/dist/dexie.min.js"></script>
+    <script src="{% static 'inventory/js/sync.js' %}"></script>
+    <script>
+      document.getElementById('refresh-button')?.addEventListener('click', () => window.location.reload())
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('{% static "inventory/js/service-worker.js" %}').catch(() => {})
+      }
+    </script>
     {% block scripts %}
     {% endblock %}
 

@@ -152,7 +152,30 @@
                   <video id="scanner-video" style="width:100%; height:250px;"></video>
                 </div>
                 <button type="button" onclick="toggleScanner()" class="btn btn-outline-secondary w-100 mb-3">Ler código de barras</button>
-                {{ item_form.as_p }}
+                {% if item_form.non_field_errors %}<div class="alert alert-danger">{{ item_form.non_field_errors }}</div>{% endif %}
+                <div class="row g-3">
+                  <div class="col-12">
+                    {{ item_form.nome.label_tag }}{{ item_form.nome }}{{ item_form.nome.errors }}
+                  </div>
+                  <div class="col-md-8">
+                    {{ item_form.descricao.label_tag }}{{ item_form.descricao }}{{ item_form.descricao.errors }}
+                  </div>
+                  <div class="col-md-4">
+                    {{ item_form.divisao.label_tag }}{{ item_form.divisao }}{{ item_form.divisao.errors }}
+                  </div>
+                  <div class="col-md-4">
+                    {{ item_form.quantidade.label_tag }}{{ item_form.quantidade }}{{ item_form.quantidade.errors }}
+                  </div>
+                  <div class="col-md-4">
+                    {{ item_form.valor.label_tag }}{{ item_form.valor }}{{ item_form.valor.errors }}
+                  </div>
+                  <div class="col-md-4">
+                    {{ item_form.data_aquisicao.label_tag }}{{ item_form.data_aquisicao }}{{ item_form.data_aquisicao.errors }}
+                  </div>
+                  <div class="col-12">
+                    {{ item_form.imagem.label_tag }}{{ item_form.imagem }}{{ item_form.imagem.errors }}
+                  </div>
+                </div>
               </div>
               <div class="modal-footer">
                 <button type="submit" class="btn btn-primary w-100">Guardar item</button>

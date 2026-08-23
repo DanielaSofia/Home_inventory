@@ -96,7 +96,7 @@
 
   <!-- Modal Adicionar Desejo -->
   <div class="modal fade" id="desejoModal" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Adicionar Desejo</h5><button class="btn-close" data-bs-dismiss="modal"></button>
@@ -104,7 +104,27 @@
         <form method="post" enctype="multipart/form-data">
           <div class="modal-body">
             {% csrf_token %}
-            {{ desejo_form.as_p }}
+            {% if desejo_form.non_field_errors %}<div class="alert alert-danger">{{ desejo_form.non_field_errors }}</div>{% endif %}
+            <div class="row g-3">
+              <div class="col-12">
+                {{ desejo_form.nome.label_tag }}{{ desejo_form.nome }}{{ desejo_form.nome.errors }}
+              </div>
+              <div class="col-md-8">
+                {{ desejo_form.descricao.label_tag }}{{ desejo_form.descricao }}{{ desejo_form.descricao.errors }}
+              </div>
+              <div class="col-md-4">
+                {{ desejo_form.divisao.label_tag }}{{ desejo_form.divisao }}{{ desejo_form.divisao.errors }}
+              </div>
+              <div class="col-md-4">
+                {{ desejo_form.quantidade.label_tag }}{{ desejo_form.quantidade }}{{ desejo_form.quantidade.errors }}
+              </div>
+              <div class="col-md-4">
+                {{ desejo_form.valor.label_tag }}{{ desejo_form.valor }}{{ desejo_form.valor.errors }}
+              </div>
+              <div class="col-12">
+                {{ desejo_form.imagem.label_tag }}{{ desejo_form.imagem }}{{ desejo_form.imagem.errors }}
+              </div>
+            </div>
             <input type="hidden" name="add_desejo" value="1" />
           </div>
           <div class="modal-footer">

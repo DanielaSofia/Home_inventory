@@ -4,7 +4,7 @@ Este módulo contém as views usadas pela aplicação web (renderização
 de templates) e os ViewSets da API REST.
 """
 
-from decimal import InvalidOperation
+from decimal import Decimal, InvalidOperation
 
 from django.conf import settings
 from django.core.paginator import Paginator
@@ -16,7 +16,7 @@ from .forms import ConsumivelForm, DesejoForm, DivisaoForm, ItemForm, parse_frac
 from .models import Consumivel, Desejo, Divisao, Item
 
 
-def service_worker(request):
+def service_worker(_request):
     """Serve o service worker a partir da raiz para que o seu scope cubra todo o site."""
 
     sw_path = (
@@ -207,14 +207,11 @@ def lista_compras(request):
         request,
         "inventory/lista_compras.html",
         {
-            "compras": compras,
             "ativos": compras,
-            "lista": compras,
             "despensa_sugestoes": Consumivel.objects.filter(
                 comprado=True, na_lista_compras=False
             ).select_related("divisao"),
             "divisoes": Divisao.objects.all(),
-            "search_query": search_query,
             "total_compras": compras.count(),
             "consumivel_form": ConsumivelForm(),
         },
@@ -242,10 +239,8 @@ def despensa(request):
         request,
         "inventory/despensa.html",
         {
-            "consumiveis": consumiveis,
             "itens": consumiveis,
             "divisoes": Divisao.objects.all(),
-            "search_query": search_query,
             "query": search_query,
             "total_consumiveis": consumiveis.count(),
             "consumivel_form": ConsumivelForm(),
@@ -319,26 +314,6 @@ def adicionar_compra(request):
                         comprado=False,
                         na_lista_compras=True,
                     )
-    return redirect("lista_compras")
-
-
-def marcar_comprado(request, compra_id):
-    """Marca um consumível como comprado e atualiza o stock."""
-
-    consumivel = get_object_or_404(Consumivel, id=compra_id)
-    if request.method == "POST" and consumivel.na_lista_compras:
-        quantidade = request.POST.get("quantidade", consumivel.quantidade_compra)
-        try:
-            quantidade = parse_fractional_decimal(quantidade)
-        except (InvalidOperation, ValueError, TypeError):
-            quantidade = consumivel.quantidade_compra
-        if quantidade > 0:
-            consumivel.quantidade += quantidade
-        consumivel.comprado = True
-        consumivel.na_lista_compras = False
-        consumivel.save(
-            update_fields=["quantidade", "comprado", "na_lista_compras", "updated_at"]
-        )
     return redirect("lista_compras")
 
 
@@ -438,8 +413,8 @@ def dashboard(request):
     # valor total considerando quantidade * valor por item
     total_valor = itens.aggregate(total=Sum(F("valor") * F("quantidade")))["total"] or 0
 
-    # consumíveis em alerta (abaixo ou igual ao mínimo)
-    consumiveis_alerta = Consumivel.objects.filter(quantidade__lte=F("quantidade_compra"))
+    # consumíveis pendentes na lista de compras
+    compras_pendentes = Consumivel.objects.filter(na_lista_compras=True)
 
     # itens adicionados recentemente
     recentes = Item.objects.order_by("-data_adicionado")[:5]
@@ -447,7 +422,7 @@ def dashboard(request):
     context = {
         "total_unidades": total_unidades,
         "total_valor": total_valor,
-        "consumiveis_alerta": consumiveis_alerta,
+        "compras_dashboard": compras_pendentes,
         "recentes": recentes,
     }
 
@@ -460,12 +435,13 @@ def consumir_consumivel(_request, consumivel_id):
     item = get_object_or_404(Consumivel, id=consumivel_id)
 
     if item.quantidade > 0:
-        Consumivel.objects.filter(id=consumivel_id).update(quantidade=F("quantidade") - 1)
-        item.quantidade -= 1
+        item.quantidade = max(item.quantidade - 1, Decimal("0"))
+    elif item.quantidade < 0:
+        item.quantidade = Decimal("0")
     if item.quantidade <= 0:
         item.comprado = False
         item.na_lista_compras = True
-        item.save(update_fields=["quantidade", "comprado", "na_lista_compras", "updated_at"])
+    item.save(update_fields=["quantidade", "comprado", "na_lista_compras", "updated_at"])
 
     return redirect("despensa")
 
@@ -496,12 +472,36 @@ def repor_consumivel(_request, consumivel_id):
     return redirect("despensa")
 
 
+def atualizar_quantidade_consumivel(request, consumivel_id):
+    """Atualiza diretamente a quantidade de um consumível na despensa."""
+
+    item = get_object_or_404(Consumivel, id=consumivel_id)
+
+    if request.method == "POST":
+        try:
+            quantidade = parse_fractional_decimal(request.POST.get("quantidade", ""))
+        except (InvalidOperation, ValueError, TypeError):
+            quantidade = None
+
+        if quantidade is not None and quantidade >= 0:
+            item.quantidade = quantidade
+            item.na_lista_compras = quantidade == 0
+            item.comprado = True
+            item.save(update_fields=["quantidade", "comprado", "na_lista_compras", "updated_at"])
+
+    return redirect("despensa")
+
+
 def apagar_consumivel(request, consumivel_id):
     """Apaga um `Consumivel` após confirmação via `POST`."""
 
     item = get_object_or_404(Consumivel, id=consumivel_id)
 
     if request.method == "POST":
-        item.delete()
+        if item.na_lista_compras:
+            item.comprado = False
+            item.save(update_fields=["comprado", "updated_at"])
+        else:
+            item.delete()
 
     return redirect("despensa")

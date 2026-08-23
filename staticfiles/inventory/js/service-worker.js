@@ -1,11 +1,12 @@
 // Service Worker da PWA Home Inventory — cache do "app shell" e modo offline.
-const CACHE_VERSION = "v1";
+const CACHE_VERSION = "v2";
 const CACHE_NAME = `home-inventory-${CACHE_VERSION}`;
 
 const APP_SHELL = [
   "/lista-compras/",
   "/despensa/",
   "/static/inventory/css/ui-revamp.css",
+  "https://unpkg.com/dexie@4.0.8/dist/dexie.min.js",
   "/static/inventory/js/barcode_scanner.js",
   "/static/inventory/js/sync.js",
   "/static/inventory/manifest.json",

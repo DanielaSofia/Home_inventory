@@ -47,10 +47,18 @@ class ItemForm(forms.ModelForm):
         model = Item
         fields = "__all__"
         widgets = {
-            "nome": forms.TextInput(attrs={"class": "form-control"}),
-            "descricao": forms.Textarea(attrs={"class": "form-control"}),
-            "quantidade": forms.NumberInput(attrs={"class": "form-control"}),
-            "valor": forms.NumberInput(attrs={"class": "form-control"}),
+            "nome": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "Ex.: Aspirador"}
+            ),
+            "descricao": forms.Textarea(
+                attrs={"class": "form-control", "rows": 3, "placeholder": "Detalhes opcionais"}
+            ),
+            "quantidade": forms.NumberInput(
+                attrs={"class": "form-control", "min": 1, "inputmode": "numeric"}
+            ),
+            "valor": forms.NumberInput(
+                attrs={"class": "form-control", "min": 0, "step": "0.01", "placeholder": "0,00"}
+            ),
             "divisao": forms.Select(attrs={"class": "form-control"}),
             "data_aquisicao": forms.DateInput(attrs={"class": "form-control", "type": "date"}),
             "imagem": forms.ClearableFileInput(attrs={"class": "form-control"}),
@@ -72,9 +80,19 @@ class DesejoForm(forms.ModelForm):
         model = Desejo
         fields = "__all__"
         widgets = {
-            "nome": forms.TextInput(attrs={"class": "form-control"}),
-            "descricao": forms.Textarea(attrs={"class": "form-control"}),
-            "valor": forms.NumberInput(attrs={"class": "form-control"}),
+            "nome": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "Ex.: Máquina de café"}
+            ),
+            "descricao": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 3,
+                    "placeholder": "Por que gostaria deste item?",
+                }
+            ),
+            "valor": forms.NumberInput(
+                attrs={"class": "form-control", "min": 0, "step": "0.01", "placeholder": "0,00"}
+            ),
             "divisao": forms.Select(attrs={"class": "form-control"}),
             "imagem": forms.ClearableFileInput(attrs={"class": "form-control"}),
         }

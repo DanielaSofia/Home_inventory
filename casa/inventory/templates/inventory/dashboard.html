@@ -40,8 +40,8 @@
         <div class="d-flex align-items-center">
           <div class="metric-icon">!</div>
           <div>
-            <div class="muted-small">Consumíveis em alerta</div>
-            <div class="fs-5 fw-bold">{{ consumiveis_alerta.count }}</div>
+            <div class="muted-small">Lista de compras</div>
+            <div class="fs-5 fw-bold">{{ compras_dashboard.count }}</div>
           </div>
         </div>
       </div>
@@ -62,18 +62,18 @@
   <div class="row">
     <div class="col-lg-6 mb-3">
       <div class="card list-card p-3">
-        <h2 class="section-heading">Consumíveis em alerta</h2>
+        <h2 class="section-heading">Lista de compras</h2>
         <ul class="list-group list-group-flush">
-          {% for c in consumiveis_alerta %}
+          {% for c in compras_dashboard %}
             <li class="list-group-item d-flex justify-content-between align-items-center break-word">
               <div>
                 <div>{{ c.nome }}</div>
                 <small class="text-muted">{{ c.quantidade }} / compra {{ c.quantidade_compra }}</small>
               </div>
-              <a href="{% url 'despensa' %}?q={{ c.nome }}" class="btn btn-sm btn-primary">Ver</a>
+              <a href="{% url 'lista_compras' %}" class="btn btn-sm btn-primary">Ver</a>
             </li>
           {% empty %}
-            <li class="list-group-item text-muted">Sem consumíveis em alerta.</li>
+            <li class="list-group-item text-muted">A lista de compras está vazia.</li>
           {% endfor %}
         </ul>
       </div>

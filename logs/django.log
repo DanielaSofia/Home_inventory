@@ -1493,3 +1493,78 @@ WARNING 2026-08-23 12:49:26,656 log 81215 140733724903392 Not Found: /marcar-com
 WARNING 2026-08-23 12:50:14,920 log 4 140734711547872 Unauthorized: /api/divisoes/
 WARNING 2026-08-23 12:53:08,160 log 81215 140733724903392 Not Found: /marcar-compra/1/
 WARNING 2026-08-23 12:53:26,799 log 81215 140733724903392 Not Found: /marcar-compra/1/
+WARNING 2026-08-23 12:57:47,034 log 84264 140735924930528 Unauthorized: /api/divisoes/
+WARNING 2026-08-23 13:00:55,146 log 85356 140735330109408 Unauthorized: /api/divisoes/
+WARNING 2026-08-23 13:04:11,523 log 86128 140735939430368 Unauthorized: /api/divisoes/
+WARNING 2026-08-23 13:09:00,675 log 87221 140733304489952 Unauthorized: /api/divisoes/
+WARNING 2026-08-23 14:21:39,468 log 96404 140733193390048 Unauthorized: /api/divisoes/
+WARNING 2026-08-23 14:22:54,757 log 96699 140734766860256 Unauthorized: /api/divisoes/
+WARNING 2026-08-23 14:24:24,247 log 97087 140732350171104 Unauthorized: /api/divisoes/
+WARNING 2026-08-23 14:25:39,690 log 97426 140732703803360 Unauthorized: /api/divisoes/
+WARNING 2026-08-23 14:26:43,130 log 97719 140735807277024 Unauthorized: /api/divisoes/
+WARNING 2026-08-23 14:28:35,849 log 98144 140733376169952 Unauthorized: /api/divisoes/
+WARNING 2026-08-23 14:32:56,193 log 99366 140732664874976 Unauthorized: /api/divisoes/
+WARNING 2026-08-23 14:38:36,359 log 100705 140736207439840 Unauthorized: /api/divisoes/
+ERROR 2026-08-23 14:39:58,653 log 100766 140735634638816 Invalid HTTP_HOST header: 'raspberrypi'. You may need to add 'raspberrypi' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/utils/deprecation.py", line 308, in __call__
+    response = self.process_request(request)
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/http/request.py", line 205, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'raspberrypi'. You may need to add 'raspberrypi' to ALLOWED_HOSTS.
+ERROR 2026-08-23 14:39:58,828 log 100766 140735634638816 Invalid HTTP_HOST header: 'raspberrypi'. You may need to add 'raspberrypi' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/utils/deprecation.py", line 308, in __call__
+    response = self.process_request(request)
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/http/request.py", line 205, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'raspberrypi'. You may need to add 'raspberrypi' to ALLOWED_HOSTS.
+WARNING 2026-08-23 14:41:53,437 log 101619 140736350570464 Unauthorized: /api/divisoes/
+WARNING 2026-08-23 14:42:16,143 log 101684 140736149850080 Unauthorized: /api/sync/consumiveis/
+WARNING 2026-08-23 14:42:16,258 log 101683 140736149850080 Not Found: /favicon.ico
+WARNING 2026-08-23 14:42:17,660 log 101683 140736149850080 Unauthorized: /api/sync/consumiveis/
+WARNING 2026-08-23 14:42:19,915 log 101683 140736149850080 Unauthorized: /api/sync/consumiveis/
+WARNING 2026-08-23 14:42:20,520 log 101682 140736149850080 Unauthorized: /api/sync/consumiveis/
+WARNING 2026-08-23 14:42:22,468 log 101684 140736149850080 Unauthorized: /api/sync/consumiveis/
+WARNING 2026-08-23 14:42:24,391 log 101683 140736149850080 Unauthorized: /api/sync/consumiveis/
+WARNING 2026-08-23 14:42:25,275 log 101682 140736149850080 Unauthorized: /api/sync/consumiveis/
+WARNING 2026-08-23 14:42:27,060 log 101683 140736149850080 Unauthorized: /api/sync/consumiveis/
+WARNING 2026-08-23 14:42:29,290 log 101684 140736149850080 Unauthorized: /api/sync/consumiveis/
+WARNING 2026-08-23 14:43:10,854 log 101684 140736149850080 Not Found: /favicon.ico
+WARNING 2026-08-23 14:43:10,855 log 101683 140736149850080 Unauthorized: /api/sync/consumiveis/
+WARNING 2026-08-23 14:43:44,078 log 101684 140736149850080 Not Found: /apple-touch-icon-precomposed.png
+WARNING 2026-08-23 14:43:44,099 log 101683 140736149850080 Not Found: /favicon.ico
+WARNING 2026-08-23 14:43:44,100 log 101682 140736149850080 Not Found: /apple-touch-icon.png
+WARNING 2026-08-23 14:44:01,665 log 101683 140736149850080 Unauthorized: /api/sync/consumiveis/
+WARNING 2026-08-23 14:44:05,705 log 101684 140736149850080 Not Found: /apple-touch-icon-precomposed.png
+WARNING 2026-08-23 14:44:05,705 log 101683 140736149850080 Not Found: /apple-touch-icon.png
+WARNING 2026-08-23 14:44:05,710 log 101683 140736149850080 Not Found: /favicon.ico
+WARNING 2026-08-23 14:44:26,174 log 101683 140736149850080 Unauthorized: /api/sync/consumiveis/
+WARNING 2026-08-23 14:44:30,763 log 101682 140736149850080 Unauthorized: /api/sync/consumiveis/
+WARNING 2026-08-23 14:44:55,184 log 102327 140736040224736 Unauthorized: /api/divisoes/
+WARNING 2026-08-23 14:45:02,294 log 102376 140733366912992 Unauthorized: /api/sync/consumiveis/
+WARNING 2026-08-23 14:45:03,877 log 102376 140733366912992 Unauthorized: /api/sync/consumiveis/
+WARNING 2026-08-23 14:45:04,837 log 102376 140733366912992 Unauthorized: /api/sync/consumiveis/
+WARNING 2026-08-23 14:45:05,851 log 102376 140733366912992 Unauthorized: /api/sync/consumiveis/
+WARNING 2026-08-23 14:45:09,436 log 102377 140733366912992 Unauthorized: /api/sync/consumiveis/
+WARNING 2026-08-23 14:45:10,298 log 102377 140733366912992 Unauthorized: /api/sync/consumiveis/
+WARNING 2026-08-23 14:46:19,928 log 102742 140735314036704 Unauthorized: /api/divisoes/
+WARNING 2026-08-23 14:46:27,524 log 102794 140733071624160 Unauthorized: /api/sync/consumiveis/
+WARNING 2026-08-23 14:46:28,730 log 102792 140733071624160 Unauthorized: /api/sync/consumiveis/
+WARNING 2026-08-23 14:46:29,242 log 102792 140733071624160 Unauthorized: /api/sync/consumiveis/
+WARNING 2026-08-23 14:46:29,655 log 102792 140733071624160 Unauthorized: /api/sync/consumiveis/
+WARNING 2026-08-23 14:46:33,692 log 102792 140733071624160 Unauthorized: /api/sync/consumiveis/
+WARNING 2026-08-23 14:46:34,151 log 102794 140733071624160 Unauthorized: /api/sync/consumiveis/
+WARNING 2026-08-23 14:46:34,813 log 102792 140733071624160 Unauthorized: /api/sync/consumiveis/
+WARNING 2026-08-23 14:47:55,693 log 102792 140733071624160 Unauthorized: /api/sync/consumiveis/
+WARNING 2026-08-23 14:47:57,387 log 102793 140733071624160 Unauthorized: /api/sync/consumiveis/
+WARNING 2026-08-23 14:49:24,939 log 103553 140733203302368 Unauthorized: /api/divisoes/
+WARNING 2026-08-23 14:53:11,206 log 104425 140735619844064 Unauthorized: /api/divisoes/

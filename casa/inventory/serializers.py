@@ -7,6 +7,7 @@ from rest_framework import serializers
 
 from .models import Consumivel, Desejo, Divisao, Item
 
+
 class DivisaoSerializer(serializers.ModelSerializer):
     """Serializer para o modelo `Divisao` incluindo os itens relacionados."""
 
@@ -69,12 +70,21 @@ class DesejoSerializer(serializers.ModelSerializer):
 class ConsumivelSerializer(serializers.ModelSerializer):
     """Serializer para o modelo `Consumivel` usado na API e na sincronização offline."""
 
+    uuid = serializers.UUIDField(required=False)
     divisao_nome = serializers.CharField(source='divisao.nome', read_only=True)
 
     class Meta:
         model = Consumivel
         fields = [
-            'id', 'uuid', 'nome', 'quantidade', 'quantidade_compra',
-            'comprado', 'divisao', 'divisao_nome', 'updated_at',
+            "id",
+            "uuid",
+            "nome",
+            "quantidade",
+            "quantidade_compra",
+            "comprado",
+            "na_lista_compras",
+            "divisao",
+            "divisao_nome",
+            "updated_at",
         ]
         read_only_fields = ['id', 'updated_at']

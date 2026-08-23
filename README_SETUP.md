@@ -52,6 +52,26 @@ Force SQLite:
 
     HOST=0.0.0.0 PORT=8001 bash scripts/setup_and_run.sh
 
+## Uso offline no iPhone
+
+Na mesma rede, abra a aplicação no iPhone usando o endereço local do
+Raspberry e instale-a no ecrã principal pelo Safari. A aplicação guarda as
+alterações da despensa e da lista de compras no dispositivo quando está
+offline e sincroniza-as automaticamente quando volta a encontrar o
+Raspberry na rede.
+
+O modo PWA offline do Safari exige HTTPS. Use um certificado local para o
+endereço do Raspberry e configure no `.env` o host usado pelo iPhone:
+
+```env
+ALLOWED_HOSTS=homeinventory.local,192.168.1.78
+CSRF_TRUSTED_ORIGINS=https://homeinventory.local,https://192.168.1.78
+```
+
+O Raspberry não precisa de ser exposto à internet. Fora da rede, o iPhone
+continua a trabalhar com os dados locais; a sincronização acontece quando
+regressar à rede de casa.
+
 ## Useful variables
 
 - DB_MODE: auto, mysql, sqlite

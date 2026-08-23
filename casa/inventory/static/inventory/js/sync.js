@@ -24,6 +24,18 @@
     el.className = `sync-status sync-status-${kind}`;
   }
 
+  function lastSyncText() {
+    const value = localStorage.getItem(LAST_SYNC_KEY);
+    if (!value) return "Nunca sincronizado";
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "Última sincronização desconhecida";
+    return `Última sincronização: ${date.toLocaleString("pt-PT", {
+      dateStyle: "short",
+      timeStyle: "short",
+    })}`;
+  }
+
   async function renderPendentes() {
     const container = document.getElementById("offline-pendentes");
     if (!container) return;
@@ -47,6 +59,7 @@
 
   async function queueUpsert(payload) {
     await db.consumiveis.put(payload);
+    await db.outbox.where("uuid").equals(payload.uuid).delete();
     await db.outbox.put({ uuid: payload.uuid, payload });
     await renderPendentes();
   }
@@ -89,13 +102,17 @@
     });
     if (!response.ok) throw new Error("push falhou");
     const data = await response.json();
-    await db.outbox.where("uuid").anyOf(data.aplicados).delete();
-    await db.apagados.where("uuid").anyOf(data.apagados).delete();
+    if (data.aplicados.length) {
+      await db.outbox.where("uuid").anyOf(data.aplicados).delete();
+    }
+    if (data.apagados.length) {
+      await db.apagados.where("uuid").anyOf(data.apagados).delete();
+    }
   }
 
   async function sincronizar() {
     if (!navigator.onLine) {
-      setStatus("📴 Offline — alterações guardadas neste dispositivo", "offline");
+      setStatus(`📴 Offline — ${lastSyncText()}`, "offline");
       await renderPendentes();
       return;
     }
@@ -104,44 +121,116 @@
       await push();
       await pull();
       await renderPendentes();
-      setStatus("✅ Sincronizado", "online");
+      setStatus(`✅ Sincronizado — ${lastSyncText()}`, "online");
     } catch (err) {
-      setStatus("⚠️ Sem ligação ao servidor — a usar dados locais", "offline");
+      setStatus(`⚠️ Sem ligação ao servidor — ${lastSyncText()}`, "offline");
     }
   }
 
-  // Intercepta os formulários da lista de compras para funcionarem offline.
+  function parseQuantidade(value) {
+    const normalized = String(value || "").trim().replace(",", ".");
+    if (normalized.includes("/")) {
+      const [numerator, denominator] = normalized.split("/").map(Number);
+      if (!denominator) return null;
+      return numerator / denominator;
+    }
+    const quantity = Number(normalized);
+    return Number.isFinite(quantity) ? quantity : null;
+  }
+
+  function quantityValue(value) {
+    return Number(value || 0);
+  }
+
+  function addPayload(form) {
+    const quantity = parseQuantidade(form.querySelector('input[name="quantidade"]').value);
+    if (quantity === null || quantity <= 0) return null;
+    const isPantry = form.dataset.offlineKind === "despensa";
+    return {
+      uuid: crypto.randomUUID(),
+      nome: form.querySelector('input[name="nome"]').value.trim(),
+      divisao: Number(form.querySelector('select[name="divisao"]').value),
+      quantidade: isPantry ? quantity : 0,
+      quantidade_compra: isPantry ? 1 : quantity,
+      comprado: isPantry,
+      na_lista_compras: !isPantry,
+    };
+  }
+
+  // Intercepta operações de consumíveis para funcionarem offline.
   function attachFormHandlers() {
     document.querySelectorAll("[data-offline-form]").forEach((form) => {
       form.addEventListener("submit", async (event) => {
         if (navigator.onLine) return; // deixa o form seguir normalmente para o servidor
         event.preventDefault();
 
-        const uuid = form.dataset.uuid;
         const tipo = form.dataset.offlineForm;
+        let uuid = form.dataset.uuid;
+
+        if (tipo === "adicionar") {
+          const payload = addPayload(form);
+          if (!payload) return;
+          await queueUpsert(payload);
+          form.reset();
+          setStatus("📴 Item guardado offline", "offline");
+          return;
+        }
 
         if (tipo === "apagar") {
-          await queueDelete(uuid);
+          const existing = await db.consumiveis.get(uuid);
+          const isShoppingList = form.dataset.offlineKind === "lista";
+          const hasStock = quantityValue(existing?.quantidade) > 0;
+          if ((isShoppingList && hasStock) || (!isShoppingList && existing?.na_lista_compras)) {
+            existing.na_lista_compras = isShoppingList ? false : true;
+            existing.comprado = isShoppingList ? existing.comprado : false;
+            await queueUpsert(existing);
+          } else {
+            await queueDelete(uuid);
+          }
           form.closest(".shopping-list-row")?.remove();
           return;
         }
 
         const existing = (await db.consumiveis.get(uuid)) || { uuid };
         if (tipo === "comprado") {
-          existing.comprado = form.querySelector('input[name="comprado"]').checked;
+          const quantity = parseQuantidade(form.querySelector('input[name="quantidade_compra"]').value);
+          if (quantity === null || quantity <= 0) return;
+          existing.quantidade = quantityValue(existing.quantidade) + quantity;
+          existing.quantidade_compra = quantity;
+          existing.comprado = true;
+          existing.na_lista_compras = false;
         } else if (tipo === "quantidade") {
-          existing.quantidade_compra = form.querySelector('input[name="quantidade_compra"]').value;
+          const quantity = parseQuantidade(form.querySelector('input[name="quantidade"]').value);
+          if (quantity === null || quantity < 0) return;
+          existing.quantidade = quantity;
+          existing.comprado = true;
+          existing.na_lista_compras = quantity === 0;
+        } else if (tipo === "consumir") {
+          existing.quantidade = Math.max(quantityValue(existing.quantidade) - 1, 0);
+          existing.comprado = existing.quantidade > 0;
+          existing.na_lista_compras = existing.quantidade === 0;
+        } else if (tipo === "repor") {
+          existing.quantidade = quantityValue(existing.quantidade) + 1;
+          existing.comprado = true;
+          existing.na_lista_compras = false;
         }
         await queueUpsert(existing);
+        setStatus("📴 Alteração guardada offline", "offline");
       });
     });
   }
 
   window.addEventListener("online", sincronizar);
-  window.addEventListener("offline", () => setStatus("📴 Offline — alterações guardadas neste dispositivo", "offline"));
+  window.addEventListener("offline", () => setStatus(`📴 Offline — ${lastSyncText()}`, "offline"));
 
   document.addEventListener("DOMContentLoaded", () => {
     attachFormHandlers();
+    const syncButton = document.getElementById("sync-button");
+    syncButton?.addEventListener("click", async () => {
+      syncButton.disabled = true;
+      await sincronizar();
+      syncButton.disabled = false;
+    });
     sincronizar();
   });
 })();
