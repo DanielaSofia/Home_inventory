@@ -194,3 +194,4 @@ python manage.py migrate
 echo ""
 echo "Projeto pronto. Iniciando servidor em http://${HOST}:${PORT}/"
 exec python manage.py runserver "${HOST}:${PORT}"
+

@@ -19,3 +19,4 @@ echo "Mostrando plano de migrations (se houver):"
 python manage.py migrate --plan || true
 
 echo "OK: verificação de migrations concluída sem problemas." 
+
