@@ -12,7 +12,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Security: Use environment variables with secure defaults
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-CHANGE-ME-IN-PRODUCTION')
 DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+    if host.strip()
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -114,7 +118,17 @@ REST_FRAMEWORK = {
     ]
 }
 
-CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', 'http://localhost:8000,https://localhost:8000').split(',')
+configured_csrf_origins = os.getenv(
+    'CSRF_TRUSTED_ORIGINS', 'http://localhost:8000,https://localhost:8000'
+).split(',')
+https_allowed_hosts = [
+    f'https://{host}' for host in ALLOWED_HOSTS if host not in {'*', 'localhost', '127.0.0.1'}
+]
+# Um host público permitido também deve aceitar formulários enviados pela sua
+# própria origem HTTPS (por exemplo, https://192.168.1.78).
+CSRF_TRUSTED_ORIGINS = list(
+    dict.fromkeys(origin.strip() for origin in [*configured_csrf_origins, *https_allowed_hosts] if origin.strip())
+)
 
 # Security Headers
 CSRF_COOKIE_SECURE = True
@@ -134,7 +148,7 @@ SECURE_CONTENT_SECURITY_POLICY = {
 }
 
 # Only in production
-if not DEBUG:
+if not DEBUG and "pytest" not in sys.modules:
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True

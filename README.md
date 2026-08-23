@@ -140,7 +140,7 @@ DB_HOST=localhost
 DB_PORT=3306
 
 # Security
-CSRF_TRUSTED_ORIGINS=http://localhost:8000,http://127.0.0.1:8000
+CSRF_TRUSTED_ORIGINS=http://localhost:8000,http://127.0.0.1:8000,https://192.168.1.78
 ```
 
 ### Security Note
@@ -390,10 +390,16 @@ Para atualizar um servidor já configurado, execute no diretório do projeto:
 ./scripts/update_server.sh
 ```
 
-O script interrompe a atualização se existirem alterações locais, faz um `git pull --ff-only`, atualiza dependências, corre as migrações, recolhe os ficheiros estáticos e reinicia o serviço `gunicorn`. Para usar outro serviço ou branch:
+O script pergunta se deve atualizar o código via Git, atualiza dependências, cria e aplica migrações pendentes, recolhe os ficheiros estáticos e reinicia o serviço `gunicorn`. Para usar outro serviço ou branch:
 
 ```bash
 SERVICE_NAME=home-inventory GIT_BRANCH=main ./scripts/update_server.sh
+```
+
+Quando as alterações forem feitas diretamente no servidor, ignore Git sem perder essas alterações:
+
+```bash
+SKIP_GIT_UPDATE=true ./scripts/update_server.sh
 ```
 
 ### Pre-Deployment Checklist

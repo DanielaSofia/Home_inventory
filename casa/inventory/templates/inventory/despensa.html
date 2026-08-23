@@ -44,22 +44,11 @@
 
   <form method="get" class="filter-bar row g-2 mb-3" aria-label="Filtrar despensa">
     <div class="col-md-5">
-      <input id="searchInput" type="text" name="q" class="form-control" placeholder="🔍 Procurar item..." value="{{ query }}" />
+      <label class="visually-hidden" for="searchInput">Procurar pelo nome do item</label>
+      <input id="searchInput" type="search" name="q" class="form-control" placeholder="Procurar pelo nome..." value="{{ query }}" />
     </div>
-    <div class="col-md-4">
-      <select name="divisao" class="form-select">
-        <option value="">Todas as divisões</option>
-        {% for d in divisoes %}
-          {% if divisao_selecionada|stringformat:'s' == d.id|stringformat:'s' %}
-            <option value="{{ d.id }}" selected>{{ d.nome }}</option>
-          {% else %}
-            <option value="{{ d.id }}">{{ d.nome }}</option>
-          {% endif %}
-        {% endfor %}
-      </select>
-    </div>
-    <div class="col-md-3">
-      <button class="btn btn-primary w-100">Filtrar</button>
+    <div class="col-md-2">
+      <button class="btn btn-primary w-100">Procurar</button>
     </div>
   </form>
 

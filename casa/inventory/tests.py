@@ -126,7 +126,7 @@ class TestDesejoViewSet:
 class TestDespensaView:
     """Testes da página de consumíveis comprados."""
 
-    @pytest.mark.parametrize("path", ["/itens/", "/desejos/", "/lista-compras/", "/despensa/"])
+    @pytest.mark.parametrize("path", ["/itens/", "/desejos/", "/lista-compras/"])
     def test_filter_by_divisao_renders_selected_option(self, client, divisao, path):
         """Renderiza filtros de divisão sem erros de sintaxe nos templates."""
         Consumivel.objects.create(
@@ -174,3 +174,28 @@ class TestConsumivelQuantities:
         assert response.status_code == status.HTTP_302_FOUND
         assert consumivel.quantidade_compra == Decimal("0.50")
         assert consumivel.quantidade == Decimal("1.50")
+
+
+@pytest.mark.django_db
+class TestShoppingListSuggestions:
+    def test_reuses_pantry_item_when_adding_it_to_shopping_list(self, client, divisao):
+        consumivel = Consumivel.objects.create(
+            nome="Arroz",
+            quantidade=Decimal("3.00"),
+            quantidade_compra=Decimal("1.00"),
+            comprado=True,
+            divisao=divisao,
+        )
+
+        response = client.post(
+            "/adicionar-compra/",
+            {"nome": "arroz", "quantidade": "2", "divisao": divisao.id},
+        )
+
+        assert response.status_code == status.HTTP_302_FOUND
+        assert Consumivel.objects.filter(nome__iexact="arroz", divisao=divisao).count() == 1
+        consumivel.refresh_from_db()
+        assert consumivel.na_lista_compras is True
+        assert consumivel.comprado is True
+        assert consumivel.quantidade == Decimal("3.00")
+        assert consumivel.quantidade_compra == Decimal("2.00")

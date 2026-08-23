@@ -187,12 +187,14 @@ def lista_compras(request):
     if request.method == "POST":
         form = ConsumivelForm(request.POST)
         if form.is_valid():
-            form.save()
+            consumivel = form.save(commit=False)
+            consumivel.na_lista_compras = True
+            consumivel.save()
             return redirect("lista_compras")
 
     divisao_id = request.GET.get("divisao")
     search_query = request.GET.get("q", "").strip()
-    compras = Consumivel.objects.filter(comprado=False).select_related("divisao")
+    compras = Consumivel.objects.filter(na_lista_compras=True).select_related("divisao")
 
     if divisao_id:
         compras = compras.filter(divisao_id=divisao_id)
@@ -208,9 +210,9 @@ def lista_compras(request):
             "compras": compras,
             "ativos": compras,
             "lista": compras,
-            "despensa_sugestoes": Consumivel.objects.filter(comprado=True).select_related(
-                "divisao"
-            ),
+            "despensa_sugestoes": Consumivel.objects.filter(
+                comprado=True, na_lista_compras=False
+            ).select_related("divisao"),
             "divisoes": Divisao.objects.all(),
             "search_query": search_query,
             "total_compras": compras.count(),
@@ -230,12 +232,9 @@ def despensa(request):
             consumivel.save()
             return redirect("despensa")
 
-    divisao_id = request.GET.get("divisao")
     search_query = request.GET.get("q", "").strip()
     consumiveis = Consumivel.objects.filter(comprado=True).select_related("divisao")
 
-    if divisao_id:
-        consumiveis = consumiveis.filter(divisao_id=divisao_id)
     if search_query:
         consumiveis = consumiveis.filter(nome__icontains=search_query)
 
@@ -248,7 +247,6 @@ def despensa(request):
             "divisoes": Divisao.objects.all(),
             "search_query": search_query,
             "query": search_query,
-            "divisao_selecionada": divisao_id,
             "total_consumiveis": consumiveis.count(),
             "consumivel_form": ConsumivelForm(),
         },
@@ -261,6 +259,7 @@ def marcar_consumivel_comprado(request, consumivel_id):
     consumivel = get_object_or_404(Consumivel, id=consumivel_id)
     if request.method == "POST":
         comprado = request.POST.get("comprado") == "on"
+        estava_na_lista = consumivel.na_lista_compras
         quantidade_compra = request.POST.get("quantidade_compra")
         if quantidade_compra:
             try:
@@ -269,10 +268,17 @@ def marcar_consumivel_comprado(request, consumivel_id):
                 quantidade_compra = None
             if quantidade_compra and quantidade_compra > 0:
                 consumivel.quantidade_compra = quantidade_compra
-        if comprado and not consumivel.comprado:
+        if comprado and (estava_na_lista or not consumivel.comprado):
             consumivel.quantidade += consumivel.quantidade_compra
         consumivel.comprado = comprado
-        update_fields = ["comprado", "quantidade", "quantidade_compra", "updated_at"]
+        consumivel.na_lista_compras = not comprado
+        update_fields = [
+            "comprado",
+            "na_lista_compras",
+            "quantidade",
+            "quantidade_compra",
+            "updated_at",
+        ]
         consumivel.save(update_fields=update_fields)
     return redirect("lista_compras")
 
@@ -290,15 +296,29 @@ def adicionar_compra(request):
             except (InvalidOperation, ValueError, TypeError):
                 quantidade = None
             if quantidade is not None and quantidade > 0:
-                consumivel, criado = Consumivel.objects.get_or_create(
-                    nome=nome,
-                    divisao_id=divisao_id,
-                    comprado=False,
-                    defaults={"quantidade_compra": quantidade},
+                consumivel = (
+                    Consumivel.objects.filter(nome__iexact=nome, divisao_id=divisao_id)
+                    .order_by("id")
+                    .first()
                 )
-                if not criado:
-                    consumivel.quantidade_compra += quantidade
-                    consumivel.save(update_fields=["quantidade_compra", "updated_at"])
+                if consumivel:
+                    if consumivel.na_lista_compras:
+                        consumivel.quantidade_compra += quantidade
+                    else:
+                        consumivel.quantidade_compra = quantidade
+                    consumivel.na_lista_compras = True
+                    consumivel.save(
+                        update_fields=["quantidade_compra", "na_lista_compras", "updated_at"]
+                    )
+                else:
+                    Consumivel.objects.create(
+                        nome=nome,
+                        divisao_id=divisao_id,
+                        quantidade=0,
+                        quantidade_compra=quantidade,
+                        comprado=False,
+                        na_lista_compras=True,
+                    )
     return redirect("lista_compras")
 
 
@@ -306,7 +326,7 @@ def marcar_comprado(request, compra_id):
     """Marca um consumível como comprado e atualiza o stock."""
 
     consumivel = get_object_or_404(Consumivel, id=compra_id)
-    if request.method == "POST" and not consumivel.comprado:
+    if request.method == "POST" and consumivel.na_lista_compras:
         quantidade = request.POST.get("quantidade", consumivel.quantidade_compra)
         try:
             quantidade = parse_fractional_decimal(quantidade)
@@ -315,7 +335,10 @@ def marcar_comprado(request, compra_id):
         if quantidade > 0:
             consumivel.quantidade += quantidade
         consumivel.comprado = True
-        consumivel.save(update_fields=["quantidade", "comprado", "updated_at"])
+        consumivel.na_lista_compras = False
+        consumivel.save(
+            update_fields=["quantidade", "comprado", "na_lista_compras", "updated_at"]
+        )
     return redirect("lista_compras")
 
 
@@ -324,7 +347,11 @@ def apagar_compra(request, compra_id):
 
     consumivel = get_object_or_404(Consumivel, id=compra_id)
     if request.method == "POST":
-        consumivel.delete()
+        if consumivel.quantidade > 0:
+            consumivel.na_lista_compras = False
+            consumivel.save(update_fields=["na_lista_compras", "updated_at"])
+        else:
+            consumivel.delete()
     return redirect("lista_compras")
 
 
@@ -437,7 +464,8 @@ def consumir_consumivel(_request, consumivel_id):
         item.quantidade -= 1
     if item.quantidade <= 0:
         item.comprado = False
-        item.save(update_fields=["quantidade", "comprado", "updated_at"])
+        item.na_lista_compras = True
+        item.save(update_fields=["quantidade", "comprado", "na_lista_compras", "updated_at"])
 
     return redirect("despensa")
 
@@ -462,7 +490,8 @@ def repor_consumivel(_request, consumivel_id):
 
     item.quantidade += 1
     item.comprado = True
-    item.save(update_fields=["quantidade", "comprado", "updated_at"])
+    item.na_lista_compras = False
+    item.save(update_fields=["quantidade", "comprado", "na_lista_compras", "updated_at"])
 
     return redirect("despensa")
 

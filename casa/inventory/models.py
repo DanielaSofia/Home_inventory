@@ -47,6 +47,7 @@ class Consumivel(models.Model):
     quantidade = models.DecimalField(max_digits=10, decimal_places=2, default=1)
     quantidade_compra = models.DecimalField(max_digits=10, decimal_places=2, default=1)
     comprado = models.BooleanField(default=False)
+    na_lista_compras = models.BooleanField(default=False)
     divisao = models.ForeignKey(Divisao, on_delete=models.CASCADE, related_name="consumiveis")
     # usado para saber o que sincronizar (offline-first / PWA)
     updated_at = models.DateTimeField(auto_now=True)

@@ -1283,3 +1283,213 @@ WARNING 2026-08-23 11:40:04,896 log 58689 140734692493280 Unauthorized: /api/div
 WARNING 2026-08-23 12:01:24,003 log 64007 140733483796448 Unauthorized: /api/divisoes/
 INFO 2026-08-23 12:16:57,924 autoreload 70787 140733100279776 Watching for file changes with StatReloader
 WARNING 2026-08-23 12:19:06,610 log 71055 140733454813152 Not Found: /favicon.ico
+WARNING 2026-08-23 12:27:34,996 log 73769 140735370807264 Forbidden (Origin checking failed - https://192.168.1.78 does not match any trusted origins.): /adicionar-consumivel/
+WARNING 2026-08-23 12:29:45,318 log 73770 140735370807264 Forbidden (Origin checking failed - https://192.168.1.78 does not match any trusted origins.): /adicionar-consumivel/
+WARNING 2026-08-23 12:36:02,175 log 2 140736396609504 Unauthorized: /api/divisoes/
+WARNING 2026-08-23 12:36:51,193 log 5 140734963861472 Unauthorized: /api/divisoes/
+ERROR 2026-08-23 12:39:03,823 log 76474 140732652177376 Internal Server Error: /lista-compras/
+Traceback (most recent call last):
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/core/handlers/base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/danilobo/Home_inventory/casa/inventory/views.py", line 197, in lista_compras
+    compras = Consumivel.objects.filter(na_lista_compras=True).select_related("divisao")
+              ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/db/models/query.py", line 1542, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/db/models/query.py", line 1560, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/db/models/query.py", line 1570, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1676, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1708, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ~~~~~~~~~~~~~~~~~^
+        child,
+        ^^^^^^
+    ...<7 lines>...
+        update_join_types=update_join_types,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1556, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg, summarize)
+                                        ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1363, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+                                ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1842, in names_to_path
+    raise FieldError(
+    ...<2 lines>...
+    )
+django.core.exceptions.FieldError: Cannot resolve keyword 'na_lista_compras' into field. Choices are: comprado, divisao, divisao_id, id, nome, quantidade, quantidade_compra, updated_at, uuid
+ERROR 2026-08-23 12:39:57,221 log 76474 140732652177376 Internal Server Error: /lista-compras/
+Traceback (most recent call last):
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/core/handlers/base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/danilobo/Home_inventory/casa/inventory/views.py", line 197, in lista_compras
+    compras = Consumivel.objects.filter(na_lista_compras=True).select_related("divisao")
+              ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/db/models/query.py", line 1542, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/db/models/query.py", line 1560, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/db/models/query.py", line 1570, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1676, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1708, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ~~~~~~~~~~~~~~~~~^
+        child,
+        ^^^^^^
+    ...<7 lines>...
+        update_join_types=update_join_types,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1556, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg, summarize)
+                                        ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1363, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+                                ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1842, in names_to_path
+    raise FieldError(
+    ...<2 lines>...
+    )
+django.core.exceptions.FieldError: Cannot resolve keyword 'na_lista_compras' into field. Choices are: comprado, divisao, divisao_id, id, nome, quantidade, quantidade_compra, updated_at, uuid
+ERROR 2026-08-23 12:39:58,466 log 76474 140732652177376 Internal Server Error: /lista-compras/
+Traceback (most recent call last):
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/core/handlers/base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/danilobo/Home_inventory/casa/inventory/views.py", line 197, in lista_compras
+    compras = Consumivel.objects.filter(na_lista_compras=True).select_related("divisao")
+              ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/db/models/query.py", line 1542, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/db/models/query.py", line 1560, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/db/models/query.py", line 1570, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1676, in add_q
+    clause, _ = self._add_q(q_object, can_reuse)
+                ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1708, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ~~~~~~~~~~~~~~~~~^
+        child,
+        ^^^^^^
+    ...<7 lines>...
+        update_join_types=update_join_types,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1556, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg, summarize)
+                                        ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1363, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+                                ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1842, in names_to_path
+    raise FieldError(
+    ...<2 lines>...
+    )
+django.core.exceptions.FieldError: Cannot resolve keyword 'na_lista_compras' into field. Choices are: comprado, divisao, divisao_id, id, nome, quantidade, quantidade_compra, updated_at, uuid
+WARNING 2026-08-23 12:41:44,722 log 4 140733358000096 Unauthorized: /api/divisoes/
+ERROR 2026-08-23 12:48:40,351 log 81215 140733724903392 Internal Server Error: /lista-compras/
+Traceback (most recent call last):
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/core/handlers/base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/danilobo/Home_inventory/casa/inventory/views.py", line 206, in lista_compras
+    return render(
+        request,
+    ...<12 lines>...
+        },
+    )
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/template/backends/django.py", line 107, in render
+    return self.template.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/template/base.py", line 174, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/template/base.py", line 166, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/template/loader_tags.py", line 160, in render
+    return compiled_parent._render(context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/template/base.py", line 166, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/template/loader_tags.py", line 66, in render
+    result = block.nodelist.render(context)
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/template/defaulttags.py", line 249, in render
+    nodelist.append(node.render_annotated(context))
+                    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/template/defaulttags.py", line 511, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/urls/base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+  File "/home/danilobo/Home_inventory/py_home/lib/python3.13/site-packages/django/urls/resolvers.py", line 842, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'marcar_comprado' not found. 'marcar_comprado' is not a valid view function or pattern name.
+WARNING 2026-08-23 12:49:04,235 log 4 140734995761120 Unauthorized: /api/divisoes/
+WARNING 2026-08-23 12:49:26,656 log 81215 140733724903392 Not Found: /marcar-compra/1/
+WARNING 2026-08-23 12:50:14,920 log 4 140734711547872 Unauthorized: /api/divisoes/
+WARNING 2026-08-23 12:53:08,160 log 81215 140733724903392 Not Found: /marcar-compra/1/
+WARNING 2026-08-23 12:53:26,799 log 81215 140733724903392 Not Found: /marcar-compra/1/
