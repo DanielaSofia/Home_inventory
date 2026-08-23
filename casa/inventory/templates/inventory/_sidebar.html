@@ -7,27 +7,33 @@
     <div class="sidebar-brand">
         <a href="{% url 'menu' %}" class="sidebar-brand-link">
             <span class="sidebar-brand-mark">⌂</span>
-            <span><strong>Casa</strong><small>gestão simples</small></span>
+            <span class="sidebar-brand-copy"><strong>Casa</strong><small>gestão simples</small></span>
         </a>
     </div>
     <nav class="sidebar-nav">
         <span class="sidebar-label">NAVEGAÇÃO</span>
-        <a href="{% url 'itens' %}" class="sidebar-link">
-            <span class="sidebar-link-icon">📦</span> Itens
+        <a href="{% url 'menu' %}" class="sidebar-link{% if request.resolver_match.url_name == 'menu' %} is-active{% endif %}" title="Menu principal">
+            <span class="sidebar-link-icon">⌂</span><span class="sidebar-link-text">Menu principal</span>
         </a>
-        <a href="{% url 'desejos' %}" class="sidebar-link">
-            <span class="sidebar-link-icon">⭐</span> Desejos
+        <a href="{% url 'dashboard' %}" class="sidebar-link{% if request.resolver_match.url_name == 'dashboard' %} is-active{% endif %}" title="Dashboard">
+            <span class="sidebar-link-icon">📊</span><span class="sidebar-link-text">Dashboard</span>
         </a>
-        <a href="{% url 'lista_compras' %}" class="sidebar-link">
-            <span class="sidebar-link-icon">🛒</span> Lista de compras
+        <a href="{% url 'itens' %}" class="sidebar-link{% if request.resolver_match.url_name == 'itens' %} is-active{% endif %}" title="Itens">
+            <span class="sidebar-link-icon">📦</span><span class="sidebar-link-text">Itens</span>
         </a>
-        <a href="{% url 'despensa' %}" class="sidebar-link">
-            <span class="sidebar-link-icon">🗄️</span> Despensa
+        <a href="{% url 'desejos' %}" class="sidebar-link{% if request.resolver_match.url_name == 'desejos' %} is-active{% endif %}" title="Desejos">
+            <span class="sidebar-link-icon">⭐</span><span class="sidebar-link-text">Desejos</span>
         </a>
-        <a href="{% url 'gastos' %}" class="sidebar-link">
-            <span class="sidebar-link-icon">€</span> Gastos
+        <a href="{% url 'lista_compras' %}" class="sidebar-link{% if request.resolver_match.url_name == 'lista_compras' %} is-active{% endif %}" title="Lista de compras">
+            <span class="sidebar-link-icon">🛒</span><span class="sidebar-link-text">Lista de compras</span>
+        </a>
+        <a href="{% url 'despensa' %}" class="sidebar-link{% if request.resolver_match.url_name == 'despensa' %} is-active{% endif %}" title="Despensa">
+            <span class="sidebar-link-icon">🗄️</span><span class="sidebar-link-text">Despensa</span>
         </a>
     </nav>
+    <button class="sidebar-collapse" type="button" aria-controls="main-sidebar" aria-expanded="true" title="Recolher menu">
+        <span aria-hidden="true">‹</span><span class="sidebar-collapse-text">Recolher menu</span>
+    </button>
     <button class="sidebar-close" type="button" title="Fechar menu">Fechar menu <span>×</span></button>
 </aside>
 
@@ -36,6 +42,12 @@
         const toggle = document.querySelector('.menu-toggle');
         const backdrop = document.querySelector('.menu-backdrop');
         const close = document.querySelector('.sidebar-close');
+        const collapse = document.querySelector('.sidebar-collapse');
+
+        if (localStorage.getItem('sidebar-collapsed') === 'true') {
+            document.body.classList.add('sidebar-collapsed');
+            collapse.setAttribute('aria-expanded', 'false');
+        }
 
         function setMenu(open) {
             document.body.classList.toggle('menu-open', open);
@@ -46,5 +58,11 @@
         toggle.addEventListener('click', () => setMenu(!document.body.classList.contains('menu-open')));
         close.addEventListener('click', () => setMenu(false));
         backdrop.addEventListener('click', () => setMenu(false));
+        collapse.addEventListener('click', () => {
+            const collapsed = document.body.classList.toggle('sidebar-collapsed');
+            collapse.setAttribute('aria-expanded', !collapsed);
+            collapse.setAttribute('title', collapsed ? 'Expandir menu' : 'Recolher menu');
+            localStorage.setItem('sidebar-collapsed', collapsed);
+        });
     })();
 </script>

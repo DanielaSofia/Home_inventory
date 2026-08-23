@@ -8,8 +8,7 @@ from decimal import InvalidOperation
 
 from django.conf import settings
 from django.core.paginator import Paginator
-from django.db.models import Avg, F, Q, Sum
-from django.db.models.functions import TruncMonth
+from django.db.models import F, Q, Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
@@ -403,85 +402,20 @@ def dashboard(request):
     # valor total considerando quantidade * valor por item
     total_valor = itens.aggregate(total=Sum(F("valor") * F("quantidade")))["total"] or 0
 
-    # divisões com maior valor
-    top_divisoes = (
-        itens.values("divisao__nome")
-        .annotate(total=Sum(F("valor") * F("quantidade")))
-        .order_by("-total")
-    )
-
     # consumíveis em alerta (abaixo ou igual ao mínimo)
     consumiveis_alerta = Consumivel.objects.filter(quantidade__lte=F("quantidade_compra"))
 
     # itens adicionados recentemente
     recentes = Item.objects.order_by("-data_adicionado")[:5]
 
-    # gastos mensais para gráfico
-    gastos_mensais_qs = (
-        itens.annotate(mes=TruncMonth("data_aquisicao"))
-        .values("mes")
-        .annotate(total=Sum(F("valor") * F("quantidade")))
-        .order_by("mes")
-    )
-
-    # preparar labels/valores para o chart (JSON)
-    import json
-
-    labels = [g["mes"].strftime("%b %Y") if g.get("mes") else "" for g in gastos_mensais_qs]
-    values = [float(g.get("total") or 0) for g in gastos_mensais_qs]
-
     context = {
         "total_unidades": total_unidades,
         "total_valor": total_valor,
-        "top_divisoes": top_divisoes,
         "consumiveis_alerta": consumiveis_alerta,
         "recentes": recentes,
-        "gastos_mensais_labels": json.dumps(labels),
-        "gastos_mensais_values": json.dumps(values),
     }
 
     return render(request, "inventory/dashboard.html", context)
-
-
-## Gastos
-
-
-def gastos(request):
-    """Gera a página de gastos com agregações e relatórios simples."""
-    itens = Item.objects.all()
-
-    # 💰 Total
-    total = itens.aggregate(total=Sum(F("valor") * F("quantidade")))["total"] or 0
-
-    # 📊 Média
-    media = itens.aggregate(media=Avg("valor"))["media"] or 0
-
-    # 🏷️ Gastos por divisão
-    gastos_por_divisao = (
-        itens.values("divisao__nome")
-        .annotate(total=Sum(F("valor") * F("quantidade")))
-        .order_by("-total")
-    )
-
-    # 📅 Gastos por mês
-    gastos_mensais = (
-        itens.annotate(mes=TruncMonth("data_aquisicao"))
-        .values("mes")
-        .annotate(total=Sum(F("valor") * F("quantidade")))
-        .order_by("mes")
-    )
-
-    return render(
-        request,
-        "inventory/gastos.html",
-        {
-            "itens": itens,
-            "total": total,
-            "media": media,
-            "gastos_por_divisao": gastos_por_divisao,
-            "gastos_mensais": gastos_mensais,
-        },
-    )
 
 
 def consumir_consumivel(_request, consumivel_id):

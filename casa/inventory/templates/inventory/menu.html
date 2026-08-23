@@ -1,67 +1,32 @@
 {% extends 'inventory/base.html' %}
 
 {% block title %}
-  Menu — Gestão da Casa
+  Menu principal — Gestão da Casa
 {% endblock %}
 
 {% block content %}
-  <div class="py-5">
-    <h2 class="text-center mb-5">🏠 Gestão da Casa</h2>
-
-    <div class="row g-4">
-      <div class="col-6 col-md-4">
-        <a href="{% url 'dashboard' %}" class="text-decoration-none">
-          <div class="card menu-card p-4 text-center">
-            <div class="icon">📊</div>
-            <h5 class="mt-2">Dashboard</h5>
-          </div>
-        </a>
+  <div class="menu-shell">
+    <section class="menu-overview">
+      <div class="menu-overview-copy">
+        <span class="overview-kicker">GESTÃO DA CASA</span>
+        <h2>Bem-vindo(a) de volta</h2>
+        <p>Centralize os itens, compras, desejos e a despensa da casa em um único ponto de controlo, com uma visão simples e rápida.</p>
       </div>
-
-      <div class="col-6 col-md-4">
-        <a href="{% url 'itens' %}" class="text-decoration-none">
-          <div class="card menu-card p-4 text-center">
-            <div class="icon">📦</div>
-            <h5 class="mt-2">Itens</h5>
-          </div>
-        </a>
-      </div>
-
-      <div class="col-6 col-md-4">
-        <a href="{% url 'desejos' %}" class="text-decoration-none">
-          <div class="card menu-card p-4 text-center">
-            <div class="icon">⭐</div>
-            <h5 class="mt-2">Desejos</h5>
-          </div>
-        </a>
-      </div>
-
-      <div class="col-6 col-md-4">
-        <a href="{% url 'lista_compras' %}" class="text-decoration-none">
-          <div class="card menu-card p-4 text-center">
-            <div class="icon">🛒</div>
-            <h5 class="mt-2">Lista de Compras</h5>
-          </div>
-        </a>
-      </div>
-
-      <div class="col-6 col-md-4">
-        <a href="{% url 'despensa' %}" class="text-decoration-none">
-          <div class="card menu-card p-4 text-center">
-            <div class="icon">💰</div>
-            <h5 class="mt-2">Despensa</h5>
-          </div>
-        </a>
-      </div>
-
-      <div class="col-6 col-md-4">
-        <a href="{% url 'gastos' %}" class="text-decoration-none">
-          <div class="card menu-card p-4 text-center">
-            <div class="icon">💰</div>
-            <h5 class="mt-2">Gastos</h5>
-          </div>
-        </a>
-      </div>
-    </div>
+      <div class="overview-symbol" aria-hidden="true">⌂</div>
+    </section>
+    <section class="menu-summary-grid" aria-label="Resumo da casa">
+      <a class="menu-summary-card" href="{% url 'itens' %}">
+        <span>Itens</span><strong>{{ total_itens }}</strong>
+      </a>
+      <a class="menu-summary-card" href="{% url 'desejos' %}">
+        <span>Desejos</span><strong>{{ total_desejos }}</strong>
+      </a>
+      <a class="menu-summary-card" href="{% url 'lista_compras' %}">
+        <span>Compras</span><strong>{{ total_compras }}</strong>
+      </a>
+      <a class="menu-summary-card" href="{% url 'despensa' %}">
+        <span>Despensa</span><strong>{{ total_despensa }}</strong>
+      </a>
+    </section>
   </div>
 {% endblock %}
