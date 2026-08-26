@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from casa.inventory.models import Consumivel, Desejo, Divisao, Item
+from casa.inventory.models import Consumivel, Divisao, Item
 
 @pytest.fixture
 def user(db):

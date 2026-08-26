@@ -1,7 +1,5 @@
 """Configuração de logging para o app inventory."""
 
-import logging.config
-
 # Configuração de logging
 LOGGING = {
     'version': 1,

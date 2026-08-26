@@ -1,8 +1,11 @@
+import logging.config
 import os
 import sys
 from pathlib import Path
 
 from dotenv import load_dotenv
+
+from casa.logging_config import LOGGING
 
 # Load environment variables from .env file
 load_dotenv()
@@ -161,10 +164,6 @@ if not DEBUG and "pytest" not in sys.modules:
     CSRF_COOKIE_SECURE = True
 
 # Logging Configuration
-import logging.config
-
-from casa.logging_config import LOGGING
-
 logging.config.dictConfig(LOGGING)
 
 # REST Framework Authentication

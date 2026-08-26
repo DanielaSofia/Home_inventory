@@ -1,13 +1,19 @@
 py_home/
 
+# Generated and local runtime data
+staticfiles/
+media/
+db.sqlite3
+casa_inventory
+
 casa/__pycache__/
 __pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
 
 casa/inventory/__pycache__/
-
-casa/inventory/migrations/*
-!casa/inventory/migrations/0010_add_default_divisoes.py
-!casa/inventory/migrations/0011_consumivel_na_lista_compras.py
+casa/certs/*.pem
 
 mysql-apt-config_0.8.36-1_all.deb
 # Environment variables (keep secrets private)

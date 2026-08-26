@@ -82,6 +82,5 @@ urlpatterns = [
         atualizar_quantidade_consumivel,
         name="atualizar_quantidade_consumivel",
     ),
-    path("apagar-consumivel/<int:consumivel_id>/", apagar_consumivel, name="apagar_consumivel"),
     path("apagar-compra/<int:compra_id>/", apagar_compra, name="apagar_compra"),
 ]
