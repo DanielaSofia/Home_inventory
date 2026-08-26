@@ -145,6 +145,13 @@ SECURE_CONTENT_SECURITY_POLICY = {
     ),
     "font-src": ("'self'", "https://fonts.gstatic.com"),
     "script-src": ("'self'", "https://cdn.jsdelivr.net", "https://unpkg.com"),
+    "connect-src": (
+        "'self'",
+        "https://world.openproductsfacts.org",
+        "https://world.openbeautyfacts.org",
+        "https://world.openpetfoodfacts.org",
+        "https://world.openfoodfacts.org",
+    ),
 }
 
 # Only in production

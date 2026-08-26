@@ -1,4 +1,5 @@
 {% extends 'inventory/base.html' %}
+{% load static %}
 
 {% block title %}
   Despensa — Gestão da Casa
@@ -13,34 +14,63 @@
     </div>
     <div class="page-header-actions">
       <div class="page-stat"><span>Em stock</span><strong>{{ total_consumiveis }}</strong><small>referências ativas</small></div>
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPantryModal">Adicionar à despensa</button>
       <a href="{% url 'lista_compras' %}" class="btn btn-primary">Lista de compras</a>
     </div>
   </header>
 
-  <section class="card form-card p-3 mb-4" aria-labelledby="add-pantry-item">
-    <h2 id="add-pantry-item" class="section-heading">Adicionar à despensa</h2>
-    <form method="POST" action="{% url 'adicionar_consumivel' %}" data-offline-form="adicionar" data-offline-kind="despensa">
-      {% csrf_token %}
-      <div class="row g-2">
-        <div class="col-md-4">
-          <input type="text" name="nome" class="form-control" placeholder="Item..." required />
+  <div class="modal fade" id="addPantryModal" tabindex="-1" aria-labelledby="addPantryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title fs-5" id="addPantryModalLabel">Adicionar à despensa</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
         </div>
-        <div class="col-md-2">
-          <input type="text" name="quantidade" class="form-control" value="1" inputmode="decimal" placeholder="Ex.: 0,5 ou 1/2" required />
-        </div>
-        <div class="col-md-3">
-          <select name="divisao" class="form-select" required>
-            {% for d in divisoes %}
-              <option value="{{ d.id }}">{{ d.nome }}</option>
-            {% endfor %}
-          </select>
-        </div>
-        <div class="col-md-3">
-          <button class="btn btn-primary w-100">Adicionar</button>
-        </div>
+        <form id="addPantryForm" method="POST" action="{% url 'adicionar_consumivel' %}" data-offline-form="adicionar" data-offline-kind="despensa" data-barcode-form>
+          {% csrf_token %}
+          <div class="modal-body">
+            <div id="scanner-container" class="mb-3" style="display:none;">
+              <div id="scanner-reader"></div>
+            </div>
+            <div class="row g-2 mb-2">
+              <div class="col-md-6">
+                <button type="button" onclick="toggleScanner()" class="btn btn-outline-secondary w-100">Ler código de barras</button>
+              </div>
+              <div class="col-md-6">
+                <div class="input-group">
+                  <input id="barcode-input" type="text" inputmode="numeric" autocomplete="off" class="form-control" placeholder="Código de barras" aria-label="Código de barras" />
+                  <button type="button" onclick="buscarProdutoManual()" class="btn btn-outline-primary">Buscar</button>
+                </div>
+              </div>
+            </div>
+            <div id="scanner-status" class="alert alert-info py-2 mb-3" role="status" hidden></div>
+            <div class="row g-2">
+              <div class="col-md-6">
+                <label class="form-label" for="pantry-item-name">Nome</label>
+                <input id="pantry-item-name" type="text" name="nome" class="form-control" placeholder="Item..." required />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label" for="pantry-item-quantity">Quantidade</label>
+                <input id="pantry-item-quantity" type="text" name="quantidade" class="form-control" value="1" inputmode="decimal" placeholder="Ex.: 0,5 ou 1/2" required />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label" for="pantry-item-division">Divisão</label>
+                <select id="pantry-item-division" name="divisao" class="form-select" required>
+                  {% for d in divisoes %}
+                    <option value="{{ d.id }}">{{ d.nome }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Adicionar</button>
+          </div>
+        </form>
       </div>
-    </form>
-  </section>
+    </div>
+  </div>
 
   <form method="get" class="filter-bar row g-2 mb-3" aria-label="Filtrar despensa">
     <div class="col-md-5">
@@ -113,6 +143,8 @@
 {% endblock %}
 
 {% block scripts %}
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script src="{% static 'inventory/js/barcode_scanner.js' %}"></script>
   <script>
     const searchInput = document.getElementById('searchInput')
     if (searchInput) {
