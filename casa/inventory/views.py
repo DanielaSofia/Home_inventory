@@ -402,6 +402,12 @@ def menu(request):
     )
 
 
+def pwa_diagnostico(request):
+    """Página com diagnóstico do estado da PWA (service worker e caches) no dispositivo."""
+
+    return render(request, "inventory/pwa_diagnostico.html")
+
+
 def dashboard(request):
     """Página de dashboard com métricas rápidas do inventário."""
 

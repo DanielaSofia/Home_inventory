@@ -28,6 +28,20 @@ body {
   max-width: 1220px;
 }
 
+.pwa-diag {
+  margin-top: 2rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.pwa-diag pre {
+  white-space: pre-wrap;
+  word-break: break-all;
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 0.75rem;
+}
 .page-title {
   font-size: clamp(1.5rem, 2vw, 2.1rem);
   font-weight: 700;
@@ -1037,7 +1051,6 @@ body {
     grid-template-columns: 1fr;
   }
 }
-
 .menu-summary-card span {
   color: var(--muted);
   font-size: 0.72rem;

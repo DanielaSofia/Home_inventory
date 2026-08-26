@@ -1,0 +1,75 @@
+{% extends 'inventory/base.html' %}
+{% load static %}
+
+{% block title %}
+  Diagnóstico PWA — Gestão da Casa
+{% endblock %}
+
+{% block content %}
+  <div class="menu-shell">
+    <header class="menu-header">
+      <span class="overview-kicker">PWA</span>
+      <h1>Diagnóstico</h1>
+      <p>Estado do service worker e das caches guardadas neste dispositivo.</p>
+    </header>
+
+    <section class="pwa-diag">
+      <pre id="pwa-diag-output">A carregar…</pre>
+      <button id="pwa-diag-refresh" class="btn btn-sm btn-outline-primary mt-2" type="button">Atualizar diagnóstico</button>
+      <button id="pwa-diag-reset" class="btn btn-sm btn-outline-danger mt-2" type="button">Limpar registos e caches</button>
+    </section>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Painel de diagnóstico visível na página (sem devtools) para depurar a PWA no iPhone.
+  async function atualizarDiagnosticoPwa(extra) {
+    const out = document.getElementById('pwa-diag-output')
+    if (!out) return
+    const linhas = []
+    linhas.push(`online: ${navigator.onLine}`)
+    linhas.push(`serviceWorker suportado: ${'serviceWorker' in navigator}`)
+    if ('serviceWorker' in navigator) {
+      try {
+        // getRegistrations() (plural) devolve TODOS os registos da origem, mesmo os que
+        // não cobrem o scope desta página — útil para detetar registos presos com scope errado.
+        const regs = await navigator.serviceWorker.getRegistrations()
+        linhas.push(`registos: ${regs.length}`)
+        regs.forEach((reg) => {
+          const estado = reg.active ? 'active' : reg.installing ? 'installing' : reg.waiting ? 'waiting' : 'desconhecido'
+          linhas.push(`  scope: ${reg.scope} — estado: ${estado}`)
+        })
+      } catch (err) {
+        linhas.push(`erro ao ler registo: ${err}`)
+      }
+    }
+    try {
+      const nomes = await caches.keys()
+      linhas.push(`caches: ${nomes.join(', ') || 'nenhuma'}`)
+      for (const nome of nomes) {
+        const cache = await caches.open(nome)
+        const pedidos = await cache.keys()
+        linhas.push(`  ${nome}: ${pedidos.length} recurso(s)`)
+        pedidos.forEach((p) => linhas.push(`    - ${p.url}`))
+      }
+    } catch (err) {
+      linhas.push(`erro ao ler caches: ${err}`)
+    }
+    if (extra) linhas.push(extra)
+    out.textContent = linhas.join('\n')
+  }
+
+  document.getElementById('pwa-diag-refresh')?.addEventListener('click', () => atualizarDiagnosticoPwa())
+  document.getElementById('pwa-diag-reset')?.addEventListener('click', async () => {
+    if ('serviceWorker' in navigator) {
+      const regs = await navigator.serviceWorker.getRegistrations()
+      await Promise.all(regs.map((reg) => reg.unregister()))
+    }
+    const nomes = await caches.keys()
+    await Promise.all(nomes.map((nome) => caches.delete(nome)))
+    window.location.reload()
+  })
+  atualizarDiagnosticoPwa()
+</script>
+{% endblock %}

@@ -47,7 +47,8 @@
     <script>
       document.getElementById('refresh-button')?.addEventListener('click', () => window.location.reload())
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('{% static "inventory/js/service-worker.js" %}').catch(() => {})
+        // Registado a partir da rota de raiz (não /static/...) para que o scope cubra todo o site.
+        navigator.serviceWorker.register('{% url "service_worker" %}').catch(() => {})
       }
     </script>
     {% block scripts %}

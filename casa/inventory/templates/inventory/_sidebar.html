@@ -29,6 +29,9 @@
         <a href="{% url 'despensa' %}" class="sidebar-link{% if request.resolver_match.url_name == 'despensa' %} is-active{% endif %}" title="Despensa">
             <span class="sidebar-link-icon">🗄️</span><span class="sidebar-link-text">Despensa</span>
         </a>
+        <a href="{% url 'pwa_diagnostico' %}" class="sidebar-link{% if request.resolver_match.url_name == 'pwa_diagnostico' %} is-active{% endif %}" title="Diagnóstico PWA">
+            <span class="sidebar-link-icon">🐞</span><span class="sidebar-link-text">Diagnóstico PWA</span>
+        </a>
     </nav>
     <button class="sidebar-collapse" type="button" aria-controls="main-sidebar" aria-expanded="true" title="Recolher menu">
         <span aria-hidden="true">‹</span><span class="sidebar-collapse-text">Recolher menu</span>

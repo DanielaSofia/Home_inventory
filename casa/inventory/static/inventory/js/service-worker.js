@@ -1,10 +1,11 @@
 // Service Worker da PWA Home Inventory — cache do "app shell" e modo offline.
-const CACHE_VERSION = "v2";
+const CACHE_VERSION = "v5";
 const CACHE_NAME = `home-inventory-${CACHE_VERSION}`;
 
 const APP_SHELL = [
   "/lista-compras/",
   "/despensa/",
+  "/pwa-diagnostico/",
   "/static/inventory/css/ui-revamp.css",
   "https://unpkg.com/dexie@4.0.8/dist/dexie.min.js",
   "/static/inventory/js/barcode_scanner.js",
@@ -15,7 +16,11 @@ const APP_SHELL = [
 self.addEventListener("install", (event) => {
   self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL).catch(() => null))
+    // Cada recurso é adicionado individualmente: se um falhar (ex.: CDN externo em baixo),
+    // não impede os restantes de ficar em cache (cache.addAll falha tudo-ou-nada).
+    caches.open(CACHE_NAME).then((cache) =>
+      Promise.allSettled(APP_SHELL.map((url) => cache.add(url)))
+    )
   );
 });
 

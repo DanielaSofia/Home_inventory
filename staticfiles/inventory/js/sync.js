@@ -157,65 +157,97 @@
     };
   }
 
-  // Intercepta operações de consumíveis para funcionarem offline.
+  // navigator.onLine só indica se há uma interface de rede ativa, não se o servidor
+  // (Raspberry na rede de casa) está alcançável. Por isso testamos sempre com um pedido
+  // real e só caímos para o modo offline se esse pedido falhar de facto.
+  async function tentarSubmeterOnline(form) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 4000);
+    try {
+      const response = await fetch(form.action, {
+        method: "POST",
+        credentials: "same-origin",
+        body: new FormData(form),
+        redirect: "follow",
+        signal: controller.signal,
+      });
+      return response;
+    } catch (err) {
+      return null;
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+
+  async function guardarOffline(tipo, form) {
+    let uuid = form.dataset.uuid;
+
+    if (tipo === "adicionar") {
+      const payload = addPayload(form);
+      if (!payload) return;
+      await queueUpsert(payload);
+      form.reset();
+      setStatus("📴 Item guardado offline", "offline");
+      return;
+    }
+
+    if (tipo === "apagar") {
+      const existing = await db.consumiveis.get(uuid);
+      const isShoppingList = form.dataset.offlineKind === "lista";
+      const hasStock = quantityValue(existing?.quantidade) > 0;
+      if ((isShoppingList && hasStock) || (!isShoppingList && existing?.na_lista_compras)) {
+        existing.na_lista_compras = isShoppingList ? false : true;
+        existing.comprado = isShoppingList ? existing.comprado : false;
+        await queueUpsert(existing);
+      } else {
+        await queueDelete(uuid);
+      }
+      form.closest(".shopping-list-row")?.remove();
+      return;
+    }
+
+    const existing = (await db.consumiveis.get(uuid)) || { uuid };
+    if (tipo === "comprado") {
+      const quantity = parseQuantidade(form.querySelector('input[name="quantidade_compra"]').value);
+      if (quantity === null || quantity <= 0) return;
+      existing.quantidade = quantityValue(existing.quantidade) + quantity;
+      existing.quantidade_compra = quantity;
+      existing.comprado = true;
+      existing.na_lista_compras = false;
+    } else if (tipo === "quantidade") {
+      const quantity = parseQuantidade(form.querySelector('input[name="quantidade"]').value);
+      if (quantity === null || quantity < 0) return;
+      existing.quantidade = quantity;
+      existing.comprado = true;
+      existing.na_lista_compras = quantity === 0;
+    } else if (tipo === "consumir") {
+      existing.quantidade = Math.max(quantityValue(existing.quantidade) - 1, 0);
+      existing.comprado = existing.quantidade > 0;
+      existing.na_lista_compras = existing.quantidade === 0;
+    } else if (tipo === "repor") {
+      existing.quantidade = quantityValue(existing.quantidade) + 1;
+      existing.comprado = true;
+      existing.na_lista_compras = false;
+    }
+    await queueUpsert(existing);
+    setStatus("📴 Alteração guardada offline", "offline");
+  }
+
+  // Intercepta operações de consumíveis: tenta sempre o servidor primeiro (mesmo se
+  // navigator.onLine indicar rede) e só usa a fila offline se o pedido falhar mesmo.
   function attachFormHandlers() {
     document.querySelectorAll("[data-offline-form]").forEach((form) => {
       form.addEventListener("submit", async (event) => {
-        if (navigator.onLine) return; // deixa o form seguir normalmente para o servidor
         event.preventDefault();
-
         const tipo = form.dataset.offlineForm;
-        let uuid = form.dataset.uuid;
 
-        if (tipo === "adicionar") {
-          const payload = addPayload(form);
-          if (!payload) return;
-          await queueUpsert(payload);
-          form.reset();
-          setStatus("📴 Item guardado offline", "offline");
+        const response = await tentarSubmeterOnline(form);
+        if (response) {
+          window.location.assign(response.url || form.action);
           return;
         }
 
-        if (tipo === "apagar") {
-          const existing = await db.consumiveis.get(uuid);
-          const isShoppingList = form.dataset.offlineKind === "lista";
-          const hasStock = quantityValue(existing?.quantidade) > 0;
-          if ((isShoppingList && hasStock) || (!isShoppingList && existing?.na_lista_compras)) {
-            existing.na_lista_compras = isShoppingList ? false : true;
-            existing.comprado = isShoppingList ? existing.comprado : false;
-            await queueUpsert(existing);
-          } else {
-            await queueDelete(uuid);
-          }
-          form.closest(".shopping-list-row")?.remove();
-          return;
-        }
-
-        const existing = (await db.consumiveis.get(uuid)) || { uuid };
-        if (tipo === "comprado") {
-          const quantity = parseQuantidade(form.querySelector('input[name="quantidade_compra"]').value);
-          if (quantity === null || quantity <= 0) return;
-          existing.quantidade = quantityValue(existing.quantidade) + quantity;
-          existing.quantidade_compra = quantity;
-          existing.comprado = true;
-          existing.na_lista_compras = false;
-        } else if (tipo === "quantidade") {
-          const quantity = parseQuantidade(form.querySelector('input[name="quantidade"]').value);
-          if (quantity === null || quantity < 0) return;
-          existing.quantidade = quantity;
-          existing.comprado = true;
-          existing.na_lista_compras = quantity === 0;
-        } else if (tipo === "consumir") {
-          existing.quantidade = Math.max(quantityValue(existing.quantidade) - 1, 0);
-          existing.comprado = existing.quantidade > 0;
-          existing.na_lista_compras = existing.quantidade === 0;
-        } else if (tipo === "repor") {
-          existing.quantidade = quantityValue(existing.quantidade) + 1;
-          existing.comprado = true;
-          existing.na_lista_compras = false;
-        }
-        await queueUpsert(existing);
-        setStatus("📴 Alteração guardada offline", "offline");
+        await guardarOffline(tipo, form);
       });
     });
   }

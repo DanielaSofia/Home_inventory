@@ -27,6 +27,7 @@ from .views import (
     listar_itens,
     marcar_consumivel_comprado,
     menu,
+    pwa_diagnostico,
     repor_consumivel,
     service_worker,
 )
@@ -55,6 +56,7 @@ urlpatterns = [
     # Web Views (Traditional Django Templates)
     path("", menu, name="menu"),
     path("dashboard/", dashboard, name="dashboard"),
+    path("pwa-diagnostico/", pwa_diagnostico, name="pwa_diagnostico"),
     path("itens/", listar_itens, name="itens"),
     path("desejos/", desejos, name="desejos"),
     path("lista-compras/", lista_compras, name="lista_compras"),
