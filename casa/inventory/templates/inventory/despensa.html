@@ -56,13 +56,13 @@
     <ul class="list-group list-group-flush">
       {% for item in itens %}
         <li class="list-group-item item-row shopping-list-row d-flex justify-content-between align-items-center" data-nome="{{ item.nome|lower }}" data-sync-row="{{ item.uuid }}">
-          <div>
-            <strong>{{ item.nome }}</strong><br />
-            <small class="text-muted">{{ item.divisao.nome }}</small><br />
+          <div class="d-flex align-items-center gap-2 flex-wrap">
+            <strong>{{ item.nome }}</strong>
+            <small class="text-muted">· {{ item.divisao.nome }}</small>
             {% if item.quantidade == 0 %}
-              <span class="stock-low">Sem stock</span>
+              <span class="stock-low">· Sem stock</span>
             {% else %}
-              <span class="stock-ok">Em stock</span>
+              <span class="stock-ok">· Em stock</span>
             {% endif %}
           </div>
           <div class="d-flex align-items-center gap-2">

@@ -76,15 +76,15 @@
     <ul class="list-group list-group-flush">
       {% for item in ativos %}
         <li class="list-group-item item-row shopping-list-row d-flex justify-content-between align-items-center" data-sync-row="{{ item.uuid }}">
-          <div>
-            <strong>{{ item.nome }}</strong><br />
+          <div class="d-flex align-items-center gap-2 flex-wrap">
+            <strong>{{ item.nome }}</strong>
             {% if item.divisao %}<span class="division-badge badge">{{ item.divisao.nome }}</span>{% endif %}
             {% if item.quantidade == 0 %}
-              <span class="stock-low d-block mt-1">Sem stock</span>
+              <span class="stock-low">· Sem stock</span>
             {% elif item.quantidade <= item.quantidade_compra %}
-              <span class="stock-warning d-block mt-1">A terminar</span>
+              <span class="stock-warning">· A terminar</span>
             {% else %}
-              <span class="stock-ok d-block mt-1">Em stock</span>
+              <span class="stock-ok">· Em stock</span>
             {% endif %}
           </div>
 
