@@ -29,7 +29,7 @@ body {
 }
 
 .pwa-diag {
-  margin-top: 2rem;
+  margin-top: 1rem;
   font-size: 0.75rem;
   color: var(--muted);
 }
@@ -41,6 +41,40 @@ body {
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   padding: 0.75rem;
+}
+.settings-tabs {
+  border-bottom: 2px solid var(--line);
+}
+
+.settings-tabs .nav-link {
+  color: var(--muted);
+  font-weight: 600;
+  border: none;
+  border-bottom: 3px solid transparent;
+  border-radius: 0;
+  padding: 0.65rem 1.25rem;
+  background: transparent;
+  transition: all 0.2s ease;
+}
+
+.settings-tabs .nav-link:hover {
+  color: var(--primary);
+  border-color: rgba(15, 118, 110, 0.3);
+}
+
+.settings-tabs .nav-link.active {
+  color: var(--primary-strong);
+  font-weight: 700;
+  background: transparent;
+  border-bottom-color: var(--primary);
+}
+
+.settings-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  padding: 1.5rem;
 }
 .page-title {
   font-size: clamp(1.5rem, 2vw, 2.1rem);

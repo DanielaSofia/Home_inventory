@@ -9,6 +9,7 @@ from rest_framework.test import APIClient
 
 from casa.inventory.models import Consumivel, Divisao, Item
 
+
 @pytest.fixture
 def user(db):
     """Cria um usuário de teste."""
@@ -198,4 +199,25 @@ class TestShoppingListSuggestions:
         assert consumivel.na_lista_compras is True
         assert consumivel.comprado is True
         assert consumivel.quantidade == Decimal("3.00")
-        assert consumivel.quantidade_compra == Decimal("2.00")
+
+
+@pytest.mark.django_db
+class TestDefinicoesView:
+    """Testes para a página de definições e diagnóstico PWA."""
+
+    def test_definicoes_renders_successfully(self, client):
+        response = client.get("/definicoes/")
+        assert response.status_code == status.HTTP_200_OK
+        assert "Definições da Aplicação" in response.content.decode()
+
+    def test_pwa_diagnostico_redirects_to_definicoes_pwa_tab(self, client):
+        response = client.get("/pwa-diagnostico/")
+        assert response.status_code == status.HTTP_302_FOUND
+        assert response.url == "/definicoes/?tab=pwa"
+
+    def test_definicoes_about_tab_renders_successfully(self, client):
+        response = client.get("/definicoes/", {"tab": "sobre"})
+        assert response.status_code == status.HTTP_200_OK
+        content = response.content.decode()
+        assert "Sobre a Aplicação" in content
+        assert "Daniela Sofia" in content

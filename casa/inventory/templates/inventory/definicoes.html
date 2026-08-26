@@ -1,0 +1,299 @@
+{% extends 'inventory/base.html' %}
+{% load static %}
+
+{% block title %}
+  Definições — Gestão da Casa
+{% endblock %}
+
+{% block content %}
+  <div class="menu-shell">
+    <header class="menu-header mb-4">
+      <span class="overview-kicker">CONFIGURAÇÕES</span>
+      <h1>Definições da Aplicação</h1>
+      <p>Gerencie as preferências da aplicação, sincronização e consulte o diagnóstico da PWA.</p>
+    </header>
+
+    <!-- Navegação de Abas -->
+    <ul class="nav nav-tabs settings-tabs mb-4" id="settingsTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link {% if active_tab != 'pwa' and active_tab != 'about' and active_tab != 'sobre' %}active{% endif %}" id="geral-tab" data-bs-toggle="tab" data-bs-target="#geral-pane" type="button" role="tab" aria-controls="geral-pane" aria-selected="{% if active_tab != 'pwa' and active_tab != 'about' and active_tab != 'sobre' %}true{% else %}false{% endif %}">
+          ⚙️ Geral
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link {% if active_tab == 'pwa' %}active{% endif %}" id="pwa-tab" data-bs-toggle="tab" data-bs-target="#pwa-pane" type="button" role="tab" aria-controls="pwa-pane" aria-selected="{% if active_tab == 'pwa' %}true{% else %}false{% endif %}">
+          🐞 Diagnóstico PWA
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link {% if active_tab == 'about' or active_tab == 'sobre' %}active{% endif %}" id="about-tab" data-bs-toggle="tab" data-bs-target="#about-pane" type="button" role="tab" aria-controls="about-pane" aria-selected="{% if active_tab == 'about' or active_tab == 'sobre' %}true{% else %}false{% endif %}">
+          ℹ️ Sobre
+        </button>
+      </li>
+    </ul>
+
+    <!-- Conteúdo das Abas -->
+    <div class="tab-content" id="settingsTabsContent">
+      <!-- Aba Geral -->
+      <div class="tab-pane fade {% if active_tab != 'pwa' and active_tab != 'about' and active_tab != 'sobre' %}show active{% endif %}" id="geral-pane" role="tabpanel" aria-labelledby="geral-tab" tabindex="0">
+        
+        <!-- Sincronização & Armazenamento -->
+        <div class="settings-card mb-4">
+          <div class="d-flex align-items-center mb-3">
+            <span class="metric-icon me-2">🔄</span>
+            <div>
+              <h5 class="mb-0 fw-bold">Sincronização & Armazenamento Offline</h5>
+              <small class="text-muted">Gestão de sincronização manual de dados</small>
+            </div>
+          </div>
+          <p class="text-muted small mb-3">
+            As alterações efetuadas sem ligação à rede são armazenadas localmente e sincronizadas com o servidor assim que a ligação for reestabelecida.
+          </p>
+          <div class="d-flex flex-wrap gap-2">
+            <button id="btn-force-sync" class="btn btn-sm btn-outline-primary" type="button">
+              🔄 Forçar Sincronização Agora
+            </button>
+          </div>
+          <div id="sync-action-feedback" class="mt-2 small fw-semibold text-primary" aria-live="polite"></div>
+        </div>
+
+        <!-- Preferências da Aplicação -->
+        <div class="settings-card mb-4">
+          <div class="d-flex align-items-center mb-3">
+            <span class="metric-icon me-2">🎛️</span>
+            <div>
+              <h5 class="mb-0 fw-bold">Preferências da Aplicação</h5>
+              <small class="text-muted">Opções visuais e comportamentais</small>
+            </div>
+          </div>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="setting-theme" class="form-label fw-semibold small mb-1">Tema Visual</label>
+              <select id="setting-theme" class="form-select form-select-sm" disabled>
+                <option value="system" selected>Automático (Tema do Sistema / UI Revamp)</option>
+                <option value="light">Claro</option>
+                <option value="dark">Escuro</option>
+              </select>
+              <div class="form-text small">Utiliza a paleta de cores do sistema com suporte a modo adaptativo.</div>
+            </div>
+            <div class="col-md-6">
+              <label for="setting-confirmations" class="form-label fw-semibold small mb-1">Confirmações de Remoção</label>
+              <select id="setting-confirmations" class="form-select form-select-sm" disabled>
+                <option value="enabled" selected>Ativadas (Recomendado)</option>
+                <option value="disabled">Desativadas</option>
+              </select>
+              <div class="form-text small">Pede confirmação antes de remover itens da despensa ou inventário.</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Aba Diagnóstico PWA -->
+      <div class="tab-pane fade {% if active_tab == 'pwa' %}show active{% endif %}" id="pwa-pane" role="tabpanel" aria-labelledby="pwa-tab" tabindex="0">
+        <div class="settings-card mb-4">
+          <div class="d-flex align-items-center mb-3">
+            <span class="metric-icon me-2">🐞</span>
+            <div>
+              <h5 class="mb-0 fw-bold">Diagnóstico PWA</h5>
+              <small class="text-muted">Estado do service worker e das caches guardadas neste dispositivo</small>
+            </div>
+          </div>
+
+          <section class="pwa-diag mt-0">
+            <pre id="pwa-diag-output">A carregar…</pre>
+            <div class="d-flex flex-wrap gap-2 mt-2">
+              <button id="pwa-diag-refresh" class="btn btn-sm btn-outline-primary" type="button">Atualizar diagnóstico</button>
+              <button id="pwa-diag-reset" class="btn btn-sm btn-outline-danger" type="button">Limpar registos e caches</button>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <!-- Aba Sobre -->
+      <div class="tab-pane fade {% if active_tab == 'about' or active_tab == 'sobre' %}show active{% endif %}" id="about-pane" role="tabpanel" aria-labelledby="about-tab" tabindex="0">
+        <!-- Informações do Sistema -->
+        <div class="settings-card mb-4">
+          <div class="d-flex align-items-center mb-3">
+            <span class="metric-icon me-2">ℹ️</span>
+            <div>
+              <h5 class="mb-0 fw-bold">Informações do Sistema</h5>
+              <small class="text-muted">Estado e versão da aplicação</small>
+            </div>
+          </div>
+          <div class="row g-3">
+            <div class="col-md-4">
+              <div class="p-3 bg-light rounded-3 border">
+                <span class="text-muted d-block small">Aplicação</span>
+                <strong class="fs-6">Home Inventory</strong>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="p-3 bg-light rounded-3 border">
+                <span class="text-muted d-block small">Modo de Operação</span>
+                <strong class="fs-6 text-success">PWA Offline-First</strong>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="p-3 bg-light rounded-3 border">
+                <span class="text-muted d-block small">Base de Dados Local</span>
+                <strong class="fs-6">IndexedDB (Dexie)</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sobre a Aplicação -->
+        <div class="settings-card mb-4">
+          <div class="d-flex align-items-center mb-3">
+            <span class="metric-icon me-2">🏠</span>
+            <div>
+              <h5 class="mb-0 fw-bold">Sobre a Aplicação</h5>
+              <small class="text-muted">Home Inventory / Gestão da Casa</small>
+            </div>
+          </div>
+          <p class="text-muted">
+            O <strong>Home Inventory</strong> é uma aplicação web intuitiva e moderna concebida para a gestão e organização do lar. Com suporte <strong>PWA (Progressive Web App)</strong> e funcionamento <strong>offline-first</strong>, permite controlar itens da casa, gerir o stock da despensa, manter listas de compras sincronizadas e registar listas de desejos mesmo sem ligação à internet.
+          </p>
+          <div class="row g-3 mt-2">
+            <div class="col-md-6">
+              <div class="p-3 bg-light rounded-3 border h-100">
+                <h6 class="fw-bold mb-2 text-dark">📦 Funcionalidades Principais</h6>
+                <ul class="mb-0 small text-muted ps-3">
+                  <li class="mb-1">Gestão de itens por divisões da casa</li>
+                  <li class="mb-1">Controlo de consumíveis e despensa</li>
+                  <li class="mb-1">Lista de compras inteligente e sincronizada</li>
+                  <li class="mb-1">Leitor de código de barras incorporado</li>
+                  <li class="mb-1">Lista de desejos e histórico de compras</li>
+                  <li>Modo Offline-First com IndexedDB e Service Worker</li>
+                </ul>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="p-3 bg-light rounded-3 border h-100">
+                <h6 class="fw-bold mb-2 text-dark">🛠️ Tecnologias Utilizadas</h6>
+                <ul class="mb-0 small text-muted ps-3">
+                  <li class="mb-1"><strong>Backend:</strong> Python &amp; Django / Django REST Framework</li>
+                  <li class="mb-1"><strong>Frontend:</strong> HTML5, CSS3 (UI Revamp), JavaScript, Bootstrap 5</li>
+                  <li class="mb-1"><strong>Offline &amp; PWA:</strong> Service Worker, Dexie.js (IndexedDB)</li>
+                  <li><strong>Base de Dados:</strong> MySQL / SQLite</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Desenvolvedor & Projeto -->
+        <div class="settings-card mb-4">
+          <div class="d-flex align-items-center mb-3">
+            <span class="metric-icon me-2">💻</span>
+            <div>
+              <h5 class="mb-0 fw-bold">Desenvolvimento &amp; Projeto</h5>
+              <small class="text-muted">Créditos e repositório</small>
+            </div>
+          </div>
+          <div class="row g-3 align-items-center">
+            <div class="col-md-8">
+              <p class="mb-2">
+                Desenvolvido por <strong>Daniela Sofia</strong>.
+              </p>
+              <p class="text-muted small mb-0">
+                O código fonte é aberto e o desenvolvimento é acompanhado continuamente com melhorias de usabilidade, desempenho e novas funcionalidades.
+              </p>
+            </div>
+            <div class="col-md-4 text-md-end">
+              <a href="https://github.com/DanielaSofia/Home_inventory" target="_blank" rel="noopener noreferrer" class="btn btn-outline-dark btn-sm">
+                <span class="me-1">🐙</span> Ver no GitHub
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Sincronização manual na aba Geral
+  document.getElementById('btn-force-sync')?.addEventListener('click', async () => {
+    const feedback = document.getElementById('sync-action-feedback')
+    if (feedback) feedback.textContent = 'A iniciar sincronização…'
+    try {
+      if (typeof window.syncConsumiveis === 'function') {
+        await window.syncConsumiveis()
+        if (feedback) feedback.textContent = 'Sincronização concluída com sucesso!'
+      } else {
+        if (feedback) feedback.textContent = 'Sincronizador não disponível nesta página.'
+      }
+    } catch (err) {
+      if (feedback) feedback.textContent = `Erro na sincronização: ${err}`
+    }
+  })
+
+  // Painel de diagnóstico PWA (visível na aba Diagnóstico)
+  async function atualizarDiagnosticoPwa(extra) {
+    const out = document.getElementById('pwa-diag-output')
+    if (!out) return
+    const linhas = []
+    linhas.push(`online: ${navigator.onLine}`)
+    linhas.push(`serviceWorker suportado: ${'serviceWorker' in navigator}`)
+    if ('serviceWorker' in navigator) {
+      try {
+        const regs = await navigator.serviceWorker.getRegistrations()
+        linhas.push(`registos: ${regs.length}`)
+        regs.forEach((reg) => {
+          const estado = reg.active ? 'active' : reg.installing ? 'installing' : reg.waiting ? 'waiting' : 'desconhecido'
+          linhas.push(`  scope: ${reg.scope} — estado: ${estado}`)
+        })
+      } catch (err) {
+        linhas.push(`erro ao ler registo: ${err}`)
+      }
+    }
+    try {
+      const nomes = await caches.keys()
+      linhas.push(`caches: ${nomes.join(', ') || 'nenhuma'}`)
+      for (const nome of nomes) {
+        const cache = await caches.open(nome)
+        const pedidos = await cache.keys()
+        linhas.push(`  ${nome}: ${pedidos.length} recurso(s)`)
+        pedidos.forEach((p) => linhas.push(`    - ${p.url}`))
+      }
+    } catch (err) {
+      linhas.push(`erro ao ler caches: ${err}`)
+    }
+    if (extra) linhas.push(extra)
+    out.textContent = linhas.join('\n')
+  }
+
+  document.getElementById('pwa-diag-refresh')?.addEventListener('click', () => atualizarDiagnosticoPwa())
+  document.getElementById('pwa-diag-reset')?.addEventListener('click', async () => {
+    if ('serviceWorker' in navigator) {
+      const regs = await navigator.serviceWorker.getRegistrations()
+      await Promise.all(regs.map((reg) => reg.unregister()))
+    }
+    const nomes = await caches.keys()
+    await Promise.all(nomes.map((nome) => caches.delete(nome)))
+    window.location.reload()
+  })
+
+  // Atualiza diagnóstico ao mudar para a aba PWA
+  const pwaTabEl = document.getElementById('pwa-tab')
+  pwaTabEl?.addEventListener('shown.bs.tab', () => atualizarDiagnosticoPwa())
+
+  // Suporte para ativação de abas via URL (hash # ou parâmetro ?tab=)
+  const currentTab = (window.location.hash.replace('#', '') || new URLSearchParams(window.location.search).get('tab'))?.toLowerCase()
+  if (currentTab === 'pwa') {
+    const tabBtn = document.getElementById('pwa-tab')
+    if (tabBtn && typeof bootstrap !== 'undefined') {
+      bootstrap.Tab.getOrCreateInstance(tabBtn).show()
+    }
+    atualizarDiagnosticoPwa()
+  } else if (currentTab === 'about' || currentTab === 'sobre') {
+    const tabBtn = document.getElementById('about-tab')
+    if (tabBtn && typeof bootstrap !== 'undefined') {
+      bootstrap.Tab.getOrCreateInstance(tabBtn).show()
+    }
+  }
+</script>
+{% endblock %}

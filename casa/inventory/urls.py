@@ -19,6 +19,7 @@ from .views import (
     consumir_consumivel,
     criar_item,
     dashboard,
+    definicoes,
     desejos,
     despensa,
     editar_desejo,
@@ -56,6 +57,7 @@ urlpatterns = [
     # Web Views (Traditional Django Templates)
     path("", menu, name="menu"),
     path("dashboard/", dashboard, name="dashboard"),
+    path("definicoes/", definicoes, name="definicoes"),
     path("pwa-diagnostico/", pwa_diagnostico, name="pwa_diagnostico"),
     path("itens/", listar_itens, name="itens"),
     path("desejos/", desejos, name="desejos"),

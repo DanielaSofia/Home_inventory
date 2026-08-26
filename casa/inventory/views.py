@@ -402,10 +402,17 @@ def menu(request):
     )
 
 
-def pwa_diagnostico(request):
-    """Página com diagnóstico do estado da PWA (service worker e caches) no dispositivo."""
+def definicoes(request):
+    """Página de definições da aplicação e diagnóstico PWA."""
 
-    return render(request, "inventory/pwa_diagnostico.html")
+    active_tab = request.GET.get("tab", "geral")
+    return render(request, "inventory/definicoes.html", {"active_tab": active_tab})
+
+
+def pwa_diagnostico(request):
+    """Redireciona a rota antiga de diagnóstico PWA para a aba correspondente nas definições."""
+
+    return redirect("/definicoes/?tab=pwa")
 
 
 def dashboard(request):
