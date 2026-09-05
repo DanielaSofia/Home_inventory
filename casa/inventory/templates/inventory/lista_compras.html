@@ -14,12 +14,27 @@
     </div>
     <div class="page-header-actions">
       <div class="page-stat"><span>Por comprar</span><strong>{{ total_compras }}</strong><small>itens pendentes</small></div>
+      <div class="d-flex flex-column align-items-start">
+        <button type="button" id="sync-button" class="btn btn-outline-primary">Sincronizar</button>
+        <span id="sync-status" class="sync-status sync-status-syncing" role="status" aria-live="polite">A verificar ligação...</span>
+      </div>
       <a href="{% url 'despensa' %}" class="btn btn-outline-secondary">Ver despensa</a>
     </div>
   </header>
 
+  <div id="offline-pendentes" class="d-none" aria-live="polite"></div>
+
   <section class="card form-card p-3 mb-4" aria-labelledby="add-shopping-item">
-    <h2 id="add-shopping-item" class="section-heading">Adicionar à lista</h2>
+    <div class="form-card-header">
+      <h2 id="add-shopping-item" class="section-heading">Adicionar à lista</h2>
+      {% if despensa_sugestoes %}
+        <button type="button" class="quick-restock-trigger" data-bs-toggle="modal" data-bs-target="#quick-restock-modal">
+          <span class="quick-restock-icon" aria-hidden="true">+</span>
+          <span>Repor rapidamente</span>
+          <span class="quick-restock-count">{{ despensa_sugestoes|length }}</span>
+        </button>
+      {% endif %}
+    </div>
     <form method="POST" action="{% url 'adicionar_compra' %}" data-offline-form="adicionar" data-offline-kind="lista">
       {% csrf_token %}
       <div class="row g-2">
@@ -46,29 +61,35 @@
   </section>
 
   {% if despensa_sugestoes %}
-    <section class="card shopping-suggestions p-3 mb-4" aria-labelledby="pantry-suggestions-title">
-      <div class="suggestions-header">
-        <div>
-          <span class="eyebrow">REPOR RAPIDAMENTE</span>
-          <h2 id="pantry-suggestions-title" class="section-heading mb-1">Já existe na despensa?</h2>
-          <p class="text-muted small mb-0">Escolha um artigo para o adicionar à lista sem criar duplicados.</p>
+    <div class="modal fade" id="quick-restock-modal" tabindex="-1" aria-labelledby="quick-restock-title" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content shopping-suggestions">
+          <div class="modal-header">
+            <div>
+              <span class="eyebrow">REPOR RAPIDAMENTE</span>
+              <h2 id="quick-restock-title" class="modal-title fs-5">Já existe na despensa?</h2>
+              <p class="text-muted small mb-0">Escolha um artigo para o adicionar à lista sem criar duplicados.</p>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+          </div>
+          <div class="modal-body">
+            <div class="suggestion-grid">
+              {% for item in despensa_sugestoes %}
+                <button type="button" class="suggestion-item" data-nome="{{ item.nome }}" data-divisao="{{ item.divisao_id }}" aria-label="Adicionar {{ item.nome }} à lista de compras">
+                  <span class="suggestion-item-icon" aria-hidden="true">+</span>
+                  <span class="suggestion-item-content">
+                    <span class="suggestion-item-name">{{ item.nome }}</span>
+                    <span class="suggestion-item-meta"><span class="suggestion-division">{{ item.divisao.nome }}</span><span>{{ item.quantidade }} em stock</span></span>
+                  </span>
+                  <span class="suggestion-item-action" aria-hidden="true">→</span>
+                </button>
+              {% endfor %}
+            </div>
+            <p id="suggestion-feedback" class="suggestion-feedback" role="status" aria-live="polite"></p>
+          </div>
         </div>
-        <span class="suggestions-count">{{ despensa_sugestoes|length }} disponíveis</span>
       </div>
-      <div class="suggestion-grid">
-        {% for item in despensa_sugestoes %}
-          <button type="button" class="suggestion-item" data-nome="{{ item.nome }}" data-divisao="{{ item.divisao_id }}" aria-label="Adicionar {{ item.nome }} à lista de compras">
-            <span class="suggestion-item-icon" aria-hidden="true">+</span>
-            <span class="suggestion-item-content">
-              <span class="suggestion-item-name">{{ item.nome }}</span>
-              <span class="suggestion-item-meta"><span class="suggestion-division">{{ item.divisao.nome }}</span><span>{{ item.quantidade }} em stock</span></span>
-            </span>
-            <span class="suggestion-item-action" aria-hidden="true">→</span>
-          </button>
-        {% endfor %}
-      </div>
-      <p id="suggestion-feedback" class="suggestion-feedback" role="status" aria-live="polite"></p>
-    </section>
+    </div>
   {% endif %}
 
   <section class="card list-card p-3 mb-4">
@@ -121,6 +142,7 @@
         document.getElementById('shopping-name').value = button.dataset.nome
         document.getElementById('shopping-division').value = button.dataset.divisao
         suggestionFeedback.textContent = `${button.dataset.nome} selecionado. Indique a quantidade e adicione à lista.`
+        bootstrap.Modal.getInstance(document.getElementById('quick-restock-modal'))?.hide()
         document.querySelector('input[name="quantidade"]').focus()
       })
     })

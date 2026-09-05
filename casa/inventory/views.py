@@ -390,6 +390,12 @@ def comprar_desejo(request, desejo_id):
 def menu(request):
     """Renderiza o menu principal do app inventory."""
 
+    itens = Item.objects.all()
+    total_unidades = itens.aggregate(total=Sum("quantidade"))["total"] or 0
+    total_valor = itens.aggregate(total=Sum(F("valor") * F("quantidade")))["total"] or 0
+    compras_pendentes = Consumivel.objects.filter(na_lista_compras=True)
+    recentes = Item.objects.order_by("-data_adicionado")[:5]
+
     return render(
         request,
         "inventory/menu.html",
@@ -398,6 +404,10 @@ def menu(request):
             "total_desejos": Desejo.objects.count(),
             "total_compras": Consumivel.objects.filter(comprado=False).count(),
             "total_despensa": Consumivel.objects.filter(comprado=True).count(),
+            "total_unidades": total_unidades,
+            "total_valor": total_valor,
+            "compras_dashboard": compras_pendentes,
+            "recentes": recentes,
         },
     )
 
@@ -416,30 +426,9 @@ def pwa_diagnostico(request):
 
 
 def dashboard(request):
-    """Página de dashboard com métricas rápidas do inventário."""
+    """Mantém a rota antiga apontando para a página inicial consolidada."""
 
-    itens = Item.objects.all()
-
-    # total de unidades (soma das quantidades dos itens)
-    total_unidades = itens.aggregate(total=Sum("quantidade"))["total"] or 0
-
-    # valor total considerando quantidade * valor por item
-    total_valor = itens.aggregate(total=Sum(F("valor") * F("quantidade")))["total"] or 0
-
-    # consumíveis pendentes na lista de compras
-    compras_pendentes = Consumivel.objects.filter(na_lista_compras=True)
-
-    # itens adicionados recentemente
-    recentes = Item.objects.order_by("-data_adicionado")[:5]
-
-    context = {
-        "total_unidades": total_unidades,
-        "total_valor": total_valor,
-        "compras_dashboard": compras_pendentes,
-        "recentes": recentes,
-    }
-
-    return render(request, "inventory/dashboard.html", context)
+    return redirect("menu")
 
 
 def consumir_consumivel(_request, consumivel_id):

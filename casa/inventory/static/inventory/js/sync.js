@@ -74,6 +74,7 @@
     const since = localStorage.getItem(LAST_SYNC_KEY) || "";
     const response = await fetch(`${SYNC_URL}?since=${encodeURIComponent(since)}`, {
       credentials: "same-origin",
+      cache: "no-store",
     });
     if (!response.ok) throw new Error("pull falhou");
     const data = await response.json();
@@ -111,19 +112,17 @@
   }
 
   async function sincronizar() {
-    if (!navigator.onLine) {
-      setStatus(`📴 Offline — ${lastSyncText()}`, "offline");
-      await renderPendentes();
-      return;
-    }
     setStatus("🔄 A sincronizar...", "syncing");
     try {
       await push();
       await pull();
       await renderPendentes();
       setStatus(`✅ Sincronizado — ${lastSyncText()}`, "online");
+      return true;
     } catch (err) {
+      await renderPendentes();
       setStatus(`⚠️ Sem ligação ao servidor — ${lastSyncText()}`, "offline");
+      return false;
     }
   }
 
@@ -260,8 +259,9 @@
     const syncButton = document.getElementById("sync-button");
     syncButton?.addEventListener("click", async () => {
       syncButton.disabled = true;
-      await sincronizar();
+      const sincronizado = await sincronizar();
       syncButton.disabled = false;
+      if (sincronizado) window.location.reload();
     });
     sincronizar();
   });
