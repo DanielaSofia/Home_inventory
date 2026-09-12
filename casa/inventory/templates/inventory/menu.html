@@ -26,6 +26,112 @@
       </a>
     </section>
 
+    <section aria-labelledby="dashboard-title">
+      <header class="page-heading">
+        <div>
+          <span class="eyebrow">RESUMO</span>
+          <h2 id="dashboard-title" class="page-title">Atividade da casa</h2>
+          <p class="page-subtitle">Uma visão rápida do inventário e do stock da casa.</p>
+        </div>
+      </header>
+
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+          <div class="card metric-card p-3">
+            <div class="d-flex align-items-center">
+              <div class="metric-icon">□</div>
+              <div>
+                <div class="muted-small">Total unidades</div>
+                <div class="fs-5 fw-bold">{{ total_unidades }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card metric-card p-3">
+            <div class="d-flex align-items-center">
+              <div class="metric-icon">€</div>
+              <div>
+                <div class="muted-small">Valor total</div>
+                <div class="fs-5 fw-bold">€ {{ total_valor|floatformat:2 }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card metric-card metric-warning p-3">
+            <div class="d-flex align-items-center">
+              <div class="metric-icon">!</div>
+              <div>
+                <div class="muted-small">Lista de compras</div>
+                <div class="fs-5 fw-bold">{{ compras_dashboard.count }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card metric-card p-3">
+            <div class="d-flex align-items-center">
+              <div class="metric-icon">◷</div>
+              <div>
+                <div class="muted-small">Itens recentes</div>
+                <div class="fs-5 fw-bold">{{ recentes.count }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-lg-6 mb-3">
+          <div class="card list-card p-3">
+            <h3 class="section-heading">Lista de compras</h3>
+            <ul class="list-group list-group-flush">
+              {% for c in compras_dashboard %}
+                <li class="list-group-item d-flex justify-content-between align-items-center break-word">
+                  <div>
+                    <div>{{ c.nome }}</div>
+                    <small class="text-muted">{{ c.quantidade }} / compra {{ c.quantidade_compra }}</small>
+                  </div>
+                  <a href="{% url 'lista_compras' %}" class="btn btn-sm btn-primary">Ver</a>
+                </li>
+              {% empty %}
+                <li class="list-group-item text-muted">A lista de compras está vazia.</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="card list-card p-3 mt-3">
+        <h3 class="section-heading">Itens recentes</h3>
+        <div class="table-responsive">
+          <table class="table table-sm mt-2">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Divisão</th>
+                <th>Quantidade</th>
+                <th>Data</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for i in recentes %}
+                <tr>
+                  <td class="break-word">{{ i.nome }}</td>
+                  <td>{% if i.divisao %}{{ i.divisao.nome }}{% else %}—{% endif %}</td>
+                  <td>{{ i.quantidade }}</td>
+                  <td>{{ i.data_adicionado|date:'Y-m-d H:i' }}</td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="4">Nenhum item recente</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
     <section class="menu-suggestion-panel" aria-labelledby="suggestion-title">
       <div>
         <span class="overview-kicker">MELHORIAS</span>

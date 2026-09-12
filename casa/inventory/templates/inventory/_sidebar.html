@@ -14,9 +14,6 @@
         <a href="{% url 'menu' %}" class="sidebar-link{% if request.resolver_match.url_name == 'menu' %} is-active{% endif %}" title="Início">
             <span class="sidebar-link-icon">⌂</span><span class="sidebar-link-text">Início</span>
         </a>
-        <a href="{% url 'dashboard' %}" class="sidebar-link{% if request.resolver_match.url_name == 'dashboard' %} is-active{% endif %}" title="Dashboard">
-            <span class="sidebar-link-icon">📊</span><span class="sidebar-link-text">Dashboard</span>
-        </a>
         <a href="{% url 'itens' %}" class="sidebar-link{% if request.resolver_match.url_name == 'itens' %} is-active{% endif %}" title="Itens">
             <span class="sidebar-link-icon">📦</span><span class="sidebar-link-text">Itens</span>
         </a>
@@ -33,6 +30,10 @@
             <span class="sidebar-link-icon">⚙️</span><span class="sidebar-link-text">Definições</span>
         </a>
     </nav>
+    <button class="sidebar-theme-toggle" id="sidebar-theme-toggle" type="button" aria-pressed="false" title="Ativar tema escuro">
+        <span class="sidebar-link-icon" aria-hidden="true">◐</span>
+        <span class="sidebar-theme-toggle-text">Tema escuro</span>
+    </button>
     <button class="sidebar-collapse" type="button" aria-controls="main-sidebar" aria-expanded="true" title="Recolher menu">
         <span aria-hidden="true">‹</span><span class="sidebar-collapse-text">Recolher menu</span>
     </button>
@@ -45,6 +46,7 @@
         const backdrop = document.querySelector('.menu-backdrop');
         const close = document.querySelector('.sidebar-close');
         const collapse = document.querySelector('.sidebar-collapse');
+        const themeToggle = document.querySelector('#sidebar-theme-toggle');
 
         if (localStorage.getItem('sidebar-collapsed') === 'true') {
             document.body.classList.add('sidebar-collapsed');
@@ -65,6 +67,21 @@
             collapse.setAttribute('aria-expanded', !collapsed);
             collapse.setAttribute('title', collapsed ? 'Expandir menu' : 'Recolher menu');
             localStorage.setItem('sidebar-collapsed', collapsed);
+        });
+
+        function updateThemeToggle() {
+            const isDark = document.documentElement.dataset.theme === 'dark';
+            themeToggle.setAttribute('aria-pressed', isDark);
+            themeToggle.setAttribute('title', isDark ? 'Ativar tema claro' : 'Ativar tema escuro');
+            themeToggle.querySelector('.sidebar-theme-toggle-text').textContent = isDark ? 'Tema claro' : 'Tema escuro';
+        }
+
+        updateThemeToggle();
+        themeToggle.addEventListener('click', () => {
+            const isDark = document.documentElement.dataset.theme !== 'dark';
+            document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+            localStorage.setItem('home_inventory_theme', isDark ? 'dark' : 'light');
+            updateThemeToggle();
         });
     })();
 </script>

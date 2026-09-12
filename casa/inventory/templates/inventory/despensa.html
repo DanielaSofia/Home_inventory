@@ -14,10 +14,16 @@
     </div>
     <div class="page-header-actions">
       <div class="page-stat"><span>Em stock</span><strong>{{ total_consumiveis }}</strong><small>referências ativas</small></div>
+      <div class="d-flex flex-column align-items-start">
+        <button type="button" id="sync-button" class="btn btn-outline-primary">Sincronizar</button>
+        <span id="sync-status" class="sync-status sync-status-syncing" role="status" aria-live="polite">A verificar ligação...</span>
+      </div>
       <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPantryModal">Adicionar à despensa</button>
       <a href="{% url 'lista_compras' %}" class="btn btn-primary">Lista de compras</a>
     </div>
   </header>
+
+  <div id="offline-pendentes" class="d-none" aria-live="polite"></div>
 
   <div class="modal fade" id="addPantryModal" tabindex="-1" aria-labelledby="addPantryModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">

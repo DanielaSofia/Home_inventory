@@ -16,8 +16,13 @@
     <!-- Navegação de Abas -->
     <ul class="nav nav-tabs settings-tabs mb-4" id="settingsTabs" role="tablist">
       <li class="nav-item" role="presentation">
-        <button class="nav-link {% if active_tab != 'pwa' and active_tab != 'about' and active_tab != 'sobre' %}active{% endif %}" id="geral-tab" data-bs-toggle="tab" data-bs-target="#geral-pane" type="button" role="tab" aria-controls="geral-pane" aria-selected="{% if active_tab != 'pwa' and active_tab != 'about' and active_tab != 'sobre' %}true{% else %}false{% endif %}">
+        <button class="nav-link {% if active_tab != 'pwa' and active_tab != 'syn' and active_tab != 'about' and active_tab != 'sobre' %}active{% endif %}" id="geral-tab" data-bs-toggle="tab" data-bs-target="#geral-pane" type="button" role="tab" aria-controls="geral-pane" aria-selected="{% if active_tab != 'pwa' and active_tab != 'syn' and active_tab != 'about' and active_tab != 'sobre' %}true{% else %}false{% endif %}">
           ⚙️ Geral
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link {% if active_tab == 'syn' %}active{% endif %}" id="syn-tab" data-bs-toggle="tab" data-bs-target="#syn-pane" type="button" role="tab" aria-controls="syn-pane" aria-selected="{% if active_tab == 'syn' %}true{% else %}false{% endif %}">
+          🔄 Sync
         </button>
       </li>
       <li class="nav-item" role="presentation">
@@ -35,27 +40,7 @@
     <!-- Conteúdo das Abas -->
     <div class="tab-content" id="settingsTabsContent">
       <!-- Aba Geral -->
-      <div class="tab-pane fade {% if active_tab != 'pwa' and active_tab != 'about' and active_tab != 'sobre' %}show active{% endif %}" id="geral-pane" role="tabpanel" aria-labelledby="geral-tab" tabindex="0">
-        
-        <!-- Sincronização & Armazenamento -->
-        <div class="settings-card mb-4">
-          <div class="d-flex align-items-center mb-3">
-            <span class="metric-icon me-2">🔄</span>
-            <div>
-              <h5 class="mb-0 fw-bold">Sincronização & Armazenamento Offline</h5>
-              <small class="text-muted">Gestão de sincronização manual de dados</small>
-            </div>
-          </div>
-          <p class="text-muted small mb-3">
-            As alterações efetuadas sem ligação à rede são armazenadas localmente e sincronizadas com o servidor assim que a ligação for reestabelecida.
-          </p>
-          <div class="d-flex flex-wrap gap-2">
-            <button id="btn-force-sync" class="btn btn-sm btn-outline-primary" type="button">
-              🔄 Forçar Sincronização Agora
-            </button>
-          </div>
-          <div id="sync-action-feedback" class="mt-2 small fw-semibold text-primary" aria-live="polite"></div>
-        </div>
+      <div class="tab-pane fade {% if active_tab != 'pwa' and active_tab != 'syn' and active_tab != 'about' and active_tab != 'sobre' %}show active{% endif %}" id="geral-pane" role="tabpanel" aria-labelledby="geral-tab" tabindex="0">
 
         <!-- Preferências da Aplicação -->
         <div class="settings-card mb-4">
@@ -69,7 +54,7 @@
           <div class="row g-3">
             <div class="col-md-6">
               <label for="setting-theme" class="form-label fw-semibold small mb-1">Tema Visual</label>
-              <select id="setting-theme" class="form-select form-select-sm" disabled>
+              <select id="setting-theme" class="form-select form-select-sm">
                 <option value="system" selected>Automático (Tema do Sistema / UI Revamp)</option>
                 <option value="light">Claro</option>
                 <option value="dark">Escuro</option>
@@ -87,6 +72,38 @@
           </div>
         </div>
 
+      </div>
+
+      <!-- Aba Sincronização -->
+      <div class="tab-pane fade {% if active_tab == 'syn' %}show active{% endif %}" id="syn-pane" role="tabpanel" aria-labelledby="syn-tab" tabindex="0">
+        <div class="settings-card mb-4">
+          <div class="d-flex align-items-center mb-3">
+            <span class="metric-icon me-2">🔄</span>
+            <div>
+              <h5 class="mb-0 fw-bold">Sincronização</h5>
+              <small class="text-muted">Estado da ligação e dados offline</small>
+            </div>
+          </div>
+          <div class="sync-controls d-flex align-items-center flex-wrap gap-2">
+            <div id="sync-status" class="sync-status" role="status" aria-live="polite"></div>
+            <button id="sync-button" class="btn btn-sm btn-outline-primary" type="button">Sincronizar</button>
+            <button id="btn-force-sync" class="btn btn-sm btn-outline-primary" type="button">Forçar sincronização</button>
+          </div>
+          <p class="text-muted small mt-3 mb-0">
+            As alterações efetuadas sem ligação à rede são armazenadas localmente e sincronizadas com o servidor assim que a ligação for reestabelecida.
+          </p>
+          <div id="sync-action-feedback" class="mt-2 small fw-semibold text-primary" aria-live="polite"></div>
+        </div>
+        <div class="settings-card mb-4">
+          <div class="d-flex align-items-center mb-3">
+            <span class="metric-icon me-2">↻</span>
+            <div>
+              <h5 class="mb-0 fw-bold">Atualizar página</h5>
+              <small class="text-muted">Recarrega os dados apresentados</small>
+            </div>
+          </div>
+          <button id="refresh-button" class="btn btn-sm btn-outline-secondary" type="button" title="Atualizar página" aria-label="Atualizar página">↻ Atualizar</button>
+        </div>
       </div>
 
       <!-- Aba Diagnóstico PWA -->
@@ -215,7 +232,21 @@
 
 {% block scripts %}
 <script>
-  // Sincronização manual na aba Geral
+  const themeSelect = document.getElementById('setting-theme')
+  const themePreference = localStorage.getItem('home_inventory_theme') || 'system'
+  if (themeSelect) {
+    themeSelect.value = themePreference
+    themeSelect.addEventListener('change', () => {
+      const preference = themeSelect.value
+      const isDark = preference === 'dark' || (preference === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+      document.documentElement.dataset.theme = isDark ? 'dark' : 'light'
+      localStorage.setItem('home_inventory_theme', preference)
+    })
+  }
+
+  document.getElementById('refresh-button')?.addEventListener('click', () => window.location.reload())
+
+  // Sincronização manual na aba Sync
   document.getElementById('btn-force-sync')?.addEventListener('click', async () => {
     const feedback = document.getElementById('sync-action-feedback')
     if (feedback) feedback.textContent = 'A iniciar sincronização…'
