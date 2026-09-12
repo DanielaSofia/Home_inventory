@@ -67,6 +67,14 @@
                   {% endfor %}
                 </select>
               </div>
+              <div class="col-md-3">
+                <label class="form-label" for="pantry-item-subdivision">Subdivisão</label>
+                <select id="pantry-item-subdivision" name="subdivisao" class="form-select" required>
+                  {% for value, label in subdivisoes %}
+                    <option value="{{ value }}">{{ label }}</option>
+                  {% endfor %}
+                </select>
+              </div>
             </div>
           </div>
           <div class="modal-footer">
@@ -79,9 +87,18 @@
   </div>
 
   <form method="get" class="filter-bar row g-2 mb-3" aria-label="Filtrar despensa">
-    <div class="col-md-5">
+    <div class="col-md-4">
       <label class="visually-hidden" for="searchInput">Procurar pelo nome do item</label>
       <input id="searchInput" type="search" name="q" class="form-control" placeholder="Procurar pelo nome..." value="{{ query }}" />
+    </div>
+    <div class="col-md-3">
+      <label class="visually-hidden" for="pantry-filter-subdivision">Subdivisão</label>
+      <select id="pantry-filter-subdivision" name="subdivisao" class="form-select">
+        <option value="">Todas as subdivisões</option>
+        {% for value, label in subdivisoes %}
+          <option value="{{ value }}" {% if subdivisao_selecionada == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
     </div>
     <div class="col-md-2">
       <button class="btn btn-primary w-100">Procurar</button>
@@ -95,6 +112,7 @@
           <div class="d-flex align-items-center gap-2 flex-wrap">
             <strong>{{ item.nome }}</strong>
             <small class="text-muted">· {{ item.divisao.nome }}</small>
+            <span class="division-badge badge">{{ item.get_subdivisao_display }}</span>
             {% if item.quantidade == 0 %}
               <span class="stock-low">· Sem stock</span>
             {% else %}

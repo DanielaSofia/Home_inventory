@@ -42,8 +42,17 @@ class Item(models.Model):
 class Consumivel(models.Model):
     """Produto consumível identificado por nome, quantidade e divisão."""
 
+    SUBDIVISOES = (
+        ("congelados", "Congelados"),
+        ("fatiados", "Fatiados"),
+        ("conservas", "Conservas"),
+        ("frutas_legumes", "Frutas e legumes"),
+        ("outros", "Outros"),
+    )
+
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     nome = models.CharField(max_length=100)
+    subdivisao = models.CharField(max_length=30, choices=SUBDIVISOES, default="outros")
     quantidade = models.DecimalField(max_digits=10, decimal_places=2, default=1)
     quantidade_compra = models.DecimalField(max_digits=10, decimal_places=2, default=1)
     comprado = models.BooleanField(default=False)

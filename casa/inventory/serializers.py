@@ -79,6 +79,7 @@ class ConsumivelSerializer(serializers.ModelSerializer):
             "id",
             "uuid",
             "nome",
+            "subdivisao",
             "quantidade",
             "quantidade_compra",
             "comprado",

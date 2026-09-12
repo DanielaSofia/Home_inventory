@@ -149,6 +149,7 @@
       uuid: crypto.randomUUID(),
       nome: form.querySelector('input[name="nome"]').value.trim(),
       divisao: Number(form.querySelector('select[name="divisao"]').value),
+      subdivisao: form.querySelector('select[name="subdivisao"]').value,
       quantidade: isPantry ? quantity : 0,
       quantidade_compra: isPantry ? 1 : quantity,
       comprado: isPantry,
