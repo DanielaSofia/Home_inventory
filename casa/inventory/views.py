@@ -193,15 +193,16 @@ def lista_compras(request):
             return redirect("lista_compras")
 
     divisao_id = request.GET.get("divisao")
+    subdivisao = request.GET.get("subdivisao")
     search_query = request.GET.get("q", "").strip()
     compras = Consumivel.objects.filter(na_lista_compras=True).select_related("divisao")
 
     if divisao_id:
         compras = compras.filter(divisao_id=divisao_id)
+    if subdivisao:
+        compras = compras.filter(subdivisao=subdivisao)
     if search_query:
-        compras = compras.filter(
-            Q(nome__icontains=search_query) | Q(descricao__icontains=search_query)
-        )
+        compras = compras.filter(nome__icontains=search_query)
 
     return render(
         request,
@@ -212,6 +213,8 @@ def lista_compras(request):
                 comprado=True, na_lista_compras=False
             ).select_related("divisao"),
             "divisoes": Divisao.objects.all(),
+            "subdivisoes": Consumivel.SUBDIVISOES,
+            "subdivisao_selecionada": subdivisao,
             "total_compras": compras.count(),
             "consumivel_form": ConsumivelForm(),
         },
@@ -230,10 +233,13 @@ def despensa(request):
             return redirect("despensa")
 
     search_query = request.GET.get("q", "").strip()
+    subdivisao = request.GET.get("subdivisao")
     consumiveis = Consumivel.objects.filter(comprado=True).select_related("divisao")
 
     if search_query:
         consumiveis = consumiveis.filter(nome__icontains=search_query)
+    if subdivisao:
+        consumiveis = consumiveis.filter(subdivisao=subdivisao)
 
     return render(
         request,
@@ -241,6 +247,8 @@ def despensa(request):
         {
             "itens": consumiveis,
             "divisoes": Divisao.objects.all(),
+            "subdivisoes": Consumivel.SUBDIVISOES,
+            "subdivisao_selecionada": subdivisao,
             "query": search_query,
             "total_consumiveis": consumiveis.count(),
             "consumivel_form": ConsumivelForm(),
@@ -284,6 +292,9 @@ def adicionar_compra(request):
     if request.method == "POST":
         nome = request.POST.get("nome", "").strip()
         divisao_id = request.POST.get("divisao")
+        subdivisao = request.POST.get("subdivisao", "outros")
+        if subdivisao not in dict(Consumivel.SUBDIVISOES):
+            subdivisao = "outros"
         quantidade = request.POST.get("quantidade", "1")
         if nome and divisao_id:
             try:
@@ -292,7 +303,9 @@ def adicionar_compra(request):
                 quantidade = None
             if quantidade is not None and quantidade > 0:
                 consumivel = (
-                    Consumivel.objects.filter(nome__iexact=nome, divisao_id=divisao_id)
+                    Consumivel.objects.filter(
+                        nome__iexact=nome, divisao_id=divisao_id, subdivisao=subdivisao
+                    )
                     .order_by("id")
                     .first()
                 )
@@ -313,6 +326,7 @@ def adicionar_compra(request):
                         quantidade_compra=quantidade,
                         comprado=False,
                         na_lista_compras=True,
+                        subdivisao=subdivisao,
                     )
     return redirect("lista_compras")
 

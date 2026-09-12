@@ -102,10 +102,22 @@ class ConsumivelForm(forms.ModelForm):
     """Formulário para cadastrar produtos consumíveis."""
 
     quantidade = FractionalDecimalField(max_digits=10, decimal_places=2, min_value=0)
+    subdivisao = forms.ChoiceField(
+        choices=Consumivel.SUBDIVISOES,
+        required=False,
+        initial="outros",
+    )
+
+    def clean_subdivisao(self):
+        """Normaliza subdivisão vazia para o valor padrão do sistema."""
+        subdivisao = self.cleaned_data.get("subdivisao")
+        if not subdivisao or subdivisao not in dict(Consumivel.SUBDIVISOES):
+            return "outros"
+        return subdivisao
 
     class Meta:
         model = Consumivel
-        fields = ["nome", "quantidade", "divisao"]
+        fields = ["nome", "quantidade", "divisao", "subdivisao"]
         widgets = {
             "nome": forms.TextInput(attrs={"class": "form-control"}),
             "quantidade": forms.TextInput(
@@ -116,4 +128,5 @@ class ConsumivelForm(forms.ModelForm):
                 }
             ),
             "divisao": forms.Select(attrs={"class": "form-control"}),
+            "subdivisao": forms.Select(attrs={"class": "form-control"}),
         }

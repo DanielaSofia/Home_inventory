@@ -117,7 +117,7 @@ class ConsumivelViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
     search_fields = ["nome"]
-    filterset_fields = ["divisao", "comprado"]
+    filterset_fields = ["divisao", "subdivisao", "comprado"]
 
 
 class ConsumivelSyncView(APIView):

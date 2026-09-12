@@ -38,18 +38,26 @@
     <form method="POST" action="{% url 'adicionar_compra' %}" data-offline-form="adicionar" data-offline-kind="lista">
       {% csrf_token %}
       <div class="row g-2">
-        <div class="col-md-5">
+        <div class="col-md-4">
           <label class="visually-hidden" for="shopping-name">Nome do item</label>
           <input id="shopping-name" type="text" name="nome" class="form-control" placeholder="Adicionar item..." required />
         </div>
         <div class="col-md-2">
           <input type="text" name="quantidade" class="form-control" value="1" inputmode="decimal" placeholder="Ex.: 0,5 ou 1/2" required />
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
           <label class="visually-hidden" for="shopping-division">Divisão</label>
           <select id="shopping-division" name="divisao" class="form-select" required>
             {% for d in divisoes %}
               <option value="{{ d.id }}" {% if request.GET.divisao|stringformat:'s' == d.id|stringformat:'s' %}selected{% endif %}>{{ d.nome }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label class="visually-hidden" for="shopping-subdivision">Subdivisão</label>
+          <select id="shopping-subdivision" name="subdivisao" class="form-select" required>
+            {% for value, label in subdivisoes %}
+              <option value="{{ value }}">{{ label }}</option>
             {% endfor %}
           </select>
         </div>
@@ -59,6 +67,25 @@
       </div>
     </form>
   </section>
+
+  <form method="get" class="filter-bar row g-2 mb-3" aria-label="Filtrar lista de compras">
+    <div class="col-md-4">
+      <label class="visually-hidden" for="shopping-search">Procurar pelo nome do item</label>
+      <input id="shopping-search" type="search" name="q" class="form-control" placeholder="Procurar pelo nome..." value="{{ request.GET.q }}" />
+    </div>
+    <div class="col-md-3">
+      <label class="visually-hidden" for="shopping-filter-subdivision">Subdivisão</label>
+      <select id="shopping-filter-subdivision" name="subdivisao" class="form-select">
+        <option value="">Todas as subdivisões</option>
+        {% for value, label in subdivisoes %}
+          <option value="{{ value }}" {% if subdivisao_selecionada == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <button class="btn btn-primary w-100">Filtrar</button>
+    </div>
+  </form>
 
   {% if despensa_sugestoes %}
     <div class="modal fade" id="quick-restock-modal" tabindex="-1" aria-labelledby="quick-restock-title" aria-hidden="true">
@@ -89,7 +116,20 @@
           </div>
         </div>
       </div>
-    </div>
+      <div class="suggestion-grid">
+        {% for item in despensa_sugestoes %}
+          <button type="button" class="suggestion-item" data-nome="{{ item.nome }}" data-divisao="{{ item.divisao_id }}" data-subdivisao="{{ item.subdivisao }}" aria-label="Adicionar {{ item.nome }} à lista de compras">
+            <span class="suggestion-item-icon" aria-hidden="true">+</span>
+            <span class="suggestion-item-content">
+              <span class="suggestion-item-name">{{ item.nome }}</span>
+              <span class="suggestion-item-meta"><span class="suggestion-division">{{ item.divisao.nome }}</span><span>{{ item.quantidade }} em stock</span></span>
+            </span>
+            <span class="suggestion-item-action" aria-hidden="true">→</span>
+          </button>
+        {% endfor %}
+      </div>
+      <p id="suggestion-feedback" class="suggestion-feedback" role="status" aria-live="polite"></p>
+    </section>
   {% endif %}
 
   <section class="card list-card p-3 mb-4">
@@ -100,6 +140,7 @@
           <div class="d-flex align-items-center gap-2 flex-wrap">
             <strong>{{ item.nome }}</strong>
             {% if item.divisao %}<span class="division-badge badge">{{ item.divisao.nome }}</span>{% endif %}
+            <span class="division-badge badge">{{ item.get_subdivisao_display }}</span>
             {% if item.quantidade == 0 %}
               <span class="stock-low">· Sem stock</span>
             {% elif item.quantidade <= item.quantidade_compra %}
@@ -141,6 +182,7 @@
         button.classList.add('is-selected')
         document.getElementById('shopping-name').value = button.dataset.nome
         document.getElementById('shopping-division').value = button.dataset.divisao
+        document.getElementById('shopping-subdivision').value = button.dataset.subdivisao
         suggestionFeedback.textContent = `${button.dataset.nome} selecionado. Indique a quantidade e adicione à lista.`
         bootstrap.Modal.getInstance(document.getElementById('quick-restock-modal'))?.hide()
         document.querySelector('input[name="quantidade"]').focus()
