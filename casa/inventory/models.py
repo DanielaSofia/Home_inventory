@@ -47,6 +47,7 @@ class Consumivel(models.Model):
         ("fatiados", "Fatiados"),
         ("conservas", "Conservas"),
         ("frutas_legumes", "Frutas e legumes"),
+        ("temperos", "Temperos"),
         ("outros", "Outros"),
     )
 
