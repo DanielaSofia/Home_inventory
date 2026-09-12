@@ -16,7 +16,7 @@ if ! python manage.py makemigrations --dry-run --check; then
 fi
 
 echo "Mostrando plano de migrations (se houver):"
-python manage.py migrate --plan || true
+python manage.py migrate --plan
 
 echo "OK: verificação de migrations concluída sem problemas." 
 
