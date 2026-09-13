@@ -1,26 +1,25 @@
-name: Check Migrations
+name: Tests
 
 on:
   pull_request:
     types: [opened, synchronize, reopened]
     paths:
-      - 'casa/inventory/**'
-      - 'casa/settings.py'
+      - 'casa/**'
       - 'manage.py'
       - 'requirements.txt'
-      - 'scripts/check_migrations.sh'
-      - '.github/workflows/check-migrations.yml'
+      - 'pytest.ini'
+      - '.github/workflows/tests.yml'
 
 permissions:
   contents: read
 
 concurrency:
-  group: check-migrations-${{ github.event.pull_request.number || github.ref }}
+  group: tests-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
-  check-migrations:
-    name: Check migrations
+  tests:
+    name: Run tests
     runs-on: ubuntu-latest
     env:
       DB_ENGINE: django.db.backends.sqlite3
@@ -40,7 +39,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          python -m pip install -r requirements.txt
 
-      - name: Run migrations check
-        run: bash scripts/check_migrations.sh
+      - name: Run tests
+        run: python -m pytest
