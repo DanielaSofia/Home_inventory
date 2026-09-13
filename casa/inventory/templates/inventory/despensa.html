@@ -105,10 +105,67 @@
     </div>
   </form>
 
-  <section class="card list-card p-3">
+  <section class="pantry-navigation mb-3" aria-label="Navegar por divisão e subdivisão">
+    <div class="pantry-navigation-header">
+      <div>
+        <span class="eyebrow">NAVEGAR POR</span>
+        <h2 class="h5 mb-0">Escolha uma secção</h2>
+      </div>
+      <span class="pantry-result-count" id="pantry-result-count" role="status" aria-live="polite"></span>
+    </div>
+    <div class="pantry-filter-group" role="group" aria-label="Divisões">
+      <button type="button" class="pantry-filter-button is-active" data-pantry-filter="all" data-filter-label="Todas as divisões" aria-pressed="true">
+        <i class="bi bi-grid-3x3-gap" aria-hidden="true"></i>
+        <span>Todas</span>
+        <small>{{ itens|length }}</small>
+      </button>
+      {% for divisao in divisoes %}
+        <button type="button" class="pantry-filter-button" data-pantry-filter="division:{{ divisao.id }}" data-filter-label="{{ divisao.nome }}" aria-pressed="false">
+          <i class="bi bi-house-door" aria-hidden="true"></i>
+          <span>{{ divisao.nome }}</span>
+          <small data-division-count="{{ divisao.id }}">0</small>
+        </button>
+      {% endfor %}
+    </div>
+    <div class="pantry-filter-group pantry-subdivision-filters" role="group" aria-label="Subdivisões">
+      <button type="button" class="pantry-subdivision-button is-active" data-pantry-filter="all" data-filter-label="Todas as subseções" aria-pressed="true">Todas as subseções</button>
+      {% for value, label in subdivisoes %}
+        <button type="button" class="pantry-subdivision-button" data-pantry-filter="subdivision:{{ value }}" data-filter-label="{{ label }}" aria-pressed="false">{{ label }}</button>
+      {% endfor %}
+    </div>
+  </section>
+
+  <div class="modal fade" id="pantryFilterModal" tabindex="-1" aria-labelledby="pantryFilterModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div>
+            <span class="eyebrow">DESPENSA</span>
+            <h2 class="modal-title fs-5" id="pantryFilterModalLabel">Itens filtrados</h2>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">
+          <p class="text-muted small" id="pantry-filter-modal-summary"></p>
+          <ul class="list-group list-group-flush" id="pantry-filter-modal-list"></ul>
+          <div class="empty-state compact d-none" id="pantry-filter-modal-empty">
+            <div class="empty-state-icon">⌕</div>
+            <h3>Nenhum item encontrado</h3>
+            <p>Não existem consumíveis nesta divisão ou subseção.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="card list-card p-3" aria-label="Lista completa da despensa">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <h2 class="h5 mb-0">Lista completa</h2>
+      <span class="text-muted small">{{ itens|length }} itens</span>
+    </div>
     <ul class="list-group list-group-flush">
       {% for item in itens %}
-        <li class="list-group-item item-row shopping-list-row d-flex justify-content-between align-items-center" data-nome="{{ item.nome|lower }}" data-sync-row="{{ item.uuid }}">
+        <li class="list-group-item item-row shopping-list-row d-flex justify-content-between align-items-center" data-nome="{{ item.nome|lower }}" data-division-id="{{ item.divisao_id }}" data-subdivision="{{ item.subdivisao }}" data-sync-row="{{ item.uuid }}">
           <div class="d-flex align-items-center gap-2 flex-wrap">
             <strong>{{ item.nome }}</strong>
             <small class="text-muted">· {{ item.divisao.nome }}</small>
@@ -119,19 +176,19 @@
               <span class="stock-ok">· Em stock</span>
             {% endif %}
           </div>
-          <div class="d-flex align-items-center gap-2">
+          <div class="d-flex align-items-center gap-2 pantry-item-actions">
             <span class="quantity-badge">{{ item.quantidade }}</span>
-            <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#update-quantity-{{ item.id }}" title="Atualizar {{ item.nome }}" aria-label="Atualizar {{ item.nome }}"><i class="bi bi-pencil" aria-hidden="true"></i></button>
-            <form method="POST" action="{% url 'adicionar_lista_compras' item.id %}">
+            <button class="btn btn-outline-primary btn-sm" type="button" data-pantry-action="edit" data-bs-toggle="modal" data-bs-target="#update-quantity-{{ item.id }}" title="Atualizar {{ item.nome }}" aria-label="Atualizar {{ item.nome }}"><i class="bi bi-pencil" aria-hidden="true"></i></button>
+            <form method="POST" action="{% url 'adicionar_lista_compras' item.id %}" data-pantry-action="add-list">
               {% csrf_token %}<button class="btn btn-primary btn-sm" type="submit" title="Adicionar {{ item.nome }} à lista de compras" aria-label="Adicionar {{ item.nome }} à lista de compras"><i class="bi bi-cart-plus" aria-hidden="true"></i></button>
             </form>
-            <form method="POST" action="{% url 'apagar_consumivel' item.id %}" data-offline-form="apagar" data-offline-kind="despensa" data-uuid="{{ item.uuid }}">
+            <form method="POST" action="{% url 'apagar_consumivel' item.id %}" data-pantry-action="delete" data-offline-form="apagar" data-offline-kind="despensa" data-uuid="{{ item.uuid }}">
               {% csrf_token %}<button class="btn btn-outline-danger btn-sm" onclick="return confirm('Apagar item?')" title="Apagar {{ item.nome }}" aria-label="Apagar {{ item.nome }}"><i class="bi bi-trash3" aria-hidden="true"></i></button>
             </form>
           </div>
         </li>
       {% empty %}
-        <li class="list-group-item"><div class="empty-state compact"><div class="empty-state-icon">⌂</div><h2>Despensa vazia</h2><p>Adicione o primeiro consumível para começar a controlar o stock.</p></div></li>
+        <li class="list-group-item" id="pantry-empty-state"><div class="empty-state compact"><div class="empty-state-icon">⌂</div><h2>Despensa vazia</h2><p>Adicione o primeiro consumível para começar a controlar o stock.</p></div></li>
       {% endfor %}
     </ul>
   </section>
@@ -148,7 +205,7 @@
             {% csrf_token %}
             <div class="modal-body">
               <label for="name-{{ item.id }}" class="form-label">Nome</label>
-              <input id="name-{{ item.id }}" type="text" name="nome" class="form-control mb-3" value="{{ item.nome }}" required />
+              <input id="name-{{ item.id }}" type="text" name="nome" class="form-control mb-3" value="{{ item.nome }}" maxlength="100" required />
               <label for="quantity-{{ item.id }}" class="form-label">Quantidade</label>
               <input id="quantity-{{ item.id }}" type="text" name="quantidade" class="form-control mb-3" value="{{ item.quantidade }}" inputmode="decimal" placeholder="Ex.: 0,5 ou 1/2" required />
               <label for="division-{{ item.id }}" class="form-label">Divisão</label>
@@ -180,15 +237,89 @@
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <script src="{% static 'inventory/js/barcode_scanner.js' %}"></script>
   <script>
-    const searchInput = document.getElementById('searchInput')
-    if (searchInput) {
-      searchInput.addEventListener('keyup', function () {
-        const value = this.value.toLowerCase()
-        document.querySelectorAll('.item-row').forEach((item) => {
-          const nome = item.getAttribute('data-nome')
-          item.style.display = nome.includes(value) ? 'flex' : 'none'
-        })
-      })
+    const pantryItems = [...document.querySelectorAll('.item-row')]
+    const pantryButtons = [...document.querySelectorAll('[data-pantry-filter]')]
+    const resultCount = document.getElementById('pantry-result-count')
+    const modalList = document.getElementById('pantry-filter-modal-list')
+    const modalSummary = document.getElementById('pantry-filter-modal-summary')
+    const modalEmpty = document.getElementById('pantry-filter-modal-empty')
+    const modalTitle = document.getElementById('pantryFilterModalLabel')
+    const pantryModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('pantryFilterModal'))
+
+    const setPressed = (button) => {
+      pantryButtons.forEach((item) => item.classList.remove('is-active'))
+      pantryButtons.forEach((item) => item.setAttribute('aria-pressed', 'false'))
+      button.classList.add('is-active')
+      button.setAttribute('aria-pressed', 'true')
     }
+
+    const escapeHtml = (value) => value.replace(/[&<>'"]/g, (character) => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      "'": '&#39;',
+      '"': '&quot;'
+    })[character])
+
+    const getFilteredItems = (filter) => {
+      if (filter === 'all') return pantryItems
+      const [type, value] = filter.split(':')
+      return pantryItems.filter((item) => type === 'division'
+        ? item.dataset.divisionId === value
+        : item.dataset.subdivision === value)
+    }
+
+    const showFilteredItems = (button) => {
+      const filteredItems = getFilteredItems(button.dataset.pantryFilter)
+      const filterLabel = button.dataset.filterLabel
+      setPressed(button)
+      resultCount.textContent = `${filteredItems.length} ${filteredItems.length === 1 ? 'item' : 'itens'}`
+      modalTitle.textContent = filterLabel
+      modalSummary.textContent = `${filteredItems.length} ${filteredItems.length === 1 ? 'item encontrado' : 'itens encontrados'}`
+      modalList.innerHTML = filteredItems.map((item) => `
+        <li class="list-group-item pantry-modal-item d-flex justify-content-between align-items-center gap-2">
+          <div>
+            <strong>${escapeHtml(item.querySelector('strong').textContent)}</strong>
+            <small class="text-muted d-block">${escapeHtml(item.querySelector('.division-badge').textContent)}</small>
+          </div>
+          <div class="d-flex align-items-center gap-2 pantry-modal-actions">
+            <span class="quantity-badge">${escapeHtml(item.querySelector('.quantity-badge').textContent)}</span>
+            <button type="button" class="btn btn-outline-primary btn-sm" data-pantry-action="edit" title="Atualizar item" aria-label="Atualizar item"><i class="bi bi-pencil" aria-hidden="true"></i></button>
+            <button type="button" class="btn btn-primary btn-sm" data-pantry-action="add-list" title="Adicionar à lista de compras" aria-label="Adicionar à lista de compras"><i class="bi bi-cart-plus" aria-hidden="true"></i></button>
+            <button type="button" class="btn btn-outline-danger btn-sm" data-pantry-action="delete" title="Apagar item" aria-label="Apagar item"><i class="bi bi-trash3" aria-hidden="true"></i></button>
+          </div>
+        </li>
+      `).join('')
+      modalList.querySelectorAll('.pantry-modal-item').forEach((modalItem, index) => {
+        modalItem.dataset.syncRow = filteredItems[index].dataset.syncRow
+      })
+      modalEmpty.classList.toggle('d-none', filteredItems.length > 0)
+      pantryModal.show()
+    }
+
+    pantryButtons.forEach((button) => button.addEventListener('click', () => showFilteredItems(button)))
+
+    modalList.addEventListener('click', (event) => {
+      const actionButton = event.target.closest('[data-pantry-action]')
+      if (!actionButton) return
+      const itemRow = pantryItems.find((item) => item.dataset.syncRow === actionButton.closest('.pantry-modal-item')?.dataset.syncRow)
+      if (!itemRow) return
+      const action = actionButton.dataset.pantryAction
+      if (action === 'edit') {
+        itemRow.querySelector('[data-pantry-action="edit"]').click()
+      } else {
+        const form = itemRow.querySelector(`form[data-pantry-action="${action}"]`)
+        if (action === 'delete') {
+          form?.querySelector('button').click()
+        } else {
+          form?.requestSubmit()
+        }
+      }
+    })
+
+    document.querySelectorAll('[data-division-count]').forEach((counter) => {
+      counter.textContent = pantryItems.filter((item) => item.dataset.divisionId === counter.dataset.divisionCount).length
+    })
+    resultCount.textContent = `${pantryItems.length} ${pantryItems.length === 1 ? 'item' : 'itens'}`
   </script>
 {% endblock %}

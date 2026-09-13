@@ -17,7 +17,7 @@ class Divisao(models.Model):
         ordering = ["nome"]
 
     def __str__(self):
-        return self.nome
+        return f"{self.nome}"
 
 
 class Item(models.Model):
@@ -46,9 +46,14 @@ class Consumivel(models.Model):
         ("congelados", "Congelados"),
         ("fatiados", "Fatiados"),
         ("conservas", "Conservas"),
-        ("frutas_legumes", "Frutas e legumes"),
+        ("frutas", "Frutas"),
+        ("legumes", "Legumes"),
         ("temperos", "Temperos"),
         ("frescos", "Frescos"),
+        ("molhos", "Molhos"),
+        ("doces", "Doces"),
+        ("cereais", "Cereais"),
+        ("bebidas", "Bebidas"),
         ("outros", "Outros"),
     )
 
@@ -67,7 +72,7 @@ class Consumivel(models.Model):
         ordering = ["nome", "id"]
 
     def __str__(self):
-        return self.nome
+        return f"{self.nome}"
 
 
 class Desejo(models.Model):
@@ -84,4 +89,4 @@ class Desejo(models.Model):
         ordering = ["nome", "id"]
 
     def __str__(self):
-        return self.nome
+        return f"{self.nome}"

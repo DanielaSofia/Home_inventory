@@ -102,7 +102,7 @@
           <div class="modal-body">
             <div class="suggestion-grid">
               {% for item in despensa_sugestoes %}
-                <button type="button" class="suggestion-item" data-nome="{{ item.nome }}" data-divisao="{{ item.divisao_id }}" aria-label="Adicionar {{ item.nome }} à lista de compras">
+                <button type="button" class="suggestion-item" data-nome="{{ item.nome }}" data-divisao="{{ item.divisao_id }}" data-subdivisao="{{ item.subdivisao }}" aria-label="Adicionar {{ item.nome }} à lista de compras">
                   <span class="suggestion-item-icon" aria-hidden="true">+</span>
                   <span class="suggestion-item-content">
                     <span class="suggestion-item-name">{{ item.nome }}</span>

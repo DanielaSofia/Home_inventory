@@ -217,6 +217,9 @@
     } else if (tipo === "quantidade") {
       const quantity = parseQuantidade(form.querySelector('input[name="quantidade"]').value);
       if (quantity === null || quantity < 0) return;
+      existing.nome = form.querySelector('input[name="nome"]').value.trim();
+      existing.divisao = Number(form.querySelector('select[name="divisao"]').value);
+      existing.subdivisao = form.querySelector('select[name="subdivisao"]').value;
       existing.quantidade = quantity;
       existing.comprado = true;
       existing.na_lista_compras = quantity === 0;

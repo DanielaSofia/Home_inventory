@@ -508,7 +508,10 @@ def atualizar_quantidade_consumivel(request, consumivel_id):
     if request.method == "POST":
         nome = request.POST.get("nome", "").strip()
         divisao_id = request.POST.get("divisao")
-        divisao = Divisao.objects.filter(id=divisao_id).first()
+        try:
+            divisao = Divisao.objects.filter(id=divisao_id).first()
+        except (ValueError, TypeError):
+            divisao = None
         subdivisao = request.POST.get("subdivisao", "")
         try:
             quantidade = parse_fractional_decimal(request.POST.get("quantidade", ""))
@@ -517,6 +520,7 @@ def atualizar_quantidade_consumivel(request, consumivel_id):
 
         if (
             nome
+            and len(nome) <= 100
             and divisao
             and subdivisao in dict(Consumivel.SUBDIVISOES)
             and quantidade is not None
