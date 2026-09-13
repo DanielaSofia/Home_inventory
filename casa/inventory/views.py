@@ -488,22 +488,57 @@ def repor_consumivel(_request, consumivel_id):
     return redirect("despensa")
 
 
-def atualizar_quantidade_consumivel(request, consumivel_id):
-    """Atualiza diretamente a quantidade de um consumível na despensa."""
+def adicionar_lista_compras(request, consumivel_id):
+    """Adiciona um consumível da despensa à lista de compras."""
 
     item = get_object_or_404(Consumivel, id=consumivel_id)
 
     if request.method == "POST":
+        item.na_lista_compras = True
+        item.save(update_fields=["na_lista_compras", "updated_at"])
+
+    return redirect("despensa")
+
+
+def atualizar_quantidade_consumivel(request, consumivel_id):
+    """Atualiza os dados principais de um consumível na despensa."""
+
+    item = get_object_or_404(Consumivel, id=consumivel_id)
+
+    if request.method == "POST":
+        nome = request.POST.get("nome", "").strip()
+        divisao_id = request.POST.get("divisao")
+        divisao = Divisao.objects.filter(id=divisao_id).first()
+        subdivisao = request.POST.get("subdivisao", "")
         try:
             quantidade = parse_fractional_decimal(request.POST.get("quantidade", ""))
         except (InvalidOperation, ValueError, TypeError):
             quantidade = None
 
-        if quantidade is not None and quantidade >= 0:
+        if (
+            nome
+            and divisao
+            and subdivisao in dict(Consumivel.SUBDIVISOES)
+            and quantidade is not None
+            and quantidade >= 0
+        ):
+            item.nome = nome
             item.quantidade = quantidade
+            item.divisao = divisao
+            item.subdivisao = subdivisao
             item.na_lista_compras = quantidade == 0
             item.comprado = True
-            item.save(update_fields=["quantidade", "comprado", "na_lista_compras", "updated_at"])
+            item.save(
+                update_fields=[
+                    "nome",
+                    "quantidade",
+                    "divisao",
+                    "subdivisao",
+                    "comprado",
+                    "na_lista_compras",
+                    "updated_at",
+                ]
+            )
 
     return redirect("despensa")
 

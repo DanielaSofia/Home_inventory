@@ -121,15 +121,12 @@
           </div>
           <div class="d-flex align-items-center gap-2">
             <span class="quantity-badge">{{ item.quantidade }}</span>
-            <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#update-quantity-{{ item.id }}">Atualizar</button>
-            <form method="POST" action="{% url 'consumir_consumivel' item.id %}" data-offline-form="consumir" data-uuid="{{ item.uuid }}">
-              {% csrf_token %}<button class="btn btn-outline-secondary btn-sm" aria-label="Consumir uma unidade de {{ item.nome }}">−</button>
-            </form>
-            <form method="POST" action="{% url 'repor_consumivel' item.id %}" data-offline-form="repor" data-uuid="{{ item.uuid }}">
-              {% csrf_token %}<button class="btn btn-primary btn-sm" aria-label="Repor uma unidade de {{ item.nome }}">+</button>
+            <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#update-quantity-{{ item.id }}" title="Atualizar {{ item.nome }}" aria-label="Atualizar {{ item.nome }}"><i class="bi bi-pencil" aria-hidden="true"></i></button>
+            <form method="POST" action="{% url 'adicionar_lista_compras' item.id %}">
+              {% csrf_token %}<button class="btn btn-primary btn-sm" type="submit" title="Adicionar {{ item.nome }} à lista de compras" aria-label="Adicionar {{ item.nome }} à lista de compras"><i class="bi bi-cart-plus" aria-hidden="true"></i></button>
             </form>
             <form method="POST" action="{% url 'apagar_consumivel' item.id %}" data-offline-form="apagar" data-offline-kind="despensa" data-uuid="{{ item.uuid }}">
-              {% csrf_token %}<button class="btn btn-outline-danger btn-sm" onclick="return confirm('Apagar item?')" aria-label="Apagar {{ item.nome }}">×</button>
+              {% csrf_token %}<button class="btn btn-outline-danger btn-sm" onclick="return confirm('Apagar item?')" title="Apagar {{ item.nome }}" aria-label="Apagar {{ item.nome }}"><i class="bi bi-trash3" aria-hidden="true"></i></button>
             </form>
           </div>
         </li>
@@ -144,15 +141,28 @@
       <div class="modal-dialog modal-sm modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
-            <h2 class="modal-title fs-6" id="update-quantity-label-{{ item.id }}">Atualizar quantidade</h2>
+            <h2 class="modal-title fs-6" id="update-quantity-label-{{ item.id }}">Atualizar consumível</h2>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
           </div>
           <form method="POST" action="{% url 'atualizar_quantidade_consumivel' item.id %}" data-offline-form="quantidade" data-uuid="{{ item.uuid }}">
             {% csrf_token %}
             <div class="modal-body">
-              <p class="mb-2">{{ item.nome }}</p>
+              <label for="name-{{ item.id }}" class="form-label">Nome</label>
+              <input id="name-{{ item.id }}" type="text" name="nome" class="form-control mb-3" value="{{ item.nome }}" required />
               <label for="quantity-{{ item.id }}" class="form-label">Quantidade</label>
-              <input id="quantity-{{ item.id }}" type="text" name="quantidade" class="form-control" value="{{ item.quantidade }}" inputmode="decimal" placeholder="Ex.: 0,5 ou 1/2" required />
+              <input id="quantity-{{ item.id }}" type="text" name="quantidade" class="form-control mb-3" value="{{ item.quantidade }}" inputmode="decimal" placeholder="Ex.: 0,5 ou 1/2" required />
+              <label for="division-{{ item.id }}" class="form-label">Divisão</label>
+              <select id="division-{{ item.id }}" name="divisao" class="form-select mb-3" required>
+                {% for divisao in divisoes %}
+                  <option value="{{ divisao.id }}" {% if item.divisao_id == divisao.id %}selected{% endif %}>{{ divisao.nome }}</option>
+                {% endfor %}
+              </select>
+              <label for="subdivision-{{ item.id }}" class="form-label">Subdivisão</label>
+              <select id="subdivision-{{ item.id }}" name="subdivisao" class="form-select" required>
+                {% for value, label in subdivisoes %}
+                  <option value="{{ value }}" {% if item.subdivisao == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>

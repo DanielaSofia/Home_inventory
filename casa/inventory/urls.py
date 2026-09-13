@@ -10,6 +10,7 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     adicionar_compra,
     adicionar_consumivel,
+    adicionar_lista_compras,
     apagar_compra,
     apagar_consumivel,
     apagar_desejo,
@@ -77,6 +78,11 @@ urlpatterns = [
     path("apagar-desejo/<int:desejo_id>/", apagar_desejo, name="apagar_desejo"),
     path("adicionar-compra/", adicionar_compra, name="adicionar_compra"),
     path("adicionar-consumivel/", adicionar_consumivel, name="adicionar_consumivel"),
+    path(
+        "adicionar-lista-compras/<int:consumivel_id>/",
+        adicionar_lista_compras,
+        name="adicionar_lista_compras",
+    ),
     path("consumir/<int:consumivel_id>/", consumir_consumivel, name="consumir_consumivel"),
     path("repor/<int:consumivel_id>/", repor_consumivel, name="repor_consumivel"),
     path(

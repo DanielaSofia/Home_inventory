@@ -116,20 +116,7 @@
           </div>
         </div>
       </div>
-      <div class="suggestion-grid">
-        {% for item in despensa_sugestoes %}
-          <button type="button" class="suggestion-item" data-nome="{{ item.nome }}" data-divisao="{{ item.divisao_id }}" data-subdivisao="{{ item.subdivisao }}" aria-label="Adicionar {{ item.nome }} à lista de compras">
-            <span class="suggestion-item-icon" aria-hidden="true">+</span>
-            <span class="suggestion-item-content">
-              <span class="suggestion-item-name">{{ item.nome }}</span>
-              <span class="suggestion-item-meta"><span class="suggestion-division">{{ item.divisao.nome }}</span><span>{{ item.quantidade }} em stock</span></span>
-            </span>
-            <span class="suggestion-item-action" aria-hidden="true">→</span>
-          </button>
-        {% endfor %}
-      </div>
-      <p id="suggestion-feedback" class="suggestion-feedback" role="status" aria-live="polite"></p>
-    </section>
+    </div>
   {% endif %}
 
   <section class="card list-card p-3 mb-4">
