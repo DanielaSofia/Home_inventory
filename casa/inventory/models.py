@@ -48,6 +48,7 @@ class Consumivel(models.Model):
         ("conservas", "Conservas"),
         ("frutas_legumes", "Frutas e legumes"),
         ("temperos", "Temperos"),
+        ("frescos", "Frescos"),
         ("outros", "Outros"),
     )
 
